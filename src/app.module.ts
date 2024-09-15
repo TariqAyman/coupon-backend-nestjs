@@ -11,6 +11,8 @@ import { NotificationsModule } from './notifications/notifications.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { DatabaseModule } from './database/database.module';
 import databaseConfig from './database/typeorm.config';
+import { AuthInterceptor } from './interceptor/auth.interceptor';
+import { APP_INTERCEPTOR } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -34,6 +36,9 @@ import databaseConfig from './database/typeorm.config';
     AuthenticationModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [{
+    provide: APP_INTERCEPTOR,
+    useClass: AuthInterceptor,
+  }],
 })
 export class AppModule {}
