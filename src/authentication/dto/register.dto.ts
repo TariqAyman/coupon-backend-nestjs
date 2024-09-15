@@ -1,20 +1,24 @@
-import { IsString, IsEmail, MinLength, IsNotEmpty, IsEnum, IsDate } from 'class-validator';
+import {
+  IsString,
+  IsEmail,
+  MinLength,
+  IsNotEmpty,
+  IsEnum,
+  IsDate,
+} from 'class-validator';
 import { UserGender } from 'src/common/enums/UserGender';
 import { UserProvider } from 'src/common/enums/UserProvider';
 import { UserRole } from 'src/common/enums/UserRole';
 import { UserStatus } from 'src/common/enums/UserStatus';
 
 export class RegisterDto {
-  @IsString()
+  @IsEmail()
   @IsNotEmpty()
-  username: string;
+  email: string;
 
   @IsString()
   @IsNotEmpty()
   password: string;
-
-  @IsEmail()
-  email: string;
 
   @IsString()
   @IsNotEmpty()
@@ -23,7 +27,7 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   phoneNumber: string;
-  
+
   @IsString()
   @IsNotEmpty()
   image: string;
@@ -39,19 +43,4 @@ export class RegisterDto {
 
   @IsEnum(UserRole)
   role: UserRole;
-
-  @IsEnum(UserStatus)
-  status: UserStatus;
-
-  @IsDate()
-  createdAt: Date;
-
-  @IsDate()
-  updatedAt: Date;
-
-  @IsDate()
-  lastLogin: Date;
-
-  @IsDate()
-  lastLogout: Date;
 }
