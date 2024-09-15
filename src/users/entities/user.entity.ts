@@ -140,16 +140,4 @@ export class User {
     inverseJoinColumn: { name: 'brand_id', referencedColumnName: 'id' },
   })
   followedBrands: Brand[];
-
-  @BeforeInsert()
-  @BeforeUpdate()
-  async hashPassword() {
-    if (this.password) {
-      this.password = await bcrypt.hash(this.password, 10);
-    }
-  }
-
-  async comparePassword(candidatePassword: string): Promise<boolean> {
-    return bcrypt.compare(candidatePassword, this.password);
-  }
 }
