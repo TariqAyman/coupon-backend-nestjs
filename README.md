@@ -23,6 +23,7 @@ This project is a backend application built with NestJS, providing a comprehensi
 - **Testing**: [Jest](https://jestjs.io/)
 
 ## Project Structure
+```
 src/
 ├── ads/
 │ ├── dto/
@@ -122,6 +123,7 @@ src/
 ├── app.module.ts
 ├── main.ts
 └── constants.ts
+```
 
 ## Endpoints
 
