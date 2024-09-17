@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { ThrottlerModule } from '@nestjs/throttler';
-import { ConfigModule } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AdsModule } from './ads/ads.module';
 import { BrandsModule } from './brands/brands.module';
@@ -10,13 +9,12 @@ import { LocationsModule } from './locations/locations.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { DatabaseModule } from './database/database.module';
-import databaseConfig from './database/typeorm.config';
-import { AuthInterceptor } from './interceptor/auth.interceptor';
-import { APP_INTERCEPTOR } from '@nestjs/core';
+import { FileUploadModule } from './file-upload/file-upload.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true, load: [databaseConfig] }),
+    DatabaseModule,
     ThrottlerModule.forRoot({
       throttlers: [
         {
@@ -25,7 +23,6 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
         },
       ],
     }),
-    DatabaseModule,
     AdsModule,
     UsersModule,
     BrandsModule,
@@ -34,11 +31,10 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     LocationsModule,
     NotificationsModule,
     AuthenticationModule,
+    FileUploadModule,
+    CommonModule,
   ],
   controllers: [],
-  providers: [{
-    provide: APP_INTERCEPTOR,
-    useClass: AuthInterceptor,
-  }],
+  providers: [],
 })
 export class AppModule {}

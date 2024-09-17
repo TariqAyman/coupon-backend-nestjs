@@ -206,7 +206,6 @@ src/
 - **joined**: Date
 - **gender**: UserGender
 - **provider**: UserProvider
-- **isDeleted**: boolean
 - **verificationCode**: string
 - **verificationCodeExpiresAt**: Date
 - **createdAt**: Date
@@ -227,7 +226,6 @@ src/
 - **usedCount**: number
 - **likeCount**: number
 - **dislikeCount**: number
-- **isDeleted**: boolean
 - **createdAt**: Date
 - **updatedAt**: Date
 
@@ -236,7 +234,6 @@ src/
 - **name**: string
 - **description**: string
 - **image**: string
-- **isDeleted**: boolean
 - **createdAt**: Date
 - **updatedAt**: Date
 
@@ -245,7 +242,6 @@ src/
 - **name**: string
 - **locationCode**: string
 - **image**: string
-- **isDeleted**: boolean
 - **createdAt**: Date
 - **updatedAt**: Date
 
@@ -257,7 +253,6 @@ src/
 - **image**: string
 - **icon**: string
 - **color**: string
-- **isDeleted**: boolean
 - **createdAt**: Date
 - **updatedAt**: Date
 
@@ -265,7 +260,6 @@ src/
 - **id**: UUID
 - **header**: { en: string; ar: string }
 - **body**: { en: string; ar: string }
-- **isDeleted**: boolean
 - **isWatched**: boolean
 - **createdAt**: Date
 - **updatedAt**: Date
@@ -275,7 +269,6 @@ src/
 - **name**: string
 - **link**: string
 - **image**: string
-- **isDeleted**: boolean
 - **createdAt**: Date
 - **updatedAt**: Date
 
