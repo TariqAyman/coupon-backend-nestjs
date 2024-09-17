@@ -4,7 +4,6 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -34,14 +33,13 @@ export class UsersService {
     user.password = registerDto.password;
     user.role = UserRole.User;
     user.status = UserStatus.Online;
-    user.fullName = registerDto.fullName; // Set default value if required
-    user.phoneNumber = registerDto.phoneNumber; // Set default value if required
-    user.image = registerDto.image; // Set default value if required
-    user.DOB = new Date(); // Set default value if required
+    user.fullName = registerDto.fullName;
+    user.phoneNumber = registerDto.phoneNumber;
+    user.image = registerDto.image;
+    user.birthday = new Date();
     user.joined = new Date();
-    user.gender = registerDto.gender; // Set default value if required
+    user.gender = registerDto.gender;
     user.provider = UserProvider.System;
-    user.isDeleted = false;
     user.confirmAccount = false;
     user.createdAt = new Date();
     user.updatedAt = new Date();
@@ -61,8 +59,9 @@ export class UsersService {
     return user;
   }
 
-  create(createUserDto: CreateUserDto): Promise<User> {
-    return this.usersRepository.save(createUserDto);
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user = this.usersRepository.create(createUserDto);
+    return this.usersRepository.save(user);
   }
 
   findByEmail(email: string): Promise<User> {
@@ -74,19 +73,7 @@ export class UsersService {
     });
   }
 
-  findAll() {
-    return this.usersRepository.find();
-  }
-
-  findOne(id: string) {
+  async findOne(id: string) {
     return this.usersRepository.findOne({ where: { id } });
-  }
-
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.usersRepository.update(id, updateUserDto);
-  }
-
-  remove(id: number) {
-    return this.usersRepository.delete(id);
   }
 }

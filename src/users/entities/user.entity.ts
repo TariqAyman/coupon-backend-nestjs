@@ -58,7 +58,7 @@ export class User {
   image!: string;
 
   @Column({ nullable: true })
-  DOB!: Date;
+  birthday!: Date;
 
   @Column({ nullable: true })
   joined!: Date;
@@ -76,9 +76,6 @@ export class User {
     default: UserProvider.System,
   })
   provider!: string;
-
-  @Column({ default: false })
-  isDeleted!: boolean;
 
   @Column({ nullable: true })
   verificationCode!: string;
