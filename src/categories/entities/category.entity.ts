@@ -6,6 +6,7 @@ import {
   ManyToMany,
   JoinTable,
   BaseEntity,
+  DeleteDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Location } from '../../locations/entities/location.entity';
@@ -34,10 +35,10 @@ export class Category {
   @Column({ nullable: true })
   color?: string;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   createdBy!: User;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy?: User;
 
   @ManyToMany(() => Location)
@@ -48,12 +49,12 @@ export class Category {
   })
   location!: Location[];
 
-  @Column({ default: false })
-  isDeleted!: boolean;
-
   @Column()
   createdAt!: Date;
 
   @Column()
   updatedAt!: Date;
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt?: Date;
 }
