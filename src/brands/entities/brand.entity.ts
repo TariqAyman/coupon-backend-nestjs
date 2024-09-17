@@ -9,6 +9,7 @@ import {
   UpdateDateColumn,
   Index,
   PrimaryGeneratedColumn,
+  DeleteDateColumn,
 } from 'typeorm';
 import { IsUrl, IsNotEmpty } from 'class-validator';
 import { Category } from '../../categories/entities/category.entity';
@@ -53,10 +54,10 @@ export class Brand {
   @Column({ default: 0 })
   mostFollowed!: number;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   createdBy!: User;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy!: User | null;
 
   @ManyToMany(() => Location, { cascade: true })
@@ -75,12 +76,12 @@ export class Brand {
   })
   userFollowed!: User[];
 
-  @Column({ default: false })
-  isDeleted!: boolean;
-
   @CreateDateColumn()
   createdAt!: Date;
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt?: Date;
 }

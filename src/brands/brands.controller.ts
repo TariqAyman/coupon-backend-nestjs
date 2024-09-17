@@ -1,34 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Param, Query } from '@nestjs/common';
 import { BrandsService } from './brands.service';
-import { CreateBrandDto } from './dto/create-brand.dto';
-import { UpdateBrandDto } from './dto/update-brand.dto';
+import { paginate, showOne } from 'src/common/utils/api-response-wrapper';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('brands')
 export class BrandsController {
   constructor(private readonly brandsService: BrandsService) {}
 
-  @Post()
-  create(@Body() createBrandDto: CreateBrandDto) {
-    return this.brandsService.create(createBrandDto);
-  }
-
   @Get()
-  findAll() {
-    return this.brandsService.findAll();
+  async findAll(@Query() pagination: PaginationDto) {
+    const { data, total, pageNumber, limitNumber } =
+      await this.brandsService.findAll(pagination);
+    return paginate(data, total, pageNumber, limitNumber);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.brandsService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateBrandDto: UpdateBrandDto) {
-    return this.brandsService.update(+id, updateBrandDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.brandsService.remove(+id);
+  async findOne(@Param('id') id: string) {
+    const response = await this.brandsService.findOne(id);
+    return showOne(response);
   }
 }
