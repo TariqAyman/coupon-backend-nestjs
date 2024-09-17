@@ -202,7 +202,7 @@ src/
 - **confirmAccount**: boolean
 - **status**: UserStatus
 - **image**: string
-- **DOB**: Date
+- **birthday**: Date
 - **joined**: Date
 - **gender**: UserGender
 - **provider**: UserProvider

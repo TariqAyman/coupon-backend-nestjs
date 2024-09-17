@@ -33,8 +33,8 @@ export class CouponsAdminController {
   constructor(private readonly couponsService: CouponsAdminService) {}
 
   @Post()
-  create(@Body() createCouponDto: CreateCouponDto) {
-    const category = this.couponsService.create(createCouponDto);
+  async create(@Body() createCouponDto: CreateCouponDto) {
+    const category = await this.couponsService.create(createCouponDto);
     return showOne(category);
   }
 

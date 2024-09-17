@@ -9,7 +9,6 @@ import { LocationsModule } from './locations/locations.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { DatabaseModule } from './database/database.module';
-import { FileUploadModule } from './file-upload/file-upload.module';
 import { CommonModule } from './common/common.module';
 
 @Module({
@@ -31,7 +30,6 @@ import { CommonModule } from './common/common.module';
     LocationsModule,
     NotificationsModule,
     AuthenticationModule,
-    FileUploadModule,
     CommonModule,
   ],
   controllers: [],

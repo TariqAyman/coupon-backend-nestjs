@@ -36,7 +36,7 @@ export class RegisterDto {
   gender: UserGender;
 
   @IsDate()
-  DOB: Date;
+  birthday: Date;
 
   @IsEnum(UserProvider)
   provider: UserProvider;
