@@ -54,14 +54,14 @@ export class Coupon {
   @Column({ default: 0 })
   dislikeCount!: number;
 
-  @Column({ default: false })
-  isDeleted!: boolean;
-
   @Column()
   createdAt!: Date;
 
   @Column()
   updatedAt!: Date;
+
+  @Column({ nullable: true })
+  deletedAt?: Date;
 
   @ManyToMany(() => User)
   @JoinTable({
