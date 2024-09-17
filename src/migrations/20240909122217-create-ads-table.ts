@@ -20,7 +20,6 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
           {
             name: 'name',
             type: 'varchar',
-            isUnique: true,
           },
           {
             name: 'link',

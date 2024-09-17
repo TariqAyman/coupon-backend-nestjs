@@ -13,7 +13,7 @@ export class CreateUsersTable20240909120612 implements MigrationInterface {
             isPrimary: true,
           },
           { name: 'fullName', type: 'varchar', isNullable: false },
-          { name: 'email', type: 'varchar', isNullable: false, isUnique: true },
+          { name: 'email', type: 'varchar', isNullable: false },
           { name: 'password', type: 'varchar', isNullable: false },
           { name: 'changePasswordTime', type: 'timestamp', isNullable: true },
           { name: 'phoneNumber', type: 'varchar', isNullable: true },
@@ -32,7 +32,7 @@ export class CreateUsersTable20240909120612 implements MigrationInterface {
             default: "'offline'",
           },
           { name: 'image', type: 'varchar', isNullable: true },
-          { name: 'DOB', type: 'timestamp', isNullable: true },
+          { name: 'birthday', type: 'timestamp', isNullable: true },
           { name: 'joined', type: 'timestamp', isNullable: true },
           {
             name: 'gender',

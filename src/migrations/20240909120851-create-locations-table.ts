@@ -12,8 +12,8 @@ export class CreateLocationsTable20240909120851 implements MigrationInterface {
             length: '36', // UUID will be inserted by the application or query
             isPrimary: true,
           },
-          { name: 'name', type: 'varchar', isNullable: false, isUnique: true },
-          { name: 'locationCode', type: 'varchar', isNullable: false, isUnique: false },
+          { name: 'name', type: 'varchar', isNullable: false },
+          { name: 'locationCode', type: 'varchar', isNullable: false },
           { name: 'latitude', type: 'varchar', isNullable: false },
           { name: 'longitude', type: 'varchar', isNullable: false },
           { name: 'image', type: 'varchar', isNullable: true },

@@ -12,7 +12,7 @@ export class CreateCouponsTable20240909122031 implements MigrationInterface {
             length: '36', // UUID will be inserted by the application or query
             isPrimary: true,
           },
-          { name: 'code', type: 'varchar', isNullable: false, isUnique: true },
+          { name: 'code', type: 'varchar', isNullable: false },
           { name: 'amount', type: 'float', default: 1 },
           { name: 'description', type: 'json', isNullable: true },
           { name: 'status', type: 'json', isNullable: false },
