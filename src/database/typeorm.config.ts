@@ -1,10 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { config as dotenvConfig } from 'dotenv';
-import { Ads } from 'src/ads/entities/ad.entity';
-import { Brand } from 'src/brands/entities/brand.entity';
-import { Category } from 'src/categories/entities/category.entity';
-import { Coupon } from 'src/coupons/entities/coupon.entity';
-import { User } from 'src/users/entities/user.entity';
+import { ActionByUserSubscriber } from 'src/common/subscribers/action-by-user.subscriber';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 const result = dotenvConfig({ path: '.env' });
@@ -16,9 +12,9 @@ const databaseConfig = {
   username: `${process.env.DATABASE_USERNAME}`,
   password: `${process.env.DATABASE_PASSWORD}`,
   database: `${process.env.DATABASE_NAME}`,
-  entities: [__dirname + '/../**/*.entity{.ts,.js}'], // Adjust path as necessary
+  entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: ['dist/migrations/*.js'],
-  subscribers: ['dist/subscribers/*.js'],
+  subscribers: [ActionByUserSubscriber],
   autoLoadEntities: true,
   synchronize: false,
   logging: `${process.env.NODE_ENV}` === 'development',

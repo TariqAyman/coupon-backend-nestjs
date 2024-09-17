@@ -1,4 +1,3 @@
-import { DataSource } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Brand } from '../brands/entities/brand.entity';
@@ -126,6 +125,8 @@ async function seedLocations() {
       id: uuidv4(),
       name: faker.string.alphanumeric(20),
       locationCode: faker.location.zipCode(),
+      latitude: faker.location.latitude().toString(),
+      longitude: faker.location.longitude().toString(),
       image: faker.image.url(),
       createdBy: null as any,
       createdAt: new Date(),
