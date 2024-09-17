@@ -3,9 +3,6 @@ import {
   Get,
   Post,
   Body,
-  Patch,
-  Param,
-  Delete,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -13,7 +10,6 @@ import { AuthenticationService } from './authentication.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { LogoutDto } from './dto/logout.dto';
-import { ProfileDto } from './dto/profile.dto';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
@@ -23,7 +19,6 @@ import { ChangeEmailDto } from './dto/changeEmail.dto';
 import { DeleteAccountDto } from './dto/deleteAccount.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../common/guards/local-auth.guard';
-import { log } from 'console';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -32,8 +27,12 @@ export class AuthenticationController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   login(@Body() loginDto: LoginDto) {
-    console.log(loginDto);
     return this.authenticationService.login(loginDto.email, loginDto.password);
+  }
+
+  @Post('refresh')
+  async refresh(@Body() body: { refresh_token: string }) {
+    return this.authenticationService.refresh(body.refresh_token);
   }
 
   @Post('register')
@@ -49,10 +48,8 @@ export class AuthenticationController {
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  profile(@Body() profileDto: ProfileDto, @Request() req: any) {
-    const user = req.user; // Extract user from request
-    console.log(user);
-    return this.authenticationService.profile(profileDto);
+  profile(@Request() req: any) {
+    return this.authenticationService.profile(req.user);
   }
 
   @Post('forgot-password')

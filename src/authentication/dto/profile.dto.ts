@@ -1,3 +1,10 @@
+import { UserRole } from 'src/common/enums/UserRole';
+
 export class ProfileDto {
-  userId: string;
+  id: string;
+  fullName: string;
+  email: string;
+  role: UserRole;
+  createdAt: Date;
+  updatedAt: Date;
 }
