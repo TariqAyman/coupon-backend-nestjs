@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { Ads } from './entities/ad.entity';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
 export class AdsAdminService {
@@ -12,17 +13,19 @@ export class AdsAdminService {
     private adsRepository: Repository<Ads>,
   ) {}
 
-  async create(createAdDto: CreateAdDto): Promise<Ads> {
-    const ad = this.adsRepository.create(createAdDto);
-    return this.adsRepository.save(ad);
+  async create(createAdDto: CreateAdDto) {
+    const coupon = this.adsRepository.create(createAdDto);
+    return this.adsRepository.save(coupon);
   }
 
-  async findAll(
-    page: number | string = 1,
-    limit: number | string = 10,
-  ): Promise<{ data: Ads[]; total: number }> {
-    const pageNumber = Number(page);
-    const limitNumber = Number(limit);
+  async findAll(pagination: PaginationDto): Promise<{
+    data: Ads[];
+    total: number;
+    pageNumber: number;
+    limitNumber: number;
+  }> {
+    const pageNumber = Number(pagination.page);
+    const limitNumber = Number(pagination.limit);
 
     if (isNaN(pageNumber) || isNaN(limitNumber)) {
       throw new Error('Invalid page or limit value');
@@ -32,26 +35,24 @@ export class AdsAdminService {
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
     });
-    return { data, total };
+
+    return { data, total, pageNumber, limitNumber };
   }
 
-  async findOne(id: string): Promise<Ads> {
-    const ad = await this.adsRepository.findOneBy({ id });
-    if (!ad) {
-      throw new Error(`Ad with id ${id} not found`);
-    }
-    return ad;
+  async findOne(id: string) {
+    return this.adsRepository.findOne({ where: { id } });
   }
-  async update(id: string, updateAdDto: UpdateAdDto): Promise<Ads> {
+
+  async update(id: string, updateAdDto: UpdateAdDto) {
     await this.adsRepository.update(id, updateAdDto);
-    const updatedAd = await this.adsRepository.findOneBy({ id });
-    if (!updatedAd) {
-      throw new Error(`Ad with id ${id} not found after update`);
-    }
-    return updatedAd;
+    return this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.adsRepository.delete(id);
+  async remove(id: string) {
+    const ads = await this.findOne(id);
+
+    if (!ads) throw new NotFoundException(`Coupon with ID "${id}" not found`);
+
+    return this.adsRepository.softDelete(id);
   }
 }

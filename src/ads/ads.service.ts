@@ -20,21 +20,28 @@ export class AdsService {
     private adsRepository: Repository<Ads>,
   ) {}
 
-  async findAll(pagination: PaginationDto): Promise<PaginatedResponse<Ads>> {
-    const { page, limit } = pagination;
+  async findAll(pagination: PaginationDto): Promise<{
+    data: Ads[];
+    total: number;
+    pageNumber: number;
+    limitNumber: number;
+  }> {
+    const pageNumber = Number(pagination.page);
+    const limitNumber = Number(pagination.limit);
+
+    if (isNaN(pageNumber) || isNaN(limitNumber)) {
+      throw new Error('Invalid page or limit value');
+    }
+
     const [data, total] = await this.adsRepository.findAndCount({
-      skip: (page - 1) * limit,
-      take: limit,
+      skip: (pageNumber - 1) * limitNumber,
+      take: limitNumber,
     });
 
-    return paginate(data, total, page, limit);
+    return { data, total, pageNumber, limitNumber };
   }
 
-  async findOne(id: string): Promise<SuccessResponse<Ads> | ErrorResponse> {
-    const ad = await this.adsRepository.findOneBy({ id });
-    if (!ad) {
-      return notFound('Ad not found');
-    }
-    return showOne(ad);
+  async findOne(id: string) {
+    return this.adsRepository.findOne({ where: { id } });
   }
 }

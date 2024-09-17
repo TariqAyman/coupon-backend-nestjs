@@ -1,18 +1,22 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
 import { AdsService } from './ads.service';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { paginate, showOne } from 'src/common/utils/api-response-wrapper';
 
 @Controller('ads')
 export class AdsController {
   constructor(private readonly adsService: AdsService) {}
 
   @Get()
-  findAll(@Query() pagination: PaginationDto) {
-    return this.adsService.findAll(pagination);
+  async findAll(@Query() pagination: PaginationDto) {
+    const { data, total, pageNumber, limitNumber } =
+      await this.adsService.findAll(pagination);
+    return paginate(data, total, pageNumber, limitNumber);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adsService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const response = await this.adsService.findOne(id);
+    return showOne(response);
   }
 }

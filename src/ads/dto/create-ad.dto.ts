@@ -14,15 +14,6 @@ export class CreateAdDto {
   @IsOptional()
   image?: string;
 
-  @IsNotEmpty()
-  createdBy: User;
-
-  @IsOptional()
-  updatedBy?: User;
-
   @IsOptional()
   locations?: Location[];
-
-  @DeleteDateColumn({ nullable: true })
-  deletedAt?: Date;
 }

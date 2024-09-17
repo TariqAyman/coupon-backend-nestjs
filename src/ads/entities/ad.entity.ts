@@ -10,7 +10,6 @@ import {
   EventSubscriber,
   EntitySubscriberInterface,
   JoinColumn,
-  BaseEntity,
   LoadEvent,
   DeleteDateColumn,
 } from 'typeorm';
@@ -23,7 +22,7 @@ export class Ads {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuidv4(); // Generates the UUID in the application
 
-  @Column({ unique: true })
+  @Column()
   name!: string;
 
   @Column()

@@ -15,6 +15,9 @@ import { UpdateAdDto } from './dto/update-ad.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/UserRole';
+import { paginate, showOne, success } from 'src/common/utils/api-response-wrapper';
+import { BodyWithParam, transformToTypeTypes } from 'src/common/decorators/body-with-param.decorator';
+import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Controller('admin/ads')
 @UseGuards(RolesGuard)
@@ -23,27 +26,42 @@ export class AdsAdminController {
   constructor(private readonly adsAdminService: AdsAdminService) {}
 
   @Post()
-  create(@Body() createAdDto: CreateAdDto) {
-    return this.adsAdminService.create(createAdDto);
+  async create(@Body() createAdDto: CreateAdDto) {
+    const category = await this.adsAdminService.create(createAdDto);
+    return showOne(category);
   }
 
   @Get()
-  findAll(@Query('page') page: number, @Query('limit') limit: number) {
-    return this.adsAdminService.findAll(page, limit);
+  async findAll(@Query() pagination: PaginationDto) {
+    const { data, total, pageNumber, limitNumber } =
+      await this.adsAdminService.findAll(pagination);
+    return paginate(data, total, pageNumber, limitNumber);
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.adsAdminService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    const response = await this.adsAdminService.findOne(id);
+    return showOne(response);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateAdDto: UpdateAdDto) {
-    return this.adsAdminService.update(id, updateAdDto);
+  async update(
+    @Param('id') id: string,
+    @BodyWithParam({
+      paramName: 'id',
+      transformTo: transformToTypeTypes.STRING,
+    })
+    @Body()
+    updateAdDto: UpdateAdDto,
+  ) {
+    const response = await this.adsAdminService.update(id, updateAdDto);
+
+    return showOne(response);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.adsAdminService.remove(id);
+  async remove(@Param('id') id: string) {
+    await this.adsAdminService.remove(id);
+    return success([]);
   }
 }
