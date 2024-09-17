@@ -6,6 +6,7 @@ import {
   ManyToMany,
   JoinTable,
   BaseEntity,
+  DeleteDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
@@ -35,14 +36,11 @@ export class Notification {
   })
   user!: User[];
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   createdBy!: User;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy?: User;
-
-  @Column({ default: false })
-  isDeleted!: boolean;
 
   @Column({ default: false })
   isWatched!: boolean;
@@ -52,4 +50,7 @@ export class Notification {
 
   @Column()
   updatedAt!: Date;
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt?: Date;
 }
