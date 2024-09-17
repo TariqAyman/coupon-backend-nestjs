@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
-import { AuthenticationService } from '../authentication/authentication.service';
-import { UsersService } from '../users/users.service';
+import { AuthenticationService } from '../../authentication/authentication.service';
+import { UsersService } from '../../users/users.service';
 
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {
@@ -16,11 +16,14 @@ export class AuthInterceptor implements NestInterceptor {
     private usersService: UsersService,
   ) {}
 
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  async intercept(
+    context: ExecutionContext,
+    next: CallHandler,
+  ): Promise<Observable<any>> {
     const req = context.switchToHttp().getRequest();
     let tokenArray = req.headers.authorization;
     if (tokenArray) {
-      req.body['user'] = this.authService.decodeToken(
+      req.body['user'] = await this.authService.decodeToken(
         tokenArray.split(' ')[1],
       ).user;
     }
