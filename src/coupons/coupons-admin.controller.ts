@@ -34,7 +34,8 @@ export class CouponsAdminController {
 
   @Post()
   create(@Body() createCouponDto: CreateCouponDto) {
-    return this.couponsService.create(createCouponDto);
+    const category = this.couponsService.create(createCouponDto);
+    return showOne(category);
   }
 
   @Get()
@@ -67,7 +68,7 @@ export class CouponsAdminController {
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    const response = await this.couponsService.remove(id);
-    return showOne(response);
+    await this.couponsService.remove(id);
+    return success([]);
   }
 }
