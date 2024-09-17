@@ -12,6 +12,7 @@ import {
   JoinColumn,
   BaseEntity,
   LoadEvent,
+  DeleteDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Location } from '../../locations/entities/location.entity';
@@ -31,11 +32,11 @@ export class Ads {
   @Column({ nullable: true })
   image!: string;
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'createdById' })
   createdBy!: User;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   @JoinColumn({ name: 'updatedById' })
   updatedBy!: User;
 
@@ -47,14 +48,14 @@ export class Ads {
   })
   locations!: Location[];
 
-  @Column({ default: false })
-  isDeleted!: boolean;
-
   @CreateDateColumn()
   createdAt!: Date;
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @DeleteDateColumn({ nullable: true })
+  deletedAt?: Date;
 }
 
 @EventSubscriber()
