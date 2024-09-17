@@ -7,6 +7,7 @@ import {
   JoinTable,
   Index,
   BaseEntity,
+  DeleteDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { Location } from '../../locations/entities/location.entity';
@@ -60,7 +61,7 @@ export class Coupon {
   @Column()
   updatedAt!: Date;
 
-  @Column({ nullable: true })
+  @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
 
   @ManyToMany(() => User)
@@ -87,10 +88,10 @@ export class Coupon {
   })
   userDisLiked!: User[];
 
-  @ManyToOne(() => User, { nullable: false })
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   createdBy!: User;
 
-  @ManyToOne(() => User, { nullable: true })
+  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy?: User;
 
   @ManyToMany(() => Location)

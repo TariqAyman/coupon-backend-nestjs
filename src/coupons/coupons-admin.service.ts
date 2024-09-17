@@ -6,8 +6,6 @@ import { Coupon } from './entities/coupon.entity';
 import { DeepPartial, Repository } from 'typeorm';
 import { CouponStatusAr, CouponStatusEn } from 'src/common/enums/CouponStatus';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { paginate } from 'src/common/utils/api-response-wrapper';
-import { log } from 'console';
 
 @Injectable()
 export class CouponsAdminService {
@@ -54,8 +52,6 @@ export class CouponsAdminService {
   }
 
   async update(id: string, updateCouponDto: UpdateCouponDto) {
-    console.log(updateCouponDto);
-    
     const updateData = {
       ...updateCouponDto,
       status: updateCouponDto.status
@@ -68,7 +64,6 @@ export class CouponsAdminService {
 
     const { id: _, ...updateFields } = updateData;
 
-    console.log(updateFields);
     await this.couponRepository.update(id, updateFields);
     return this.findOne(id);
   }
@@ -79,6 +74,6 @@ export class CouponsAdminService {
     if (!coupon)
       throw new NotFoundException(`Coupon with ID "${id}" not found`);
 
-    return this.couponRepository.remove(coupon);
+    return this.couponRepository.softDelete(id);
   }
 }
