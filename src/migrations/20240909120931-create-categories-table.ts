@@ -18,7 +18,6 @@ export class CreateCategoriesTable20240909120931 implements MigrationInterface {
           { name: 'image', type: 'varchar', isNullable: true },
           { name: 'icon', type: 'varchar', isNullable: true },
           { name: 'color', type: 'varchar', isNullable: true },
-          { name: 'isDeleted', type: 'boolean', default: false },
           { name: 'createdById', type: 'char', length: '36', isNullable: true },
           { name: 'updatedById', type: 'char', length: '36', isNullable: true },
           { name: 'createdAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP', isNullable: false },

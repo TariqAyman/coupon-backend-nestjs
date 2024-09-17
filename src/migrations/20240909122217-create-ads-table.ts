@@ -34,11 +34,6 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
           { name: 'createdById', type: 'char', length: '36', isNullable: true },
           { name: 'updatedById', type: 'char', length: '36', isNullable: true },
           {
-            name: 'isDeleted',
-            type: 'boolean',
-            default: false,
-          },
-          {
             name: 'createdAt',
             type: 'timestamp',
             default: 'now()',
@@ -47,6 +42,11 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
             name: 'updatedAt',
             type: 'timestamp',
             default: 'now()',
+          },
+          {
+            name: 'deletedAt',
+            type: 'timestamp',
+            isNullable: true,
           },
         ],
       }),

@@ -15,7 +15,6 @@ export class CreateNotificationsTable20240909122106 implements MigrationInterfac
           { name: 'header', type: 'json', isNullable: false },
           { name: 'body', type: 'json', isNullable: false },
           { name: 'isWatched', type: 'boolean', default: false },
-          { name: 'isDeleted', type: 'boolean', default: false },
           { name: 'createdById', type: 'char', length: '36', isNullable: true },
           { name: 'updatedById', type: 'char', length: '36', isNullable: true },
           { name: 'createdAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP', isNullable: false },

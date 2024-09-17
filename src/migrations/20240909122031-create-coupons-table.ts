@@ -22,7 +22,6 @@ export class CreateCouponsTable20240909122031 implements MigrationInterface {
           { name: 'usedCount', type: 'integer', default: 0 },
           { name: 'likeCount', type: 'integer', default: 0 },
           { name: 'dislikeCount', type: 'integer', default: 0 },
-          { name: 'isDeleted', type: 'boolean', default: false },
           { name: 'createdById', type: 'char', length: '36', isNullable: true },
           { name: 'updatedById', type: 'char', length: '36', isNullable: true },
           { name: 'createdAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP', isNullable: false },

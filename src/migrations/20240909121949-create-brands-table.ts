@@ -19,7 +19,6 @@ export class CreateBrandsTable20240909121949 implements MigrationInterface {
           { name: 'image', type: 'varchar', isNullable: true },
           { name: 'mostUsed', type: 'integer', default: 0 },
           { name: 'mostFollowed', type: 'integer', default: 0 },
-          { name: 'isDeleted', type: 'boolean', default: false },
           { name: 'createdById', type: 'char', length: '36', isNullable: true },
           { name: 'updatedById', type: 'char', length: '36', isNullable: true },
           { name: 'createdAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP', isNullable: false },

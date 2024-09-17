@@ -53,7 +53,6 @@ export class CreateUsersTable20240909120612 implements MigrationInterface {
             type: 'timestamp',
             isNullable: true,
           },
-          { name: 'isDeleted', type: 'boolean', default: false },
           {
             name: 'createdAt',
             type: 'timestamp',
