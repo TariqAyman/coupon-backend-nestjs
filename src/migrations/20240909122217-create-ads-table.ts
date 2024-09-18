@@ -30,6 +30,56 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
             type: 'varchar',
             isNullable: true,
           },
+          {
+            name: 'seoDescription',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'seoKeywords',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'ogTitle',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'ogDescription',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'ogImage',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'ogUrl',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'twitterCard',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'twitterTitle',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'twitterDescription',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'twitterImage',
+            type: 'text',
+            isNullable: true,
+          },
           { name: 'createdById', type: 'char', length: '36', isNullable: true },
           { name: 'updatedById', type: 'char', length: '36', isNullable: true },
           {

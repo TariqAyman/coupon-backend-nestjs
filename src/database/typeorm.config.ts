@@ -1,6 +1,6 @@
 import { registerAs } from '@nestjs/config';
 import { config as dotenvConfig } from 'dotenv';
-import { ActionByUserSubscriber } from 'src/common/subscribers/action-by-user.subscriber';
+import { ActionByUserSubscriber } from '../common/subscribers/action-by-user.subscriber';
 import { DataSource, DataSourceOptions } from 'typeorm';
 
 const result = dotenvConfig({ path: '.env' });

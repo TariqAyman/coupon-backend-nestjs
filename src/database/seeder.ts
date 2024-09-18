@@ -34,22 +34,22 @@ async function seedUsers() {
     followedBrands: [] as Brand[],
   });
 
-    users.push({
-      id: uuidv4(),
-      fullName: 'User',
-      email: 'user@user.com',
-      password: await bcrypt.hash('password', 10),
-      role: UserRole.User,
-      confirmAccount: true,
-      status: UserStatus.Online,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      likedCoupons: [] as Coupon[],
-      followedCoupons: [] as Coupon[],
-      favoriteCoupons: [] as Coupon[],
-      dislikedCoupons: [] as Coupon[],
-      followedBrands: [] as Brand[],
-    });
+  users.push({
+    id: uuidv4(),
+    fullName: 'User',
+    email: 'user@user.com',
+    password: await bcrypt.hash('password', 10),
+    role: UserRole.User,
+    confirmAccount: true,
+    status: UserStatus.Online,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    likedCoupons: [] as Coupon[],
+    followedCoupons: [] as Coupon[],
+    favoriteCoupons: [] as Coupon[],
+    dislikedCoupons: [] as Coupon[],
+    followedBrands: [] as Brand[],
+  });
 
   for (let i = 0; i < 100; i++) {
     users.push({
@@ -88,6 +88,34 @@ async function seedCategories() {
       image: faker.image.url(),
       icon: faker.image.url(),
       color: faker.color.rgb(),
+      seoDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      seoKeywords: {
+        en: faker.lorem.words({ min: 10, max: 20 }),
+        ar: faker.lorem.words({ min: 10, max: 20 }),
+      },
+      ogTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      ogDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      ogImage: faker.image.url(),
+      ogUrl: faker.internet.url(),
+      twitterCard: 'summary_large_image',
+      twitterTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      twitterDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      twitterImage: faker.image.url(),
       createdBy: null as any,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -108,6 +136,34 @@ async function seedBrands() {
       description: { en: faker.lorem.sentence(), ar: faker.lorem.sentence() },
       link: faker.internet.url(),
       image: faker.image.url(),
+      seoDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      seoKeywords: {
+        en: faker.lorem.words({ min: 10, max: 20 }),
+        ar: faker.lorem.words({ min: 10, max: 20 }),
+      },
+      ogTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      ogDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      ogImage: faker.image.url(),
+      ogUrl: faker.internet.url(),
+      twitterCard: 'summary_large_image',
+      twitterTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      twitterDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      twitterImage: faker.image.url(),
       createdBy: null as any,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -128,6 +184,34 @@ async function seedLocations() {
       latitude: faker.location.latitude().toString(),
       longitude: faker.location.longitude().toString(),
       image: faker.image.url(),
+      seoDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      seoKeywords: {
+        en: faker.lorem.words({ min: 10, max: 20 }),
+        ar: faker.lorem.words({ min: 10, max: 20 }),
+      },
+      ogTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      ogDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      ogImage: faker.image.url(),
+      ogUrl: faker.internet.url(),
+      twitterCard: 'summary_large_image',
+      twitterTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      twitterDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      twitterImage: faker.image.url(),
       createdBy: null as any,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -158,6 +242,34 @@ async function seedCoupons(
       expire: faker.date.future(),
       qrCode: faker.string.alphanumeric(10),
       link: faker.internet.url(),
+      seoDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      seoKeywords: {
+        en: faker.lorem.words({ min: 10, max: 20 }),
+        ar: faker.lorem.words({ min: 10, max: 20 }),
+      },
+      ogTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      ogDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      ogImage: faker.image.url(),
+      ogUrl: faker.internet.url(),
+      twitterCard: 'summary_large_image',
+      twitterTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      twitterDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      twitterImage: faker.image.url(),
       createdBy: users[Math.floor(Math.random() * users.length)],
       categories: [categories[Math.floor(Math.random() * categories.length)]],
       locations: [locations[Math.floor(Math.random() * locations.length)]],
@@ -179,6 +291,34 @@ async function seedAds(users: User[], locations: any[]) {
       name: faker.company.catchPhrase(),
       link: faker.internet.url(),
       image: faker.image.url(),
+      seoDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      seoKeywords: {
+        en: faker.lorem.words({ min: 10, max: 20 }),
+        ar: faker.lorem.words({ min: 10, max: 20 }),
+      },
+      ogTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      ogDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      ogImage: faker.image.url(),
+      ogUrl: faker.internet.url(),
+      twitterCard: 'summary_large_image',
+      twitterTitle: {
+        en: faker.lorem.words(5),
+        ar: faker.lorem.words(5),
+      },
+      twitterDescription: {
+        en: faker.lorem.sentence(),
+        ar: faker.lorem.sentence(),
+      },
+      twitterImage: faker.image.url(),
       createdBy: users[Math.floor(Math.random() * users.length)],
       locations: [locations[Math.floor(Math.random() * locations.length)]],
       createdAt: new Date(),
@@ -189,101 +329,62 @@ async function seedAds(users: User[], locations: any[]) {
 }
 
 async function seedBrandCategories(brands: Brand[], categories: Category[]) {
-  const brandCategoryRepository = dataSource.getRepository('brand_categories');
-  const brandCategories = new Set();
+  const brandRepository = dataSource.getRepository(Brand);
 
-  while (brandCategories.size < 100) {
-    const brandId = brands[Math.floor(Math.random() * brands.length)].id;
-    const categoryId =
-      categories[Math.floor(Math.random() * categories.length)].id;
-    const key = `${brandId}-${categoryId}`;
-
-    if (!brandCategories.has(key)) {
-      brandCategories.add(key);
-    }
+  for (const brand of brands) {
+    // Randomly select 1-3 categories for each brand
+    const brandCategories = faker.helpers.arrayElements(categories, {
+      min: 1,
+      max: 3,
+    });
+    brand.categories = brandCategories;
+    await brandRepository.save(brand);
   }
-
-  const brandCategoryArray = Array.from(brandCategories).map((key: string) => {
-    const [brand_id, category_id] = key.split('-');
-    return { brand_id, category_id };
-  });
-
-  await brandCategoryRepository.save(brandCategoryArray);
 }
 
 async function seedBrandLocations(brands: Brand[], locations: Location[]) {
-  const brandLocationRepository = dataSource.getRepository('brand_locations');
-  const brandLocations = new Set();
+  const brandRepository = dataSource.getRepository(Brand);
 
-  while (brandLocations.size < 100) {
-    const brandId = brands[Math.floor(Math.random() * brands.length)].id;
-    const locationId =
-      locations[Math.floor(Math.random() * locations.length)].id;
-    const key = `${brandId}-${locationId}`;
-
-    if (!brandLocations.has(key)) {
-      brandLocations.add(key);
-    }
+  for (const brand of brands) {
+    // Randomly select 1-3 locations for each brand
+    const brandLocations = faker.helpers.arrayElements(locations, {
+      min: 1,
+      max: 3,
+    });
+    brand.locations = brandLocations;
+    await brandRepository.save(brand);
   }
-
-  const brandLocationArray = Array.from(brandLocations).map((key: string) => {
-    const [brand_id, location_id] = key.split('-');
-    return { brand_id, location_id };
-  });
-
-  await brandLocationRepository.save(brandLocationArray);
 }
 
 async function seedCategoryLocations(
   categories: Category[],
   locations: Location[],
 ) {
-  const categoryLocationRepository =
-    dataSource.getRepository('category_locations');
-  const categoryLocations = new Set();
+  const categoryRepository = dataSource.getRepository(Category);
 
-  while (categoryLocations.size < 100) {
-    const categoryId =
-      categories[Math.floor(Math.random() * categories.length)].id;
-    const locationId =
-      locations[Math.floor(Math.random() * locations.length)].id;
-    const key = `${categoryId}-${locationId}`;
-
-    if (!categoryLocations.has(key)) {
-      categoryLocations.add(key);
-    }
+  for (const category of categories) {
+    // Randomly select 1-3 locations for each category
+    const categoryLocations = faker.helpers.arrayElements(locations, {
+      min: 1,
+      max: 3,
+    });
+    category.locations = categoryLocations;
+    await categoryRepository.save(category);
   }
-
-  const categoryLocationArray = Array.from(categoryLocations).map(
-    (key: string) => {
-      const [category_id, location_id] = key.split('-');
-      return { category_id, location_id };
-    },
-  );
-
-  await categoryLocationRepository.save(categoryLocationArray);
 }
 
 async function seedCouponBrands(coupons: Coupon[], brands: Brand[]) {
-  const couponBrandRepository = dataSource.getRepository('coupon_brands');
-  const couponBrands = new Set();
+  const couponRepository = dataSource.getRepository(Coupon);
 
-  while (couponBrands.size < 100) {
-    const couponId = coupons[Math.floor(Math.random() * coupons.length)].id;
-    const brandId = brands[Math.floor(Math.random() * brands.length)].id;
-    const key = `${couponId}-${brandId}`;
-
-    if (!couponBrands.has(key)) {
-      couponBrands.add(key);
-    }
+  for (const coupon of coupons) {
+    // Randomly select 1-3 brands for each coupon
+    const couponBrands = faker.helpers.arrayElements(brands, {
+      min: 1,
+      max: 3,
+    });
+    coupon.brands = couponBrands;
+    await couponRepository.save(coupon);
   }
-
-  const couponBrandArray = Array.from(couponBrands).map((key: string) => {
-    const [coupon_id, brand_id] = key.split('-');
-    return { coupon_id, brand_id };
-  });
-
-  await couponBrandRepository.save(couponBrandArray);
 }
 
 async function runSeeders() {
@@ -322,11 +423,11 @@ async function runSeeders() {
 
   await userRepository.save(users);
 
-  //   // Seed additional relationships
-  //   await seedBrandCategories(brands as any, categories as any);
-  //   await seedBrandLocations(brands as any, locations as any);
-  //   await seedCategoryLocations(categories as any, locations as any);
-  //   await seedCouponBrands(coupons as any, brands as any);
+  // Seed additional relationships
+  await seedBrandCategories(brands as any, categories as any);
+  await seedBrandLocations(brands as any, locations as any);
+  await seedCategoryLocations(categories as any, locations as any);
+  await seedCouponBrands(coupons as any, brands as any);
 
   await dataSource.destroy();
 }

@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { IsUrl, IsNotEmpty } from 'class-validator';
+import { IsUrl, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
 import { Location } from '../../locations/entities/location.entity';
@@ -40,13 +40,43 @@ export class Brand {
   @Column({ nullable: true })
   image?: string;
 
+  @Column('json', { nullable: true })
+  seoDescription?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  seoKeywords?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  ogTitle?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  ogDescription?: { en: string; ar: string };
+
+  @Column({ nullable: true })
+  ogImage?: string;
+
+  @Column({ nullable: true })
+  ogUrl?: string;
+
+  @Column({ nullable: true })
+  twitterCard?: string;
+
+  @Column('json', { nullable: true })
+  twitterTitle?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  twitterDescription?: { en: string; ar: string };
+
+  @Column({ nullable: true })
+  twitterImage?: string;
+
   @ManyToMany(() => Category, { cascade: true })
   @JoinTable({
     name: 'brand_categories',
     joinColumn: { name: 'brand_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
   })
-  category!: Category[];
+  categories!: Category[];
 
   @Column({ default: 0 })
   mostUsed!: number;
@@ -66,7 +96,7 @@ export class Brand {
     joinColumn: { name: 'brand_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'location_id', referencedColumnName: 'id' },
   })
-  location!: Location[];
+  locations!: Location[];
 
   @ManyToMany(() => User, { cascade: true })
   @JoinTable({

@@ -1,4 +1,9 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+} from 'typeorm';
 
 export class CreateCouponsTable20240909122031 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -19,13 +24,73 @@ export class CreateCouponsTable20240909122031 implements MigrationInterface {
           { name: 'expire', type: 'timestamp', isNullable: true },
           { name: 'qrCode', type: 'varchar', isNullable: true },
           { name: 'link', type: 'varchar', isNullable: true },
+          {
+            name: 'seoDescription',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'seoKeywords',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'ogTitle',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'ogDescription',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'ogImage',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'ogUrl',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'twitterCard',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'twitterTitle',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'twitterDescription',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'twitterImage',
+            type: 'text',
+            isNullable: true,
+          },
           { name: 'usedCount', type: 'integer', default: 0 },
           { name: 'likeCount', type: 'integer', default: 0 },
           { name: 'dislikeCount', type: 'integer', default: 0 },
           { name: 'createdById', type: 'char', length: '36', isNullable: true },
           { name: 'updatedById', type: 'char', length: '36', isNullable: true },
-          { name: 'createdAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP', isNullable: false },
-          { name: 'updatedAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP', isNullable: false },
+          {
+            name: 'createdAt',
+            type: 'timestamp',
+            default: 'CURRENT_TIMESTAMP',
+            isNullable: false,
+          },
+          {
+            name: 'updatedAt',
+            type: 'timestamp',
+            default: 'CURRENT_TIMESTAMP',
+            isNullable: false,
+          },
           { name: 'deletedAt', type: 'timestamp', isNullable: true },
         ],
       }),
@@ -56,10 +121,14 @@ export class CreateCouponsTable20240909122031 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('coupons');
     const foreignKeys = table?.foreignKeys.filter(
-      fk => fk.columnNames.includes('createdById') || fk.columnNames.includes('updatedById'),
+      (fk) =>
+        fk.columnNames.includes('createdById') ||
+        fk.columnNames.includes('updatedById'),
     );
     if (foreignKeys) {
-      await Promise.all(foreignKeys.map((fk) => queryRunner.dropForeignKey('coupons', fk)));
+      await Promise.all(
+        foreignKeys.map((fk) => queryRunner.dropForeignKey('coupons', fk)),
+      );
     }
     await queryRunner.dropTable('coupons');
   }

@@ -46,6 +46,36 @@ export class Coupon {
   @Column({ nullable: true })
   link?: string;
 
+  @Column('json', { nullable: true })
+  seoDescription?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  seoKeywords?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  ogTitle?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  ogDescription?: { en: string; ar: string };
+
+  @Column({ nullable: true })
+  ogImage?: string;
+
+  @Column({ nullable: true })
+  ogUrl?: string;
+
+  @Column({ nullable: true })
+  twitterCard?: string;
+
+  @Column('json', { nullable: true })
+  twitterTitle?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  twitterDescription?: { en: string; ar: string };
+
+  @Column({ nullable: true })
+  twitterImage?: string;
+
   @Column({ default: 0 })
   usedCount!: number;
 
@@ -116,5 +146,5 @@ export class Coupon {
     joinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
     inverseJoinColumn: { name: 'brand_id', referencedColumnName: 'id' },
   })
-  brand!: Brand[];
+  brands!: Brand[];
 }

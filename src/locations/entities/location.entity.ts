@@ -22,6 +22,36 @@ export class Location {
   @Column({ nullable: true })
   image?: string;
 
+  @Column('json', { nullable: true })
+  seoDescription?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  seoKeywords?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  ogTitle?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  ogDescription?: { en: string; ar: string };
+
+  @Column({ nullable: true })
+  ogImage?: string;
+
+  @Column({ nullable: true })
+  ogUrl?: string;
+
+  @Column({ nullable: true })
+  twitterCard?: string;
+
+  @Column('json', { nullable: true })
+  twitterTitle?: { en: string; ar: string };
+
+  @Column('json', { nullable: true })
+  twitterDescription?: { en: string; ar: string };
+
+  @Column({ nullable: true })
+  twitterImage?: string;
+
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   createdBy!: User;
 

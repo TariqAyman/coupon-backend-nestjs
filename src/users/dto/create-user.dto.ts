@@ -1,4 +1,10 @@
-import { IsNotEmpty, IsEmail, IsOptional, IsEnum, IsDateString } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsEmail,
+  IsOptional,
+  IsEnum,
+  IsDateString,
+} from 'class-validator';
 import { UserProvider } from '../../common/enums/UserProvider';
 import { UserRole } from '../../common/enums/UserRole';
 import { UserGender } from '../../common/enums/UserGender';
@@ -32,7 +38,7 @@ export class CreateUserDto {
   provider: UserProvider;
 
   @IsOptional()
-  @IsEnum(UserGender)
+  @IsEnum(UserStatus)
   status!: UserStatus;
 
   @IsOptional()

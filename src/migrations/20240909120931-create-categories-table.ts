@@ -1,4 +1,9 @@
-import { MigrationInterface, QueryRunner, Table, TableForeignKey } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+} from 'typeorm';
 
 export class CreateCategoriesTable20240909120931 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
@@ -18,10 +23,70 @@ export class CreateCategoriesTable20240909120931 implements MigrationInterface {
           { name: 'image', type: 'varchar', isNullable: true },
           { name: 'icon', type: 'varchar', isNullable: true },
           { name: 'color', type: 'varchar', isNullable: true },
+          {
+            name: 'seoDescription',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'seoKeywords',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'ogTitle',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'ogDescription',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'ogImage',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'ogUrl',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'twitterCard',
+            type: 'text',
+            isNullable: true,
+          },
+          {
+            name: 'twitterTitle',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'twitterDescription',
+            type: 'json',
+            isNullable: true,
+          },
+          {
+            name: 'twitterImage',
+            type: 'text',
+            isNullable: true,
+          },
           { name: 'createdById', type: 'char', length: '36', isNullable: true },
           { name: 'updatedById', type: 'char', length: '36', isNullable: true },
-          { name: 'createdAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP', isNullable: false },
-          { name: 'updatedAt', type: 'timestamp', default: 'CURRENT_TIMESTAMP', isNullable: false },
+          {
+            name: 'createdAt',
+            type: 'timestamp',
+            default: 'CURRENT_TIMESTAMP',
+            isNullable: false,
+          },
+          {
+            name: 'updatedAt',
+            type: 'timestamp',
+            default: 'CURRENT_TIMESTAMP',
+            isNullable: false,
+          },
           { name: 'deletedAt', type: 'timestamp', isNullable: true },
         ],
       }),
@@ -52,10 +117,14 @@ export class CreateCategoriesTable20240909120931 implements MigrationInterface {
   public async down(queryRunner: QueryRunner): Promise<void> {
     const table = await queryRunner.getTable('categories');
     const foreignKeys = table?.foreignKeys.filter(
-      fk => fk.columnNames.includes('createdById') || fk.columnNames.includes('updatedById'),
+      (fk) =>
+        fk.columnNames.includes('createdById') ||
+        fk.columnNames.includes('updatedById'),
     );
     if (foreignKeys) {
-      await Promise.all(foreignKeys.map(fk => queryRunner.dropForeignKey('categories', fk)));
+      await Promise.all(
+        foreignKeys.map((fk) => queryRunner.dropForeignKey('categories', fk)),
+      );
     }
     await queryRunner.dropTable('categories');
   }

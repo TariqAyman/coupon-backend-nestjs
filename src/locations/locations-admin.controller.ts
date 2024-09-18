@@ -22,7 +22,10 @@ import {
   successCreate,
 } from 'src/common/utils/api-response-wrapper';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { BodyWithParam, transformToTypeTypes } from 'src/common/decorators/body-with-param.decorator';
+import {
+  BodyWithParam,
+  transformToTypeTypes,
+} from 'src/common/decorators/body-with-param.decorator';
 
 @Controller('admin/locations')
 @UseGuards(RolesGuard)
@@ -31,8 +34,9 @@ export class LocationsAdminController {
   constructor(private readonly locationsService: LocationsAdminService) {}
 
   @Post()
-  create(@Body() createLocationDto: CreateLocationDto) {
-    return successCreate(this.locationsService.create(createLocationDto));
+  async create(@Body() createLocationDto: CreateLocationDto) {
+    const location = await this.locationsService.create(createLocationDto);
+    return successCreate(location);
   }
 
   @Get()
@@ -43,12 +47,13 @@ export class LocationsAdminController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return showOne(this.locationsService.findOne(id));
+  async findOne(@Param('id') id: string) {
+    const location = await this.locationsService.findOne(id);
+    return showOne(location);
   }
 
   @Patch(':id')
-  update(
+  async update(
     @Param('id') id: string,
     @BodyWithParam({
       paramName: 'id',
@@ -57,11 +62,12 @@ export class LocationsAdminController {
     @Body()
     updateLocationDto: UpdateLocationDto,
   ) {
-    return success(this.locationsService.update(id, updateLocationDto));
+    const location = await this.locationsService.update(id, updateLocationDto);
+    return success(location);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.locationsService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.locationsService.remove(id);
   }
 }
