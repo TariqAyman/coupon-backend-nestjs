@@ -2,8 +2,8 @@ import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, DeleteDateColumn } f
 import { User } from '../../users/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 
-@Entity('locations')
-export class Location {
+@Entity('countries')
+export class Country {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuidv4(); // Generates the UUID in the application
 
@@ -11,13 +11,7 @@ export class Location {
   name!: string;
 
   @Column({ nullable: true })
-  locationCode!: string;
-
-  @Column({ nullable: true })
-  latitude?: string;
-
-  @Column({ nullable: true })
-  longitude?: string;
+  countryCode!: string;
 
   @Column({ nullable: true })
   image?: string;

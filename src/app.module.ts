@@ -5,7 +5,7 @@ import { AdsModule } from './ads/ads.module';
 import { BrandsModule } from './brands/brands.module';
 import { CategoriesModule } from './categories/categories.module';
 import { CouponsModule } from './coupons/coupons.module';
-import { LocationsModule } from './locations/locations.module';
+import { CountriesModule } from './countries/countries.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { DatabaseModule } from './database/database.module';
@@ -27,7 +27,7 @@ import { CommonModule } from './common/common.module';
     BrandsModule,
     CategoriesModule,
     CouponsModule,
-    LocationsModule,
+    CountriesModule,
     NotificationsModule,
     AuthenticationModule,
     CommonModule,

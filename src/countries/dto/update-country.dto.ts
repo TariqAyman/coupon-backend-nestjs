@@ -1,8 +1,8 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { CreateLocationDto } from './create-location.dto';
+import { CreateCountryDto } from './create-country.dto';
 import { IsNotEmpty } from 'class-validator';
 
-export class UpdateLocationDto extends PartialType(CreateLocationDto) {
+export class UpdateCountryDto extends PartialType(CreateCountryDto) {
   @IsNotEmpty()
   id: string;
 }

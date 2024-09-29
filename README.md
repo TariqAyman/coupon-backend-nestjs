@@ -1,13 +1,13 @@
 # Project Overview
 
-This project is a backend application built with NestJS, providing a comprehensive set of features for user authentication, coupon management, brand management, location management, and more.
+This project is a backend application built with NestJS, providing a comprehensive set of features for user authentication, coupon management, brand management, country management, and more.
 
 ## Features
 
 - **User Authentication**: Register, login, logout, password reset, email verification, and profile management.
 - **Coupon Management**: Create, update, delete, and retrieve coupons.
 - **Brand Management**: Create, update, delete, and retrieve brands.
-- **Location Management**: Create, update, delete, and retrieve locations.
+- **Country Management**: Create, update, delete, and retrieve countries.
 - **Category Management**: Create, update, delete, and retrieve categories.
 - **Notification Management**: Create, update, delete, and retrieve notifications.
 - **Ad Management**: Create, update, delete, and retrieve ads.
@@ -23,6 +23,7 @@ This project is a backend application built with NestJS, providing a comprehensi
 - **Testing**: [Jest](https://jestjs.io/)
 
 ## Project Structure
+
 ```
 src/
 ├── ads/
@@ -96,14 +97,14 @@ src/
 │ │ └── 20240909120612-create-users-table.ts
 │ ├── seeder.ts
 │ └── database.module.ts
-├── locations/
+├── countries/
 │ ├── dto/
-│ │ ├── create-location.dto.ts
-│ │ └── update-location.dto.ts
+│ │ ├── create-country.dto.ts
+│ │ └── update-country.dto.ts
 │ ├── entities/
-│ │ └── location.entity.ts
-│ ├── locations.controller.ts
-│ └── locations.service.ts
+│ │ └── country.entity.ts
+│ ├── countries.controller.ts
+│ └── countries.service.ts
 ├── notifications/
 │ ├── dto/
 │ │ ├── create-notification.dto.ts
@@ -128,6 +129,7 @@ src/
 ## Endpoints
 
 ### Authentication
+
 - **POST /auth/login**: User login
 - **POST /auth/register**: User registration
 - **POST /auth/logout**: User logout
@@ -141,6 +143,7 @@ src/
 - **POST /auth/delete-account**: Delete account
 
 ### Users
+
 - **POST /users**: Create a new user
 - **GET /users**: Retrieve all users
 - **GET /users/:id**: Retrieve a user by ID
@@ -148,6 +151,7 @@ src/
 - **DELETE /users/:id**: Delete a user by ID
 
 ### Coupons
+
 - **POST /coupons**: Create a new coupon
 - **GET /coupons**: Retrieve all coupons
 - **GET /coupons/:id**: Retrieve a coupon by ID
@@ -155,20 +159,23 @@ src/
 - **DELETE /coupons/:id**: Delete a coupon by ID
 
 ### Brands
+
 - **POST /brands**: Create a new brand
 - **GET /brands**: Retrieve all brands
 - **GET /brands/:id**: Retrieve a brand by ID
 - **PATCH /brands/:id**: Update a brand by ID
 - **DELETE /brands/:id**: Delete a brand by ID
 
-### Locations
-- **POST /locations**: Create a new location
-- **GET /locations**: Retrieve all locations
-- **GET /locations/:id**: Retrieve a location by ID
-- **PATCH /locations/:id**: Update a location by ID
-- **DELETE /locations/:id**: Delete a location by ID
+### Countries
+
+- **POST /countries**: Create a new country
+- **GET /countries**: Retrieve all countries
+- **GET /countries/:id**: Retrieve a country by ID
+- **PATCH /countries/:id**: Update a country by ID
+- **DELETE /countries/:id**: Delete a country by ID
 
 ### Categories
+
 - **POST /categories**: Create a new category
 - **GET /categories**: Retrieve all categories
 - **GET /categories/:id**: Retrieve a category by ID
@@ -176,6 +183,7 @@ src/
 - **DELETE /categories/:id**: Delete a category by ID
 
 ### Notifications
+
 - **POST /notifications**: Create a new notification
 - **GET /notifications**: Retrieve all notifications
 - **GET /notifications/:id**: Retrieve a notification by ID
@@ -183,6 +191,7 @@ src/
 - **DELETE /notifications/:id**: Delete a notification by ID
 
 ### Ads
+
 - **POST /ads**: Create a new ad
 - **GET /ads**: Retrieve all ads
 - **GET /ads/:id**: Retrieve an ad by ID
@@ -192,6 +201,7 @@ src/
 ## Entities
 
 ### User
+
 - **id**: UUID
 - **fullName**: string
 - **email**: string
@@ -215,6 +225,7 @@ src/
 - **lastLogout**: Date
 
 ### Coupon
+
 - **id**: UUID
 - **code**: string
 - **amount**: number
@@ -230,6 +241,7 @@ src/
 - **updatedAt**: Date
 
 ### Brand
+
 - **id**: UUID
 - **name**: string
 - **description**: string
@@ -237,15 +249,17 @@ src/
 - **createdAt**: Date
 - **updatedAt**: Date
 
-### Location
+### Country
+
 - **id**: UUID
 - **name**: string
-- **locationCode**: string
+- **countryCode**: string
 - **image**: string
 - **createdAt**: Date
 - **updatedAt**: Date
 
 ### Category
+
 - **id**: UUID
 - **name**: { en: string; ar: string }
 - **slug**: { en: string; ar: string }
@@ -257,6 +271,7 @@ src/
 - **updatedAt**: Date
 
 ### Notification
+
 - **id**: UUID
 - **header**: { en: string; ar: string }
 - **body**: { en: string; ar: string }
@@ -265,13 +280,13 @@ src/
 - **updatedAt**: Date
 
 ### Ad
+
 - **id**: UUID
 - **name**: string
 - **link**: string
 - **image**: string
 - **createdAt**: Date
 - **updatedAt**: Date
-
 
 ## Running the Application
 
@@ -280,73 +295,81 @@ src/
 To run the application in development mode:
 
 1. **Install dependencies**:
-    ```bash
-    npm install
-    ```
+
+   ```bash
+   npm install
+   ```
 
 2. **Set up environment variables**:
-    Create a `.env` file in the root directory and add the necessary environment variables. For example:
-    ```env
-    DATABASE_HOST=localhost
-    DATABASE_PORT=5432
-    DATABASE_USER=your_db_user
-    DATABASE_PASSWORD=your_db_password
-    DATABASE_NAME=your_db_name
-    JWT_SECRET=your_jwt_secret
-    ```
+   Create a `.env` file in the root directory and add the necessary environment variables. For example:
+
+   ```env
+   DATABASE_HOST=localhost
+   DATABASE_PORT=5432
+   DATABASE_USER=your_db_user
+   DATABASE_PASSWORD=your_db_password
+   DATABASE_NAME=your_db_name
+   JWT_SECRET=your_jwt_secret
+   ```
 
 3. **Run the application**:
-    ```bash
-    npm run start:dev
-    ```
+   ```bash
+   npm run start:dev
+   ```
 
 ### Production
 
 To run the application in production mode:
 
 1. **Install dependencies**:
-    ```bash
-    npm install
-    ```
+
+   ```bash
+   npm install
+   ```
 
 2. **Set up environment variables**:
-    Create a `.env` file in the root directory and add the necessary environment variables.
+   Create a `.env` file in the root directory and add the necessary environment variables.
 
 3. **Build the application**:
-    ```bash
-    npm run build
-    ```
+
+   ```bash
+   npm run build
+   ```
 
 4. **Run the application**:
-    ```bash
-    npm run start:prod
-    ```
+   ```bash
+   npm run start:prod
+   ```
 
 ### Testing
 
 To run tests:
 
 1. **Install dependencies**:
-    ```bash
-    npm install
-    ```
+
+   ```bash
+   npm install
+   ```
 
 2. **Run the tests**:
-    ```bash
-    npm run test
-    ```
+
+   ```bash
+   npm run test
+   ```
 
 3. **Run tests in watch mode**:
-    ```bash
-    npm run test:watch
-    ```
+
+   ```bash
+   npm run test:watch
+   ```
 
 4. **Run end-to-end tests**:
-    ```bash
-    npm run test:e2e
-    ```
+
+   ```bash
+   npm run test:e2e
+   ```
 
 5. **Run tests with coverage**:
-    ```bash
-    npm run test:cov
-    ```
+   ```bash
+   npm run test:cov
+   ```

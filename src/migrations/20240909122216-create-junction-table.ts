@@ -9,9 +9,9 @@ export class CreateJunctionTables20240909122216 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const tables = [
       {
-        name: 'category_locations',
-        columns: ['category_id', 'location_id'],
-        referencedTables: ['categories', 'locations'],
+        name: 'category_countries',
+        columns: ['category_id', 'country_id'],
+        referencedTables: ['categories', 'countries'],
       },
       {
         name: 'brand_categories',
@@ -19,9 +19,9 @@ export class CreateJunctionTables20240909122216 implements MigrationInterface {
         referencedTables: ['brands', 'categories'],
       },
       {
-        name: 'brand_locations',
-        columns: ['brand_id', 'location_id'],
-        referencedTables: ['brands', 'locations'],
+        name: 'brand_countries',
+        columns: ['brand_id', 'country_id'],
+        referencedTables: ['brands', 'countries'],
       },
       {
         name: 'user_followed_brands',
@@ -34,9 +34,9 @@ export class CreateJunctionTables20240909122216 implements MigrationInterface {
         referencedTables: ['users', 'coupons'],
       },
       {
-        name: 'coupon_locations',
-        columns: ['coupon_id', 'location_id'],
-        referencedTables: ['coupons', 'locations'],
+        name: 'coupon_countries',
+        columns: ['coupon_id', 'country_id'],
+        referencedTables: ['coupons', 'countries'],
       },
       {
         name: 'coupon_categories',
@@ -119,12 +119,12 @@ export class CreateJunctionTables20240909122216 implements MigrationInterface {
 
   public async down(queryRunner: QueryRunner): Promise<void> {
     const tables = [
-      'category_locations',
+      'category_countries',
       'brand_categories',
-      'brand_locations',
+      'brand_countries',
       'user_followed_brands',
       'user_followed_coupons',
-      'coupon_locations',
+      'coupon_countries',
       'coupon_categories',
       'coupon_brands',
       'user_favorite_coupons',

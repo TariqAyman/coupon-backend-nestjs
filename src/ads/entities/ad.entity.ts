@@ -14,7 +14,7 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Location } from '../../locations/entities/location.entity';
+import { Country } from '../../countries/entities/country.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { IsOptional, IsString, IsUrl } from 'class-validator';
 
@@ -70,13 +70,13 @@ export class Ads {
   @JoinColumn({ name: 'updatedById' })
   updatedBy!: User;
 
-  @ManyToMany(() => Location)
+  @ManyToMany(() => Country)
   @JoinTable({
-    name: 'ads_locations',
+    name: 'ads_countries',
     joinColumn: { name: 'ads_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'location_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'country_id', referencedColumnName: 'id' },
   })
-  locations!: Location[];
+  countries!: Country[];
 
   @CreateDateColumn()
   createdAt!: Date;
@@ -99,7 +99,7 @@ export class AdsSubscriber implements EntitySubscriberInterface<Ads> {
       // Manually load relations
       await event.manager.getRepository(Ads).findOne({
         where: { id: event.entity.id },
-        relations: ['createdBy', 'updatedBy', 'locations'],
+        relations: ['createdBy', 'updatedBy', 'countries'],
       });
     }
   }

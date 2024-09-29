@@ -14,7 +14,7 @@ import {
 import { IsUrl, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
-import { Location } from '../../locations/entities/location.entity';
+import { Country } from '../../countries/entities/country.entity';
 import { v4 as uuidv4 } from 'uuid';
 
 @Entity('brands')
@@ -90,13 +90,13 @@ export class Brand {
   @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy!: User | null;
 
-  @ManyToMany(() => Location, { cascade: true })
+  @ManyToMany(() => Country, { cascade: true })
   @JoinTable({
-    name: 'brand_locations',
+    name: 'brand_countries',
     joinColumn: { name: 'brand_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'location_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'country_id', referencedColumnName: 'id' },
   })
-  locations!: Location[];
+  countries!: Country[];
 
   @ManyToMany(() => User, { cascade: true })
   @JoinTable({

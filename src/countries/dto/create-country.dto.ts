@@ -1,22 +1,22 @@
-import { IsNotEmpty, IsOptional, IsString, IsUrl, ValidateNested } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  ValidateNested,
+} from 'class-validator';
 import { IsUnique } from 'src/common/decorators/is-unique.decorator';
-import { Location } from '../entities/location.entity';
+import { Country } from '../entities/country.entity';
 import { Type } from 'class-transformer';
 import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
-export class CreateLocationDto {
+export class CreateCountryDto {
   @IsNotEmpty()
-  @IsUnique(Location, 'name')
+  @IsUnique(Country, 'name')
   name: string;
 
   @IsNotEmpty()
-  locationCode: string;
-
-  @IsNotEmpty()
-  latitude?: string;
-
-  @IsNotEmpty()
-  longitude?: string;
+  countryCode: string;
 
   @IsOptional()
   image?: string;

@@ -124,7 +124,7 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
 
     await queryRunner.createTable(
       new Table({
-        name: 'ads_locations',
+        name: 'ads_countries',
         columns: [
           {
             name: 'ads_id',
@@ -133,7 +133,7 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
             isNullable: false,
           },
           {
-            name: 'location_id',
+            name: 'country_id',
             type: 'char',
             length: '36',
             isNullable: false,
@@ -144,7 +144,7 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'ads_locations',
+      'ads_countries',
       new TableForeignKey({
         columnNames: ['ads_id'],
         referencedColumnNames: ['id'],
@@ -154,32 +154,32 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'ads_locations',
+      'ads_countries',
       new TableForeignKey({
-        columnNames: ['location_id'],
+        columnNames: ['country_id'],
         referencedColumnNames: ['id'],
-        referencedTableName: 'locations',
+        referencedTableName: 'countries',
         onDelete: 'CASCADE',
       }),
     );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const adsLocationsTable = await queryRunner.getTable('ads_locations');
-    if (adsLocationsTable) {
-      const adsForeignKey = adsLocationsTable.foreignKeys.find(
+    const adsCountriesTable = await queryRunner.getTable('ads_countries');
+    if (adsCountriesTable) {
+      const adsForeignKey = adsCountriesTable.foreignKeys.find(
         (fk) => fk.columnNames.indexOf('ads_id') !== -1,
       );
-      const locationForeignKey = adsLocationsTable.foreignKeys.find(
-        (fk) => fk.columnNames.indexOf('location_id') !== -1,
+      const countryForeignKey = adsCountriesTable.foreignKeys.find(
+        (fk) => fk.columnNames.indexOf('country_id') !== -1,
       );
       if (adsForeignKey) {
-        await queryRunner.dropForeignKey('ads_locations', adsForeignKey);
+        await queryRunner.dropForeignKey('ads_countries', adsForeignKey);
       }
-      if (locationForeignKey) {
-        await queryRunner.dropForeignKey('ads_locations', locationForeignKey);
+      if (countryForeignKey) {
+        await queryRunner.dropForeignKey('ads_countries', countryForeignKey);
       }
-      await queryRunner.dropTable('ads_locations');
+      await queryRunner.dropTable('ads_countries');
     }
 
     const adsTable = await queryRunner.getTable('ads');

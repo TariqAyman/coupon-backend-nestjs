@@ -9,7 +9,7 @@ import {
   DeleteDateColumn,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
-import { Location } from '../../locations/entities/location.entity';
+import { Country } from '../../countries/entities/country.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { IsOptional, IsString, IsUrl } from 'class-validator';
 
@@ -72,13 +72,13 @@ export class Category {
   @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy?: User;
 
-  @ManyToMany(() => Location)
+  @ManyToMany(() => Country)
   @JoinTable({
-    name: 'category_locations',
+    name: 'category_countries',
     joinColumn: { name: 'category_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'location_id', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'country_id', referencedColumnName: 'id' },
   })
-  locations!: Location[];
+  countries!: Country[];
 
   @Column()
   createdAt!: Date;

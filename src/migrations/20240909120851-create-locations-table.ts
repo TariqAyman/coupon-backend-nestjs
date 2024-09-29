@@ -5,11 +5,11 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class CreateLocationsTable20240909120851 implements MigrationInterface {
+export class CreateCountriesTable20240909120851 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'locations',
+        name: 'countries',
         columns: [
           {
             name: 'id',
@@ -18,9 +18,7 @@ export class CreateLocationsTable20240909120851 implements MigrationInterface {
             isPrimary: true,
           },
           { name: 'name', type: 'varchar', isNullable: false },
-          { name: 'locationCode', type: 'varchar', isNullable: false },
-          { name: 'latitude', type: 'varchar', isNullable: false },
-          { name: 'longitude', type: 'varchar', isNullable: false },
+          { name: 'countryCode', type: 'varchar', isNullable: false },
           { name: 'image', type: 'varchar', isNullable: true },
           {
             name: 'seoDescription',
@@ -93,7 +91,7 @@ export class CreateLocationsTable20240909120851 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'locations',
+      'countries',
       new TableForeignKey({
         columnNames: ['createdById'],
         referencedColumnNames: ['id'],
@@ -103,7 +101,7 @@ export class CreateLocationsTable20240909120851 implements MigrationInterface {
     );
 
     await queryRunner.createForeignKey(
-      'locations',
+      'countries',
       new TableForeignKey({
         columnNames: ['updatedById'],
         referencedColumnNames: ['id'],
@@ -114,7 +112,7 @@ export class CreateLocationsTable20240909120851 implements MigrationInterface {
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const table = await queryRunner.getTable('locations');
+    const table = await queryRunner.getTable('countries');
     const foreignKeys = table?.foreignKeys.filter(
       (fk) =>
         fk.columnNames.includes('createdById') ||
@@ -122,9 +120,9 @@ export class CreateLocationsTable20240909120851 implements MigrationInterface {
     );
     if (foreignKeys) {
       await Promise.all(
-        foreignKeys.map((fk) => queryRunner.dropForeignKey('locations', fk)),
+        foreignKeys.map((fk) => queryRunner.dropForeignKey('countries', fk)),
       );
     }
-    await queryRunner.dropTable('locations');
+    await queryRunner.dropTable('countries');
   }
 }

@@ -1,7 +1,7 @@
 import { User } from '../users/entities/user.entity';
 import { Category } from '../categories/entities/category.entity';
 import { Brand } from '../brands/entities/brand.entity';
-import { Location } from '../locations/entities/location.entity';
+import { Country } from '../countries/entities/country.entity';
 import { Coupon } from '../coupons/entities/coupon.entity';
 import { Ads } from '../ads/entities/ad.entity';
 import { v4 as uuidv4 } from 'uuid';
@@ -173,14 +173,14 @@ async function seedBrands() {
   return brands;
 }
 
-async function seedLocations() {
-  const locationRepository = dataSource.getRepository(Location);
-  const locations = [];
+async function seedCountries() {
+  const countryRepository = dataSource.getRepository(Country);
+  const countries = [];
   for (let i = 0; i < 100; i++) {
-    locations.push({
+    countries.push({
       id: uuidv4(),
-      name: faker.string.alphanumeric(20),
-      locationCode: faker.location.zipCode(),
+      name: faker.location.country(),
+      countryCode: faker.location.countryCode(),
       latitude: faker.location.latitude().toString(),
       longitude: faker.location.longitude().toString(),
       image: faker.image.url(),
@@ -217,15 +217,15 @@ async function seedLocations() {
       updatedAt: new Date(),
     });
   }
-  await locationRepository.save(locations);
-  return locations;
+  await countryRepository.save(countries);
+  return countries;
 }
 
 async function seedCoupons(
   users: User[],
   categories: any[],
   brands: any[],
-  locations: any[],
+  countries: any[],
 ) {
   const couponRepository = dataSource.getRepository(Coupon);
   const coupons = [];
@@ -272,7 +272,7 @@ async function seedCoupons(
       twitterImage: faker.image.url(),
       createdBy: users[Math.floor(Math.random() * users.length)],
       categories: [categories[Math.floor(Math.random() * categories.length)]],
-      locations: [locations[Math.floor(Math.random() * locations.length)]],
+      countries: [countries[Math.floor(Math.random() * countries.length)]],
       brand: brands[Math.floor(Math.random() * brands.length)],
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -282,7 +282,7 @@ async function seedCoupons(
   return coupons;
 }
 
-async function seedAds(users: User[], locations: any[]) {
+async function seedAds(users: User[], countries: any[]) {
   const adsRepository = dataSource.getRepository(Ads);
   const ads = [];
   for (let i = 0; i < 100; i++) {
@@ -320,7 +320,7 @@ async function seedAds(users: User[], locations: any[]) {
       },
       twitterImage: faker.image.url(),
       createdBy: users[Math.floor(Math.random() * users.length)],
-      locations: [locations[Math.floor(Math.random() * locations.length)]],
+      countries: [countries[Math.floor(Math.random() * countries.length)]],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
@@ -342,33 +342,33 @@ async function seedBrandCategories(brands: Brand[], categories: Category[]) {
   }
 }
 
-async function seedBrandLocations(brands: Brand[], locations: Location[]) {
+async function seedBrandCountries(brands: Brand[], countries: Country[]) {
   const brandRepository = dataSource.getRepository(Brand);
 
   for (const brand of brands) {
-    // Randomly select 1-3 locations for each brand
-    const brandLocations = faker.helpers.arrayElements(locations, {
+    // Randomly select 1-3 countries for each brand
+    const brandCountries = faker.helpers.arrayElements(countries, {
       min: 1,
       max: 3,
     });
-    brand.locations = brandLocations;
+    brand.countries = brandCountries;
     await brandRepository.save(brand);
   }
 }
 
-async function seedCategoryLocations(
+async function seedCategoryCountries(
   categories: Category[],
-  locations: Location[],
+  countries: Country[],
 ) {
   const categoryRepository = dataSource.getRepository(Category);
 
   for (const category of categories) {
-    // Randomly select 1-3 locations for each category
-    const categoryLocations = faker.helpers.arrayElements(locations, {
+    // Randomly select 1-3 countries for each category
+    const categoryCountries = faker.helpers.arrayElements(countries, {
       min: 1,
       max: 3,
     });
-    category.locations = categoryLocations;
+    category.countries = categoryCountries;
     await categoryRepository.save(category);
   }
 }
@@ -392,14 +392,14 @@ async function runSeeders() {
   const users = await seedUsers();
   const categories = await seedCategories();
   const brands = await seedBrands();
-  const locations = await seedLocations();
+  const countries = await seedCountries();
   const coupons = await seedCoupons(
     users as any,
     categories,
     brands,
-    locations,
+    countries,
   );
-  await seedAds(users as any, locations);
+  await seedAds(users as any, countries);
 
   // Establish relationships
   const userRepository = dataSource.getRepository(User);
@@ -425,8 +425,8 @@ async function runSeeders() {
 
   // Seed additional relationships
   await seedBrandCategories(brands as any, categories as any);
-  await seedBrandLocations(brands as any, locations as any);
-  await seedCategoryLocations(categories as any, locations as any);
+  await seedBrandCountries(brands as any, countries as any);
+  await seedCategoryCountries(categories as any, countries as any);
   await seedCouponBrands(coupons as any, brands as any);
 
   await dataSource.destroy();

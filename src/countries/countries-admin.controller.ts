@@ -9,12 +9,12 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { CreateLocationDto } from './dto/create-location.dto';
-import { UpdateLocationDto } from './dto/update-location.dto';
+import { CreateCountryDto } from './dto/create-country.dto';
+import { UpdateCountryDto } from './dto/update-country.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { UserRole } from 'src/common/enums/UserRole';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { LocationsAdminService } from './locations-admin.service';
+import { CountriesAdminService } from './countries-admin.service';
 import {
   paginate,
   showOne,
@@ -27,29 +27,29 @@ import {
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
 
-@Controller('admin/locations')
+@Controller('admin/countries')
 @UseGuards(RolesGuard)
 @Roles(UserRole.Admin)
-export class LocationsAdminController {
-  constructor(private readonly locationsService: LocationsAdminService) {}
+export class CountriesAdminController {
+  constructor(private readonly countriesService: CountriesAdminService) {}
 
   @Post()
-  async create(@Body() createLocationDto: CreateLocationDto) {
-    const location = await this.locationsService.create(createLocationDto);
-    return successCreate(location);
+  async create(@Body() createCountryDto: CreateCountryDto) {
+    const country = await this.countriesService.create(createCountryDto);
+    return successCreate(country);
   }
 
   @Get()
   async findAll(@Query() pagination: PaginationDto) {
     const { data, total, pageNumber, limitNumber } =
-      await this.locationsService.findAll(pagination);
+      await this.countriesService.findAll(pagination);
     return paginate(data, total, pageNumber, limitNumber);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const location = await this.locationsService.findOne(id);
-    return showOne(location);
+    const country = await this.countriesService.findOne(id);
+    return showOne(country);
   }
 
   @Patch(':id')
@@ -60,14 +60,14 @@ export class LocationsAdminController {
       transformTo: transformToTypeTypes.STRING,
     })
     @Body()
-    updateLocationDto: UpdateLocationDto,
+    updateCountryDto: UpdateCountryDto,
   ) {
-    const location = await this.locationsService.update(id, updateLocationDto);
-    return success(location);
+    const country = await this.countriesService.update(id, updateCountryDto);
+    return success(country);
   }
 
   @Delete(':id')
   async remove(@Param('id') id: string) {
-    return await this.locationsService.remove(id);
+    return await this.countriesService.remove(id);
   }
 }

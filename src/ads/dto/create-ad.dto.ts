@@ -6,7 +6,7 @@ import {
   ValidateNested,
 } from 'class-validator';
 import { User } from '../../users/entities/user.entity';
-import { Location } from '../../locations/entities/location.entity';
+import { Country } from '../../countries/entities/country.entity';
 import { DeleteDateColumn } from 'typeorm';
 import { Type } from 'class-transformer';
 import { BilingualString } from '../../common/dto/bilingual-string.dto';
@@ -23,7 +23,7 @@ export class CreateAdDto {
   image?: string;
 
   @IsOptional()
-  locations?: Location[];
+  countries?: Country[];
 
   @IsOptional()
   @ValidateNested()
