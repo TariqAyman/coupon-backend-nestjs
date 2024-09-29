@@ -55,7 +55,7 @@ export class User {
   status!: string;
 
   @Column({ nullable: true })
-  image!: string;
+  avatar!: string;
 
   @Column({ nullable: true })
   birthday!: Date;

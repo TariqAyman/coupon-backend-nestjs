@@ -9,7 +9,6 @@ import {
 import { AuthenticationService } from './authentication.service';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
-import { LogoutDto } from './dto/logout.dto';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
@@ -19,6 +18,7 @@ import { ChangeEmailDto } from './dto/changeEmail.dto';
 import { DeleteAccountDto } from './dto/deleteAccount.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../common/guards/local-auth.guard';
+import { success } from 'src/common/utils/api-response-wrapper';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -26,73 +26,96 @@ export class AuthenticationController {
 
   @UseGuards(LocalAuthGuard)
   @Post('login')
-  login(@Body() loginDto: LoginDto) {
-    return this.authenticationService.login(loginDto.email, loginDto.password);
+  async login(@Body() loginDto: LoginDto) {
+    const response = await this.authenticationService.login(
+      loginDto.email,
+      loginDto.password,
+    );
+    return success(response);
   }
 
   @Post('refresh')
   async refresh(@Body() body: { refresh_token: string }) {
-    return this.authenticationService.refresh(body.refresh_token);
+    const response = await this.authenticationService.refresh(
+      body.refresh_token,
+    );
+    return success(response);
   }
 
   @Post('register')
-  register(@Body() registerDto: RegisterDto) {
-    return this.authenticationService.register(registerDto);
+  async register(@Body() registerDto: RegisterDto) {
+    const response = await this.authenticationService.register(registerDto);
+    return success(response);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  logout(@Body() logoutDto: LogoutDto) {
-    return this.authenticationService.logout(logoutDto);
+  async logout(@Request() req: any) {
+    await this.authenticationService.logout(req);
+    return success([]);
   }
 
   @UseGuards(JwtAuthGuard)
   @Get('profile')
-  profile(@Request() req: any) {
-    return this.authenticationService.profile(req.user);
+  async profile(@Request() req: any) {
+    const response = await this.authenticationService.profile(req.user);
+    return success(response);
   }
 
   @Post('forgot-password')
-  forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
-    return this.authenticationService.forgotPassword(forgotPasswordDto);
+  async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
+    const response =
+      await this.authenticationService.forgotPassword(forgotPasswordDto);
+    return success(response);
   }
 
   @Post('reset-password')
-  resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
-    return this.authenticationService.resetPassword(resetPasswordDto);
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    const response =
+      await this.authenticationService.resetPassword(resetPasswordDto);
+    return success(response);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('change-password')
-  changePassword(@Body() changePasswordDto: ChangePasswordDto) {
-    return this.authenticationService.changePassword(changePasswordDto);
+  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+    const response =
+      await this.authenticationService.changePassword(changePasswordDto);
+    return success(response);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('verify-email')
-  verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
-    return this.authenticationService.verifyEmail(verifyEmailDto);
+  async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
+    const response =
+      await this.authenticationService.verifyEmail(verifyEmailDto);
+    return success(response);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('resend-verification-email')
-  resendVerificationEmail(
+  async resendVerificationEmail(
     @Body() resendVerificationEmailDto: ResendVerificationEmailDto,
   ) {
-    return this.authenticationService.resendVerificationEmail(
+    const response = await this.authenticationService.resendVerificationEmail(
       resendVerificationEmailDto,
     );
+    return success(response);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('change-email')
-  changeEmail(@Body() changeEmailDto: ChangeEmailDto) {
-    return this.authenticationService.changeEmail(changeEmailDto);
+  async changeEmail(@Body() changeEmailDto: ChangeEmailDto) {
+    const response =
+      await this.authenticationService.changeEmail(changeEmailDto);
+    return success(response);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('delete-account')
-  deleteAccount(@Body() deleteAccountDto: DeleteAccountDto) {
-    return this.authenticationService.deleteAccount(deleteAccountDto);
+  async deleteAccount(@Body() deleteAccountDto: DeleteAccountDto) {
+    const response =
+      await this.authenticationService.deleteAccount(deleteAccountDto);
+    return success(response);
   }
 }

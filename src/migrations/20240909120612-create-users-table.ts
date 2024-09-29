@@ -31,7 +31,7 @@ export class CreateUsersTable20240909120612 implements MigrationInterface {
             enum: ['offline', 'online', 'blocked'],
             default: "'offline'",
           },
-          { name: 'image', type: 'varchar', isNullable: true },
+          { name: 'avatar', type: 'varchar', isNullable: true },
           { name: 'birthday', type: 'timestamp', isNullable: true },
           { name: 'joined', type: 'timestamp', isNullable: true },
           {

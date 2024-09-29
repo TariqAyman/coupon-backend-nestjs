@@ -4,6 +4,7 @@ import {
   IsOptional,
   IsEnum,
   IsDateString,
+  IsPhoneNumber,
 } from 'class-validator';
 import { UserProvider } from '../../common/enums/UserProvider';
 import { UserRole } from '../../common/enums/UserRole';
@@ -21,6 +22,7 @@ export class CreateUserDto {
   password: string;
 
   @IsOptional()
+  @IsPhoneNumber('EG', { message: 'Phone number must be valid' })
   phoneNumber?: string;
 
   @IsEnum(UserRole)

@@ -35,7 +35,7 @@ export class UsersService {
     user.status = UserStatus.Online;
     user.fullName = registerDto.fullName;
     user.phoneNumber = registerDto.phoneNumber;
-    user.image = registerDto.image;
+    user.avatar = registerDto.avatar;
     user.birthday = new Date();
     user.joined = new Date();
     user.gender = registerDto.gender;

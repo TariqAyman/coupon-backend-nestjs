@@ -1,11 +1,11 @@
 import {
+  Inject,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { RegisterDto } from './dto/register.dto';
-import { LogoutDto } from './dto/logout.dto';
 import { ProfileDto } from './dto/profile.dto';
 import { ForgotPasswordDto } from './dto/forgotPassword.dto';
 import { ResetPasswordDto } from './dto/resetPassword.dto';
@@ -16,7 +16,7 @@ import { DeleteAccountDto } from './dto/deleteAccount.dto';
 import { ChangeEmailDto } from './dto/changeEmail.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
-import { success } from 'src/common/utils/api-response-wrapper';
+import { jwtConstants } from './constants';
 
 @Injectable()
 export class AuthenticationService {
@@ -52,21 +52,35 @@ export class AuthenticationService {
       email: user.email,
       fullName: user.fullName,
       role: user.role,
-      created_at: user.createdAt,
-      updated_at: user.updatedAt,
     };
 
-    const accessToken = this.jwtService.sign(payload);
-    const refreshToken = this.jwtService.sign(payload, { expiresIn: '7d' });
 
-    return success({
+    // Calculate the expiration time
+    const expirationDate = new Date(
+      Date.now() + this.parseExpirationTime(jwtConstants.expiresIn) * 1000,
+    );
+
+    // Calculate the expiration time
+    const refreshExpirationDate = new Date(
+      Date.now() +
+        this.parseExpirationTime(jwtConstants.refreshExpiresIn) * 1000,
+    );
+
+    const accessToken = this.jwtService.sign(payload);
+    const refreshToken = this.jwtService.sign(payload, {
+      expiresIn: jwtConstants.refreshExpiresIn,
+    });
+
+    return {
       user: payload,
       token: {
         type: 'Bearer',
         access_token: accessToken,
+        access_token_expire: expirationDate.toISOString(),
         refresh_token: refreshToken,
+        refresh_token_expire: refreshExpirationDate.toISOString(),
       },
-    });
+    };
   }
 
   async refresh(refreshToken: string) {
@@ -78,22 +92,33 @@ export class AuthenticationService {
         email: payload.email,
         fullName: payload.fullName,
         role: payload.role,
-        created_at: payload.created_at,
-        updated_at: payload.updated_at,
       };
 
+      // Calculate the expiration time
+      const expirationDate = new Date(
+        Date.now() + this.parseExpirationTime(jwtConstants.expiresIn) * 1000,
+      );
+
+      // Calculate the expiration time
+      const refreshExpirationDate = new Date(
+        Date.now() +
+          this.parseExpirationTime(jwtConstants.refreshExpiresIn) * 1000,
+      );
+      
       const newAccessToken = this.jwtService.sign(newPayload);
       const newRefreshToken = this.jwtService.sign(newPayload, {
-        expiresIn: '7d',
+        expiresIn: jwtConstants.refreshExpiresIn,
       });
 
-      return success({
+      return {
         token: {
           type: 'Bearer',
           access_token: newAccessToken,
+          access_token_expire: expirationDate.toISOString(),
           refresh_token: newRefreshToken,
+          refresh_token_expire: refreshExpirationDate.toISOString(),
         },
-      });
+      };
     } catch (e) {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -104,7 +129,7 @@ export class AuthenticationService {
     return user;
   }
 
-  async logout(logoutDto: LogoutDto) {
+  async logout(request: any) {
     return 'Logout successful';
   }
 
@@ -146,5 +171,30 @@ export class AuthenticationService {
 
   decodeToken(token: string): any {
     return this.jwtService.decode(token);
+  }
+
+  // Helper method to parse expiration time
+  private parseExpirationTime(expiration: string | number): number {
+    if (typeof expiration === 'number') {
+      return expiration;
+    }
+    const match = expiration.match(/(\d+)([smhd])/);
+    if (!match) {
+      return 3600; // Default to 1 hour if parsing fails
+    }
+    const value = parseInt(match[1]);
+    const unit = match[2];
+    switch (unit) {
+      case 's':
+        return value;
+      case 'm':
+        return value * 60;
+      case 'h':
+        return value * 3600;
+      case 'd':
+        return value * 86400;
+      default:
+        return 3600;
+    }
   }
 }

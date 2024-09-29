@@ -1,7 +1,6 @@
 import {
   createParamDecorator,
   ExecutionContext,
-  ParseIntPipe,
 } from '@nestjs/common';
 
 export enum transformToTypeTypes {
