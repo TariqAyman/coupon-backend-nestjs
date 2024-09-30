@@ -6,17 +6,20 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import { useContainer, ValidationError } from 'class-validator';
 import { handleError } from './common/utils/api-response-wrapper';
 import { connectionSource } from './database/typeorm.config';
+import { join } from 'path';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
   await connectionSource.initialize();
 
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
   // app use global pipes to automatically validate requests
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
       transform: true,
+      transformOptions: { enableImplicitConversion: true },
       exceptionFactory: (errors: ValidationError[]) => {
         const formattedErrors = errors.reduce(
           (acc: Record<string, string[]>, err) => {
@@ -40,6 +43,10 @@ async function bootstrap() {
 
   // wrap AppModule with UseContainer
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
+
+  app.useStaticAssets(join(__dirname, '..', 'storage/uploads'), {
+    prefix: '/storage/uploads/',
+  });
 
   await app.listen(3000);
 }

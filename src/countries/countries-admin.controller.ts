@@ -26,9 +26,10 @@ import {
   BodyWithParam,
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('admin/countries')
-@UseGuards(RolesGuard)
+@UseGuards(RolesGuard, JwtAuthGuard)
 @Roles(UserRole.Admin)
 export class CountriesAdminController {
   constructor(private readonly countriesService: CountriesAdminService) {}

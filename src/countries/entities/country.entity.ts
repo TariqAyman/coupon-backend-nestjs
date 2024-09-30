@@ -1,4 +1,10 @@
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, DeleteDateColumn } from 'typeorm';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  DeleteDateColumn,
+} from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
 

@@ -10,30 +10,37 @@ import {
 import { IsUnique } from 'src/common/decorators/is-unique.decorator';
 import { Coupon } from '../entities/coupon.entity';
 import { BilingualString } from 'src/common/dto/bilingual-string.dto';
-import { Type } from 'class-transformer';
+import {  Type } from 'class-transformer';
 
 export class CreateCouponDto {
   @IsNotEmpty()
+  @IsString()
   @IsUnique(Coupon, 'code', { message: 'Coupon code must be unique' })
   code: string;
 
   @IsNumber()
+  @Type(() => Number)
   amount: number;
 
   @IsNotEmpty()
+  @Type(() => Object)
   status: { en: string; ar: string };
 
   @IsOptional()
+  @Type(() => Object)
   description?: { en: string; ar: string };
 
   @IsOptional()
   @IsDateString()
+  @Type(() => Date)
   expire?: Date;
 
   @IsOptional()
+  @Type(() => String)
   qrCode?: string;
 
   @IsOptional()
+  @Type(() => String)
   link?: string;
 
   @IsOptional()
@@ -57,7 +64,6 @@ export class CreateCouponDto {
   ogDescription?: BilingualString;
 
   @IsOptional()
-  @IsUrl()
   ogImage?: string;
 
   @IsOptional()
@@ -79,6 +85,5 @@ export class CreateCouponDto {
   twitterDescription?: BilingualString;
 
   @IsOptional()
-  @IsUrl()
   twitterImage?: string;
 }

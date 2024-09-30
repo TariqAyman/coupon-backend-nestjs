@@ -34,13 +34,17 @@ export class CategoriesAdminService {
     const [data, total] = await this.categoryRepository.findAndCount({
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
+      relations: ['categories', 'countries'],
     });
 
     return { data, total, pageNumber, limitNumber };
   }
 
   async findOne(id: string) {
-    return this.categoryRepository.findOne({ where: { id } });
+    return this.categoryRepository.findOne({
+      where: { id },
+      relations: ['categories', 'countries'],
+    });
   }
 
   async update(id: string, updateCategoryDto: UpdateCategoryDto) {

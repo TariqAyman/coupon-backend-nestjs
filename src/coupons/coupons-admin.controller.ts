@@ -8,6 +8,11 @@ import {
   Delete,
   UseGuards,
   Query,
+  UseInterceptors,
+  UploadedFile,
+  ValidationPipe,
+  Req,
+  Request,
 } from '@nestjs/common';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
@@ -25,17 +30,20 @@ import {
   BodyWithParam,
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { JsonToObjectsInterceptor } from 'src/common/interceptor/json-to-objects.interceptor';
 
 @Controller('admin/coupons')
-@UseGuards(RolesGuard)
+@UseGuards(RolesGuard, JwtAuthGuard)
 @Roles(UserRole.Admin)
 export class CouponsAdminController {
   constructor(private readonly couponsService: CouponsAdminService) {}
 
   @Post()
   async create(@Body() createCouponDto: CreateCouponDto) {
-    const category = await this.couponsService.create(createCouponDto);
-    return showOne(category);
+    console.log(createCouponDto);
+    const coupon = await this.couponsService.create(createCouponDto);
+    return showOne(coupon);
   }
 
   @Get()

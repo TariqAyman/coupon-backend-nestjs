@@ -15,12 +15,20 @@ import { UpdateAdDto } from './dto/update-ad.dto';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/UserRole';
-import { paginate, showOne, success } from 'src/common/utils/api-response-wrapper';
-import { BodyWithParam, transformToTypeTypes } from 'src/common/decorators/body-with-param.decorator';
+import {
+  paginate,
+  showOne,
+  success,
+} from 'src/common/utils/api-response-wrapper';
+import {
+  BodyWithParam,
+  transformToTypeTypes,
+} from 'src/common/decorators/body-with-param.decorator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('admin/ads')
-@UseGuards(RolesGuard)
+@UseGuards(RolesGuard, JwtAuthGuard)
 @Roles(UserRole.Admin)
 export class AdsAdminController {
   constructor(private readonly adsAdminService: AdsAdminService) {}

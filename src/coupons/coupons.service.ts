@@ -9,8 +9,8 @@ export class CouponsService {
   constructor(
     @InjectRepository(Coupon)
     private couponRepository: Repository<Coupon>,
-  ) { }
-  
+  ) {}
+
   async findAll(pagination: PaginationDto): Promise<{
     data: Coupon[];
     total: number;
@@ -27,12 +27,16 @@ export class CouponsService {
     const [data, total] = await this.couponRepository.findAndCount({
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
+      relations: ['categories', 'countries', 'brands'],
     });
 
     return { data, total, pageNumber, limitNumber };
   }
 
   async findOne(id: string) {
-    return this.couponRepository.findOne({ where: { id } });
+    return this.couponRepository.findOne({
+      where: { id },
+      relations: ['categories', 'countries', 'brands'],
+    });
   }
 }

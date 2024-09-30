@@ -6,15 +6,21 @@ import { Coupon } from './entities/coupon.entity';
 import { DeepPartial, Repository } from 'typeorm';
 import { CouponStatusAr, CouponStatusEn } from 'src/common/enums/CouponStatus';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { UploadMediaService } from 'src/upload-media/upload-media.service';
 
 @Injectable()
 export class CouponsAdminService {
   constructor(
     @InjectRepository(Coupon)
     private couponRepository: Repository<Coupon>,
+    private uploadMediaService: UploadMediaService,
   ) {}
 
-  async create(createCouponDto: CreateCouponDto) {
+  async create(
+    createCouponDto: CreateCouponDto,
+    // twitterImage: Express.Multer.File,
+    // ogImage: Express.Multer.File,
+  ) {
     const couponData: DeepPartial<Coupon> = {
       ...createCouponDto,
       status: {
@@ -22,7 +28,24 @@ export class CouponsAdminService {
         ar: createCouponDto.status.ar as CouponStatusAr,
       },
     };
+
     const coupon = this.couponRepository.create(couponData);
+
+    // const twitterMedia = await this.uploadMediaService.saveFileData(
+    //   twitterImage,
+    //   'coupon',
+    //   coupon.id,
+    // );
+
+    // const ogMedia = await this.uploadMediaService.saveFileData(
+    //   ogImage,
+    //   'coupon',
+    //   coupon.id,
+    // );
+
+    // coupon.twitterImage = twitterMedia.url;
+    // coupon.ogImage = ogMedia.url;
+
     return this.couponRepository.save(coupon);
   }
 
@@ -42,13 +65,17 @@ export class CouponsAdminService {
     const [data, total] = await this.couponRepository.findAndCount({
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
+      relations: ['categories', 'countries', 'brands'],
     });
 
     return { data, total, pageNumber, limitNumber };
   }
 
   async findOne(id: string) {
-    return this.couponRepository.findOne({ where: { id } });
+    return this.couponRepository.findOne({
+      where: { id },
+      relations: ['categories', 'countries', 'brands'],
+    });
   }
 
   async update(id: string, updateCouponDto: UpdateCouponDto) {

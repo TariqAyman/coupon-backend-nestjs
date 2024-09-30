@@ -27,12 +27,16 @@ export class BrandsService {
     const [data, total] = await this.brandRepository.findAndCount({
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
+      relations: ['categories', 'countries'],
     });
 
     return { data, total, pageNumber, limitNumber };
   }
 
   async findOne(id: string) {
-    return this.brandRepository.findOne({ where: { id } });
+    return this.brandRepository.findOne({
+      where: { id },
+      relations: ['categories', 'countries'],
+    });
   }
 }

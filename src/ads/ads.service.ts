@@ -36,12 +36,16 @@ export class AdsService {
     const [data, total] = await this.adsRepository.findAndCount({
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
+      relations: ['countries'],
     });
 
     return { data, total, pageNumber, limitNumber };
   }
 
   async findOne(id: string) {
-    return this.adsRepository.findOne({ where: { id } });
+    return this.adsRepository.findOne({
+      where: { id },
+      relations: ['countries'],
+    });
   }
 }

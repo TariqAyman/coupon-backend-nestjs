@@ -25,9 +25,10 @@ import {
   BodyWithParam,
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
 @Controller('admin/brands')
-@UseGuards(RolesGuard)
+@UseGuards(RolesGuard, JwtAuthGuard)
 @Roles(UserRole.Admin)
 export class BrandsAdminController {
   constructor(private readonly brandsService: BrandsAdminService) {}
