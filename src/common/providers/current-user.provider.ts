@@ -6,6 +6,6 @@ export const CURRENT_USER = 'CURRENT_USER';
 export const CurrentUserProvider: Provider = {
   provide: CURRENT_USER,
   scope: Scope.REQUEST,
-  useFactory: (request) => request?.user?.userId,
+  useFactory: (request) => request?.body?.user,
   inject: [REQUEST],
 };

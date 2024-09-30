@@ -10,17 +10,38 @@ import { CURRENT_USER } from '../providers/current-user.provider';
 @Injectable({ scope: Scope.REQUEST })
 @EventSubscriber()
 export class ActionByUserSubscriber implements EntitySubscriberInterface {
-  constructor(@Inject(CURRENT_USER) private readonly currentUserId: string) {}
+  constructor(@Inject(CURRENT_USER) private readonly currentUserId: string) {
+    console.log(
+      'ActionByUserSubscriber constructor called with currentUserId:',
+      this.currentUserId,
+    );
+  }
 
   beforeInsert(event: InsertEvent<any>) {
-    if (event?.entity?.createdBy) {
-      event.entity.createdBy = this.currentUserId;
+    console.log('beforeInsert called, currentUserId:', this.currentUserId);
+    if (this.currentUserId) {
+      if (event?.entity?.createdBy !== undefined) {
+        event.entity.createdBy = this.currentUserId;
+      }
+      if (event?.entity?.createdById !== undefined) {
+        event.entity.createdById = this.currentUserId;
+      }
+    } else {
+      console.warn('currentUserId is undefined in beforeInsert');
     }
   }
 
   beforeUpdate(event: UpdateEvent<any>) {
-    if (event?.entity?.updatedBy) {
-      event.entity.updatedBy = this.currentUserId;
+    console.log('beforeUpdate called, currentUserId:', this.currentUserId);
+    if (this.currentUserId) {
+      if (event?.entity?.updatedBy !== undefined) {
+        event.entity.updatedBy = this.currentUserId;
+      }
+      if (event?.entity?.updatedById !== undefined) {
+        event.entity.updatedById = this.currentUserId;
+      }
+    } else {
+      console.warn('currentUserId is undefined in beforeUpdate');
     }
   }
 }

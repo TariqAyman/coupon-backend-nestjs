@@ -6,9 +6,21 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthInterceptor } from 'src/common/interceptor/auth.interceptor';
 import { UsersModule } from 'src/users/users.module';
 import { AuthenticationModule } from 'src/authentication/authentication.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 @Module({
-  imports: [AuthenticationModule, UsersModule],
+  imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60, // Time to live in seconds
+          limit: 10, // Max number of requests in the TTL
+        },
+      ],
+    }),
+    AuthenticationModule,
+    UsersModule,
+  ],
   providers: [
     CurrentUserProvider,
     ActionByUserSubscriber,

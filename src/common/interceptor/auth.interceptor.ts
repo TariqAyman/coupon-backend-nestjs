@@ -23,9 +23,13 @@ export class AuthInterceptor implements NestInterceptor {
     const req = context.switchToHttp().getRequest();
     let tokenArray = req.headers.authorization;
     if (tokenArray) {
-      req.body['user'] = await this.authService.decodeToken(
+      const userId = await this.authService.decodeToken(
         tokenArray.split(' ')[1],
-      ).user;
+      ).id;
+
+      const user = await this.usersService.findOne(userId);
+
+      req.body['user'] = user;
     }
 
     return next

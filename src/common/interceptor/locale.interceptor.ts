@@ -10,7 +10,11 @@ import { Observable } from 'rxjs';
 export class LocaleInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const request = context.switchToHttp().getRequest();
-    const locale = request.query.locale || 'en';
+    const locale =
+      request.query.locale ||
+      request.headers['accept-language'] ||
+      request.headers['Accept-Language'] ||
+      'en';
     request.locale = locale;
     return next.handle();
   }
