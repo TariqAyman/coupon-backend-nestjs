@@ -42,4 +42,8 @@ export class UploadMedia {
 
   @Column({ nullable: true })
   deletedAt: Date;
+
+  constructor(partial: Partial<UploadMedia>) {
+    Object.assign(this, partial);
+  }
 }

@@ -86,6 +86,10 @@ export class Ads {
 
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
+
+  constructor(partial: Partial<Ads>) {
+    Object.assign(this, partial);
+  }
 }
 
 @EventSubscriber()

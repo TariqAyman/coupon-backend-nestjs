@@ -137,4 +137,8 @@ export class User {
     inverseJoinColumn: { name: 'brand_id', referencedColumnName: 'id' },
   })
   followedBrands: Brand[];
+
+  // constructor(partial: Partial<User>) {
+  //   Object.assign(this, partial);
+  // }
 }

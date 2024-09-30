@@ -66,4 +66,8 @@ export class Country {
 
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
+
+  constructor(partial: Partial<Country>) {
+    Object.assign(this, partial);
+  }
 }

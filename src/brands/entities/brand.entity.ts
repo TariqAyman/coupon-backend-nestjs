@@ -114,4 +114,8 @@ export class Brand {
 
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
+
+  constructor(partial: Partial<Brand>) {
+    Object.assign(this, partial);
+  }
 }

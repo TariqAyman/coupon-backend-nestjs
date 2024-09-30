@@ -147,4 +147,8 @@ export class Coupon {
     inverseJoinColumn: { name: 'brand_id', referencedColumnName: 'id' },
   })
   brands!: Brand[];
+
+  constructor(partial: Partial<Coupon>) {
+    Object.assign(this, partial);
+  }
 }

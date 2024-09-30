@@ -88,4 +88,8 @@ export class Category {
 
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
+
+  constructor(partial: Partial<Category>) {
+    Object.assign(this, partial);
+  }
 }
