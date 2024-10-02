@@ -16,19 +16,21 @@ export class UploadMediaService {
     file: Express.Multer.File,
     entityType: string,
     entityId: string,
+    isFileRequired: boolean = true,
   ): Promise<UploadMedia> {
     console.log(file);
 
-    if (!file) {
+    if (isFileRequired && !file) {
       throw new Error('File is required');
     }
 
-    const uploadDir = `src/public/storage/uploads/${entityType}`;
+    const uploadDir = `public/storage/uploads/${entityType}`;
+
     if (!fs.existsSync(uploadDir)) {
       fs.mkdirSync(uploadDir, { recursive: true });
     }
 
-    const uniqueFilename = `${Date.now()}-${file.originalname}`;
+    const uniqueFilename = file.filename;
     const filePath = path.join(uploadDir, uniqueFilename).replace(/\\/g, '/');
 
     const newFile = this.filesRepository.create({

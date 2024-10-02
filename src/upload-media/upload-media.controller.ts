@@ -31,12 +31,13 @@ export class UploadMediaController {
     @UploadedFile() uploadFile: Express.Multer.File,
     @Body() body: CreateUploadMediaDto,
   ) {
-    console.log(uploadFile);
+
     const savedFile = await this.uploadMediaService.saveFileData(
       uploadFile,
       body.entityType,
       body.entityId,
     );
+    
     return success(savedFile, 200, 'File uploaded successfully');
   }
 }

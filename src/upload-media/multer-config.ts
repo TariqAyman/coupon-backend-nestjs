@@ -23,5 +23,8 @@ export function multerOptions(entityType: string) {
         cb(null, true);
       }
     },
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 5MB limit
+    },
   };
 }
