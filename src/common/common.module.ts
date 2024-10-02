@@ -25,10 +25,6 @@ import { ThrottlerModule } from '@nestjs/throttler';
     CurrentUserProvider,
     ActionByUserSubscriber,
     IsUniqueConstraint,
-    {
-      provide: APP_INTERCEPTOR,
-      useClass: AuthInterceptor,
-    },
     // AllExceptionsFilter,
   ],
   exports: [CurrentUserProvider, ActionByUserSubscriber],

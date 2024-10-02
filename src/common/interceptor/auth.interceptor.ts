@@ -9,6 +9,9 @@ import { tap } from 'rxjs/operators';
 import { AuthenticationService } from '../../authentication/authentication.service';
 import { UsersService } from '../../users/users.service';
 
+/**
+ * @deprecated
+ */
 @Injectable()
 export class AuthInterceptor implements NestInterceptor {
   constructor(
