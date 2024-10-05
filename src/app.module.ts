@@ -16,6 +16,7 @@ import { UploadMediaModule } from './upload-media/upload-media.module';
   imports: [
     DatabaseModule,
     CommonModule,
+    AuthenticationModule,
     AdsModule,
     UsersModule,
     BrandsModule,
@@ -23,7 +24,6 @@ import { UploadMediaModule } from './upload-media/upload-media.module';
     CouponsModule,
     CountriesModule,
     NotificationsModule,
-    AuthenticationModule,
     UploadMediaModule,
   ],
   controllers: [],

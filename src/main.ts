@@ -17,8 +17,9 @@ async function bootstrap() {
   // app use global pipes to automatically validate requests
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      transform: true,
+      transform: true, // Enables automatic data transformation
+      whitelist: true, // Strips properties without decorators
+      forbidNonWhitelisted: true, // Throws an error if non-whitelisted properties are present
       transformOptions: { enableImplicitConversion: true },
       exceptionFactory: (errors: ValidationError[]) => {
         const formattedErrors = errors.reduce(
@@ -44,8 +45,8 @@ async function bootstrap() {
   // wrap AppModule with UseContainer
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
 
-  app.useStaticAssets(join(__dirname, '..', 'storage/uploads'), {
-    prefix: '/storage/uploads/',
+  app.useStaticAssets(join(__dirname, '..', 'public/storage/uploads'), {
+    prefix: '/public/storage/uploads/',
   });
 
   await app.listen(3000);
