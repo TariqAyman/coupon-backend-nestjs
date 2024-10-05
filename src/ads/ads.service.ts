@@ -37,6 +37,7 @@ export class AdsService {
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
       relations: ['countries'],
+      order: { createdAt: 'DESC' },
     });
 
     return { data, total, pageNumber, limitNumber };

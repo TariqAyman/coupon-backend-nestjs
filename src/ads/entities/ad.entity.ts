@@ -30,7 +30,7 @@ export class Ads {
   link!: string;
 
   @Column({ nullable: true })
-  image!: string;
+  image?: string;
 
   @Column('json', { nullable: true })
   seoDescription?: { en: string; ar: string };

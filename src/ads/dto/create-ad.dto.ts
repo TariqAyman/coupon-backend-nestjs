@@ -1,4 +1,5 @@
 import {
+  IsArray,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -8,11 +9,12 @@ import {
 import { User } from '../../users/entities/user.entity';
 import { Country } from '../../countries/entities/country.entity';
 import { DeleteDateColumn } from 'typeorm';
-import { Type } from 'class-transformer';
+import { Transform, TransformationType, Type } from 'class-transformer';
 import { BilingualString } from '../../common/dto/bilingual-string.dto';
 
 export class CreateAdDto {
   @IsNotEmpty()
+  @IsString()
   name: string;
 
   @IsNotEmpty()
@@ -70,4 +72,9 @@ export class CreateAdDto {
   @IsOptional()
   @IsUrl()
   twitterImage?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  countryIds?: string[];
 }

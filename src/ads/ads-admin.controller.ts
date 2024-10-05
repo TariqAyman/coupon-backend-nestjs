@@ -8,6 +8,8 @@ import {
   Delete,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import { AdsAdminService } from './ads-admin.service';
 import { CreateAdDto } from './dto/create-ad.dto';
@@ -26,17 +28,29 @@ import {
 } from 'src/common/decorators/body-with-param.decorator';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { EntityFilesInterceptor } from 'src/upload-media/entity-files.interceptor';
+import { EntityFileInterceptor } from 'src/upload-media/entity-file.interceptor';
 
-@Controller('admin/ads')
-@UseGuards(RolesGuard, JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
+@Controller('admin/ads')
 export class AdsAdminController {
   constructor(private readonly adsAdminService: AdsAdminService) {}
 
   @Post()
-  async create(@Body() createAdDto: CreateAdDto) {
-    const category = await this.adsAdminService.create(createAdDto);
-    return showOne(category);
+  @UseInterceptors(
+    EntityFilesInterceptor('ads', [
+      { name: 'image', maxCount: 1 },
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
+  async create(
+    @UploadedFiles() files: { [fieldName: string]: Express.Multer.File[] },
+    @Body() createAdDto: CreateAdDto,
+  ) {
+    const ads = await this.adsAdminService.create(createAdDto, files);
+    return showOne(ads);
   }
 
   @Get()
@@ -53,16 +67,19 @@ export class AdsAdminController {
   }
 
   @Patch(':id')
+  @UseInterceptors(
+    EntityFilesInterceptor('ads', [
+      { name: 'image', maxCount: 1 },
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
   async update(
     @Param('id') id: string,
-    @BodyWithParam({
-      paramName: 'id',
-      transformTo: transformToTypeTypes.STRING,
-    })
-    @Body()
-    updateAdDto: UpdateAdDto,
+    @Body() updateAdDto: UpdateAdDto,
+    @UploadedFiles() files: { [fieldName: string]: Express.Multer.File[] },
   ) {
-    const response = await this.adsAdminService.update(id, updateAdDto);
+    const response = await this.adsAdminService.update(id, updateAdDto, files);
 
     return showOne(response);
   }
