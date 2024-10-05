@@ -1,20 +1,50 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCountryDto } from './dto/create-country.dto';
 import { UpdateCountryDto } from './dto/update-country.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Country } from './entities/country.entity';
 import { Repository } from 'typeorm';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { UploadMediaService } from 'src/upload-media/upload-media.service';
 
 @Injectable()
 export class CountriesAdminService {
   constructor(
     @InjectRepository(Country)
-    private countryRepository: Repository<Country>,
+    private readonly countryRepository: Repository<Country>,
+    private readonly uploadMediaService: UploadMediaService,
   ) {}
 
-  async create(createCountryDto: CreateCountryDto): Promise<Country> {
+  async create(
+    createCountryDto: CreateCountryDto,
+    files: { [fieldName: string]: Express.Multer.File[] },
+  ): Promise<Country> {
     const country = this.countryRepository.create(createCountryDto);
+
+    country.twitterImage = (
+      await this.uploadMediaService.saveOneFile(
+        files?.twitterImage,
+        'country',
+        country.id,
+      )
+    )?.url;
+
+    country.ogImage = (
+      await this.uploadMediaService.saveOneFile(
+        files?.ogImage,
+        'country',
+        country.id,
+      )
+    )?.url;
+
+    country.image = (
+      await this.uploadMediaService.saveOneFile(
+        files?.image,
+        'country',
+        country.id,
+      )
+    )?.url;
+
     return await this.countryRepository.save(country);
   }
 
@@ -34,6 +64,7 @@ export class CountriesAdminService {
     const [data, total] = await this.countryRepository.findAndCount({
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
+      order: { createdAt: 'DESC' },
     });
 
     return { data, total, pageNumber, limitNumber };
@@ -46,14 +77,53 @@ export class CountriesAdminService {
   async update(
     id: string,
     updateCountryDto: UpdateCountryDto,
+    files: { [fieldName: string]: Express.Multer.File[] },
   ): Promise<Country | null> {
-    const { id: _, ...updateFields } = updateCountryDto;
+    const country = await this.findOne(id);
 
-    await this.countryRepository.update(id, updateFields);
+    if (!country)
+      throw new NotFoundException(`country with ID "${id}" not found`);
+
+    country.twitterImage =
+      (
+        await this.uploadMediaService.saveOneFile(
+          files?.twitterImage,
+          'ads',
+          country.id,
+        )
+      )?.url ?? country.twitterImage;
+
+    country.ogImage =
+      (
+        await this.uploadMediaService.saveOneFile(
+          files?.ogImage,
+          'country',
+          country.id,
+        )
+      )?.url ?? country.ogImage;
+
+    country.image =
+      (
+        await this.uploadMediaService.saveOneFile(
+          files?.image,
+          'country',
+          country.id,
+        )
+      )?.url ?? country.image;
+
+    // Update other fields
+    Object.assign(country, updateCountryDto);
+
+    await this.countryRepository.save(country);
+
     return this.findOne(id);
   }
 
-  async remove(id: string): Promise<void> {
-    await this.countryRepository.delete(id);
+  async remove(id: string) {
+    const country = await this.findOne(id);
+
+    if (!country) throw new NotFoundException(`Ads with ID "${id}" not found`);
+
+    return await this.countryRepository.softDelete(id);
   }
 }

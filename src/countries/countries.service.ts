@@ -27,6 +27,7 @@ export class CountriesService {
     const [data, total] = await this.countryRepository.findAndCount({
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
+      order: { createdAt: 'DESC' },
     });
 
     return { data, total, pageNumber, limitNumber };

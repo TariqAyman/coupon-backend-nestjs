@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateCountryDto } from './dto/create-country.dto';
 import { UpdateCountryDto } from './dto/update-country.dto';
@@ -27,16 +29,27 @@ import {
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { EntityFilesInterceptor } from 'src/upload-media/entity-files.interceptor';
 
-@Controller('admin/countries')
-@UseGuards(RolesGuard, JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
+@Controller('admin/countries')
 export class CountriesAdminController {
   constructor(private readonly countriesService: CountriesAdminService) {}
 
   @Post()
-  async create(@Body() createCountryDto: CreateCountryDto) {
-    const country = await this.countriesService.create(createCountryDto);
+  @UseInterceptors(
+    EntityFilesInterceptor('country', [
+      { name: 'image', maxCount: 1 },
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
+  async create(
+    @UploadedFiles() files: { [fieldName: string]: Express.Multer.File[] },
+    @Body() createCountryDto: CreateCountryDto,
+  ) {
+    const country = await this.countriesService.create(createCountryDto, files);
     return successCreate(country);
   }
 
@@ -54,16 +67,23 @@ export class CountriesAdminController {
   }
 
   @Patch(':id')
+  @UseInterceptors(
+    EntityFilesInterceptor('country', [
+      { name: 'image', maxCount: 1 },
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
   async update(
     @Param('id') id: string,
-    @BodyWithParam({
-      paramName: 'id',
-      transformTo: transformToTypeTypes.STRING,
-    })
-    @Body()
-    updateCountryDto: UpdateCountryDto,
+    @Body() updateCountryDto: UpdateCountryDto,
+    @UploadedFiles() files: { [fieldName: string]: Express.Multer.File[] },
   ) {
-    const country = await this.countriesService.update(id, updateCountryDto);
+    const country = await this.countriesService.update(
+      id,
+      updateCountryDto,
+      files,
+    );
     return success(country);
   }
 
