@@ -27,9 +27,9 @@ import {
 } from 'src/common/decorators/body-with-param.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 
-@Controller('admin/users')
-@UseGuards(RolesGuard, JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
+@Controller('admin/users')
 export class UsersAdminController {
   constructor(private readonly usersService: UsersAdminService) {}
 

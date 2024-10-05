@@ -16,14 +16,14 @@ import { File } from 'buffer';
 export class CouponsAdminService {
   constructor(
     @InjectRepository(Coupon)
-    private couponRepository: Repository<Coupon>,
+    private readonly couponRepository: Repository<Coupon>,
     @InjectRepository(Country)
     private readonly countryRepository: Repository<Country>,
     @InjectRepository(Brand)
     private readonly brandRepository: Repository<Brand>,
     @InjectRepository(Category)
     private readonly categoryRepository: Repository<Category>,
-    private uploadMediaService: UploadMediaService,
+    private readonly uploadMediaService: UploadMediaService,
   ) {}
 
   async create(

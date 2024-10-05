@@ -2,9 +2,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  BeforeInsert,
-  BeforeUpdate,
-  BaseEntity,
   ManyToMany,
   JoinTable,
 } from 'typeorm';
@@ -34,8 +31,11 @@ export class User {
   @Column({ nullable: true })
   changePasswordTime!: Date;
 
-  @Column({ nullable: true })
-  phoneNumber!: string;
+  @Column()
+  phoneNumber: string;
+
+  @Column()
+  phoneNumberCountryCode: string;
 
   @Column({
     type: 'enum',
@@ -55,7 +55,7 @@ export class User {
   status!: string;
 
   @Column({ nullable: true })
-  avatar!: string;
+  avatar?: string;
 
   @Column({ nullable: true })
   birthday!: Date;

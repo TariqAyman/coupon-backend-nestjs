@@ -1,5 +1,4 @@
 import {
-  ConflictException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
@@ -9,10 +8,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { RegisterDto } from 'src/authentication/dto/register.dto';
-import { UserRole } from 'src/common/enums/UserRole';
-import { UserStatus } from 'src/common/enums/UserStatus';
-import { UserProvider } from 'src/common/enums/UserProvider';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
 @Injectable()
@@ -21,8 +16,6 @@ export class UsersAdminService {
     @InjectRepository(User)
     private readonly usersRepository: Repository<User>,
   ) {}
-
-  
 
   create(createUserDto: CreateUserDto): Promise<User> {
     return this.usersRepository.save(createUserDto);
@@ -53,6 +46,7 @@ export class UsersAdminService {
     const [data, total] = await this.usersRepository.findAndCount({
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
+      order: { createdAt: 'DESC' },
     });
 
     return { data, total, pageNumber, limitNumber };
