@@ -29,7 +29,6 @@ if (result.error) {
   console.error('Error loading .env file', result.error);
 } else {
   console.log('.env file loaded successfully');
-  console.log(databaseConfig);
 }
 
 export default registerAs('databaseConfig', () => databaseConfig);

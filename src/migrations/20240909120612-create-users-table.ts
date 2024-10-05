@@ -17,6 +17,7 @@ export class CreateUsersTable20240909120612 implements MigrationInterface {
           { name: 'password', type: 'varchar', isNullable: false },
           { name: 'changePasswordTime', type: 'timestamp', isNullable: true },
           { name: 'phoneNumber', type: 'varchar', isNullable: true },
+          { name: 'phoneNumberCountryCode', type: 'varchar', isNullable: true },
           { name: 'countryCode', type: 'varchar', isNullable: true },
           {
             name: 'role',
