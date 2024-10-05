@@ -3,23 +3,32 @@ import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Coupon } from './entities/coupon.entity';
-import { DeepPartial, Repository } from 'typeorm';
+import { DeepPartial, In, Repository } from 'typeorm';
 import { CouponStatusAr, CouponStatusEn } from 'src/common/enums/CouponStatus';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 import { UploadMediaService } from 'src/upload-media/upload-media.service';
+import { Country } from 'src/countries/entities/country.entity';
+import { Brand } from 'src/brands/entities/brand.entity';
+import { Category } from 'src/categories/entities/category.entity';
+import { File } from 'buffer';
 
 @Injectable()
 export class CouponsAdminService {
   constructor(
     @InjectRepository(Coupon)
     private couponRepository: Repository<Coupon>,
+    @InjectRepository(Country)
+    private readonly countryRepository: Repository<Country>,
+    @InjectRepository(Brand)
+    private readonly brandRepository: Repository<Brand>,
+    @InjectRepository(Category)
+    private readonly categoryRepository: Repository<Category>,
     private uploadMediaService: UploadMediaService,
   ) {}
 
   async create(
     createCouponDto: CreateCouponDto,
-    // twitterImage: Express.Multer.File,
-    // ogImage: Express.Multer.File,
+    files: { [fieldName: string]: Express.Multer.File[] },
   ) {
     const couponData: DeepPartial<Coupon> = {
       ...createCouponDto,
@@ -29,24 +38,53 @@ export class CouponsAdminService {
       },
     };
 
-    const coupon = this.couponRepository.create(couponData);
+    let countries: Country[] = [];
+    if (createCouponDto.countryIds && createCouponDto.countryIds.length > 0) {
+      countries = await this.countryRepository.findBy({
+        id: In(createCouponDto.countryIds),
+      });
+    }
 
-    // const twitterMedia = await this.uploadMediaService.saveFileData(
-    //   twitterImage,
-    //   'coupon',
-    //   coupon.id,
-    // );
+    let brands: Brand[] = [];
+    if (createCouponDto.brandIds && createCouponDto.brandIds.length > 0) {
+      brands = await this.brandRepository.findBy({
+        id: In(createCouponDto.brandIds),
+      });
+    }
 
-    // const ogMedia = await this.uploadMediaService.saveFileData(
-    //   ogImage,
-    //   'coupon',
-    //   coupon.id,
-    // );
+    let categories: Category[] = [];
+    if (createCouponDto.categoryIds && createCouponDto.categoryIds.length > 0) {
+      categories = await this.categoryRepository.findBy({
+        id: In(createCouponDto.categoryIds),
+      });
+    }
 
-    // coupon.twitterImage = twitterMedia.url;
-    // coupon.ogImage = ogMedia.url;
+    let coupon = this.couponRepository.create({
+      ...couponData,
+      countries,
+      brands,
+      categories,
+    });
 
-    return this.couponRepository.save(coupon);
+    coupon.twitterImage = (
+      await this.uploadMediaService.saveOneFile(
+        files?.twitterImage,
+        'coupon',
+        coupon.id,
+      )
+    )?.url;
+
+    coupon.ogImage = (
+      await this.uploadMediaService.saveOneFile(
+        files?.ogImage,
+        'coupon',
+        coupon.id,
+      )
+    )?.url;
+
+    coupon = await this.couponRepository.save(coupon);
+
+    return this.findOne(coupon.id);
   }
 
   async findAll(pagination: PaginationDto): Promise<{
@@ -66,6 +104,7 @@ export class CouponsAdminService {
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
       relations: ['categories', 'countries', 'brands'],
+      order: { createdAt: 'DESC' },
     });
 
     return { data, total, pageNumber, limitNumber };
@@ -75,10 +114,20 @@ export class CouponsAdminService {
     return this.couponRepository.findOne({
       where: { id },
       relations: ['categories', 'countries', 'brands'],
+      select: ['categories'],
     });
   }
 
-  async update(id: string, updateCouponDto: UpdateCouponDto) {
+  async update(
+    id: string,
+    updateCouponDto: UpdateCouponDto,
+    files: { [fieldName: string]: Express.Multer.File[] },
+  ) {
+    const coupon = await this.findOne(id);
+
+    if (!coupon)
+      throw new NotFoundException(`coupon with ID "${id}" not found`);
+
     const updateData = {
       ...updateCouponDto,
       status: updateCouponDto.status
@@ -89,9 +138,29 @@ export class CouponsAdminService {
         : undefined,
     };
 
-    const { id: _, ...updateFields } = updateData;
+    coupon.twitterImage =
+      (
+        await this.uploadMediaService.saveOneFile(
+          files?.twitterImage,
+          'coupon',
+          coupon.id,
+        )
+      )?.url ?? coupon.twitterImage;
 
-    await this.couponRepository.update(id, updateFields);
+    coupon.ogImage =
+      (
+        await this.uploadMediaService.saveOneFile(
+          files?.ogImage,
+          'coupon',
+          coupon.id,
+        )
+      )?.url ?? coupon.ogImage;
+
+    // Update other fields
+    Object.assign(coupon, updateData);
+
+    await this.couponRepository.save(coupon);
+
     return this.findOne(id);
   }
 

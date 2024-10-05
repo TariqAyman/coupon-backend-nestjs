@@ -9,10 +9,7 @@ import {
   UseGuards,
   Query,
   UseInterceptors,
-  UploadedFile,
-  ValidationPipe,
-  Req,
-  Request,
+  UploadedFiles,
 } from '@nestjs/common';
 import { CreateCouponDto } from './dto/create-coupon.dto';
 import { UpdateCouponDto } from './dto/update-coupon.dto';
@@ -31,18 +28,26 @@ import {
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { JsonToObjectsInterceptor } from 'src/common/interceptor/json-to-objects.interceptor';
+import { EntityFilesInterceptor } from 'src/upload-media/entity-files.interceptor';
 
-@Controller('admin/coupons')
-@UseGuards(RolesGuard, JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
+@Controller('admin/coupons')
 export class CouponsAdminController {
   constructor(private readonly couponsService: CouponsAdminService) {}
 
   @Post()
-  async create(@Body() createCouponDto: CreateCouponDto) {
-    console.log(createCouponDto);
-    const coupon = await this.couponsService.create(createCouponDto);
+  @UseInterceptors(
+    EntityFilesInterceptor('coupon', [
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
+  async create(
+    @UploadedFiles() files: { [fieldName: string]: Express.Multer.File[] },
+    @Body() createCouponDto: CreateCouponDto,
+  ) {
+    const coupon = await this.couponsService.create(createCouponDto, files);
     return showOne(coupon);
   }
 
@@ -60,16 +65,22 @@ export class CouponsAdminController {
   }
 
   @Patch(':id')
+  @UseInterceptors(
+    EntityFilesInterceptor('coupon', [
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
   async update(
     @Param('id') id: string,
-    @BodyWithParam({
-      paramName: 'id',
-      transformTo: transformToTypeTypes.STRING,
-    })
-    @Body()
-    updateCouponDto: UpdateCouponDto,
+    @Body() updateCouponDto: UpdateCouponDto,
+    @UploadedFiles() files: { [fieldName: string]: Express.Multer.File[] },
   ) {
-    const response = await this.couponsService.update(id, updateCouponDto);
+    const response = await this.couponsService.update(
+      id,
+      updateCouponDto,
+      files,
+    );
 
     return showOne(response);
   }

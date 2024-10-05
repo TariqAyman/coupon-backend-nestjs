@@ -28,6 +28,7 @@ export class CouponsService {
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
       relations: ['categories', 'countries', 'brands'],
+      order: { createdAt: 'DESC' },
     });
 
     return { data, total, pageNumber, limitNumber };

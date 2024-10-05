@@ -6,24 +6,31 @@ import {
   IsUrl,
   IsString,
   ValidateNested,
+  IsArray,
+  Min,
 } from 'class-validator';
 import { IsUnique } from 'src/common/decorators/is-unique.decorator';
 import { Coupon } from '../entities/coupon.entity';
 import { BilingualString } from 'src/common/dto/bilingual-string.dto';
-import {  Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 
 export class CreateCouponDto {
   @IsNotEmpty()
   @IsString()
   @IsUnique(Coupon, 'code', { message: 'Coupon code must be unique' })
+  @Transform(({ value }) => value?.toString().trim())
   code: string;
 
+  @IsNotEmpty()
   @IsNumber()
+  @Min(0)
   @Type(() => Number)
+  @Transform(({ value }) => parseFloat(value))
   amount: number;
 
   @IsNotEmpty()
   @Type(() => Object)
+  // @Transform(({ value }) => JSON.parse(value))
   status: { en: string; ar: string };
 
   @IsOptional()
@@ -86,4 +93,19 @@ export class CreateCouponDto {
 
   @IsOptional()
   twitterImage?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  brandIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categoryIds?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  countryIds?: string[];
 }
