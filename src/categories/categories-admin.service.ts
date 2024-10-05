@@ -4,18 +4,66 @@ import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
+import { Country } from 'src/countries/entities/country.entity';
+import { UploadMediaService } from 'src/upload-media/upload-media.service';
 
 @Injectable()
 export class CategoriesAdminService {
   constructor(
     @InjectRepository(Category)
-    private categoryRepository: Repository<Category>,
+    private readonly categoryRepository: Repository<Category>,
+    @InjectRepository(Country)
+    private readonly countryRepository: Repository<Country>,
+    private readonly uploadMediaService: UploadMediaService,
   ) {}
 
-  async create(createCategoryDto: CreateCategoryDto) {
-    const category = this.categoryRepository.create(createCategoryDto);
-    return await this.categoryRepository.save(category);
+  async create(
+    createCategoryDto: CreateCategoryDto,
+    files: { [fieldName: string]: Express.Multer.File[] },
+  ) {
+    let countries: Country[] = [];
+    if (
+      createCategoryDto.countryIds &&
+      createCategoryDto.countryIds.length > 0
+    ) {
+      countries = await this.countryRepository.findBy({
+        id: In(createCategoryDto.countryIds),
+      });
+    }
+
+    let category = this.categoryRepository.create({
+      ...createCategoryDto,
+      countries,
+    });
+
+    category.twitterImage = (
+      await this.uploadMediaService.saveOneFile(
+        files?.twitterImage,
+        'category',
+        category.id,
+      )
+    )?.url;
+
+    category.ogImage = (
+      await this.uploadMediaService.saveOneFile(
+        files?.ogImage,
+        'category',
+        category.id,
+      )
+    )?.url;
+
+    category.image = (
+      await this.uploadMediaService.saveOneFile(
+        files?.image,
+        'category',
+        category.id,
+      )
+    )?.url;
+
+    category = await this.categoryRepository.save(category);
+
+    return this.findOne(category.id);
   }
 
   async findAll(pagination: PaginationDto): Promise<{
@@ -34,7 +82,8 @@ export class CategoriesAdminService {
     const [data, total] = await this.categoryRepository.findAndCount({
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
-      relations: ['categories', 'countries'],
+      relations: ['countries'],
+      order: { createdAt: 'DESC' },
     });
 
     return { data, total, pageNumber, limitNumber };
@@ -43,20 +92,59 @@ export class CategoriesAdminService {
   async findOne(id: string) {
     return this.categoryRepository.findOne({
       where: { id },
-      relations: ['categories', 'countries'],
+      relations: ['countries'],
     });
   }
 
-  async update(id: string, updateCategoryDto: UpdateCategoryDto) {
-    await this.categoryRepository.update(id, updateCategoryDto);
+  async update(
+    id: string,
+    updateCategoryDto: UpdateCategoryDto,
+    files: { [fieldName: string]: Express.Multer.File[] },
+  ) {
+    const category = await this.findOne(id);
+
+    if (!category) throw new NotFoundException(`category with ID "${id}" not found`);
+
+    category.twitterImage =
+      (
+        await this.uploadMediaService.saveOneFile(
+          files?.twitterImage,
+          'category',
+          category.id,
+        )
+      )?.url ?? category.twitterImage;
+
+    category.ogImage =
+      (
+        await this.uploadMediaService.saveOneFile(
+          files?.ogImage,
+          'category',
+          category.id,
+        )
+      )?.url ?? category.ogImage;
+
+    category.image =
+      (
+        await this.uploadMediaService.saveOneFile(
+          files?.image,
+          'category',
+          category.id,
+        )
+      )?.url ?? category.image;
+
+    // Update other fields
+    Object.assign(category, updateCategoryDto);
+
+    await this.categoryRepository.save(category);
+
     return this.findOne(id);
   }
 
   async remove(id: string) {
-    const coupon = await this.findOne(id);
+    const category = await this.findOne(id);
 
-    if (!coupon)
-      throw new NotFoundException(`Coupon with ID "${id}" not found`);
+    if (!category)
+      throw new NotFoundException(`Category with ID "${id}" not found`);
 
     return this.categoryRepository.softDelete(id);
   }

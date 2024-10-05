@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
@@ -26,16 +28,30 @@ import {
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { EntityFilesInterceptor } from 'src/upload-media/entity-files.interceptor';
 
-@Controller('admin/categories')
-@UseGuards(RolesGuard, JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
+@Controller('admin/categories')
 export class CategoriesAdminController {
   constructor(private readonly categoriesService: CategoriesAdminService) {}
 
   @Post()
-  async create(@Body() createCategoryDto: CreateCategoryDto) {
-    const category = await this.categoriesService.create(createCategoryDto);
+  @UseInterceptors(
+    EntityFilesInterceptor('category', [
+      { name: 'image', maxCount: 1 },
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
+  async create(
+    @UploadedFiles() files: { [fieldName: string]: Express.Multer.File[] },
+    @Body() createCategoryDto: CreateCategoryDto,
+  ) {
+    const category = await this.categoriesService.create(
+      createCategoryDto,
+      files,
+    );
     return success(category);
   }
 
@@ -53,16 +69,23 @@ export class CategoriesAdminController {
   }
 
   @Patch(':id')
+  @UseInterceptors(
+    EntityFilesInterceptor('category', [
+      { name: 'image', maxCount: 1 },
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
   async update(
     @Param('id') id: string,
-    @BodyWithParam({
-      paramName: 'id',
-      transformTo: transformToTypeTypes.STRING,
-    })
-    @Body()
-    updateCategoryDto: UpdateCategoryDto,
+    @Body() updateCategoryDto: UpdateCategoryDto,
+    @UploadedFiles() files: { [fieldName: string]: Express.Multer.File[] },
   ) {
-    const response = await this.categoriesService.update(id, updateCategoryDto);
+    const response = await this.categoriesService.update(
+      id,
+      updateCategoryDto,
+      files,
+    );
 
     return showOne(response);
   }

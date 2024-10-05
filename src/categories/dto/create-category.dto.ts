@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNotEmpty, IsOptional, IsString, IsUrl, ValidateNested } from 'class-validator';
+import { IsArray, IsNotEmpty, IsOptional, IsString, IsUrl, ValidateNested } from 'class-validator';
 import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
 export class CreateCategoryDto {
@@ -66,4 +66,9 @@ export class CreateCategoryDto {
   @IsOptional()
   @IsUrl()
   twitterImage?: string;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  countryIds?: string[];
 }

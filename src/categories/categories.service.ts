@@ -28,6 +28,7 @@ export class CategoriesService {
       skip: (pageNumber - 1) * limitNumber,
       take: limitNumber,
       relations: ['categories', 'countries'],
+      order: { createdAt: 'DESC' },
     });
 
     return { data, total, pageNumber, limitNumber };
