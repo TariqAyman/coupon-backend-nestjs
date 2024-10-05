@@ -1,5 +1,5 @@
 import { User } from 'src/users/entities/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, DeleteDateColumn } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 @Entity('upload_media')
@@ -40,6 +40,6 @@ export class UploadMedia {
   @Column({ nullable: true })
   updatedAt: Date;
 
-  @Column({ nullable: true })
-  deletedAt: Date;
+  @DeleteDateColumn({ nullable: true })
+  deletedAt?: Date;
 }
