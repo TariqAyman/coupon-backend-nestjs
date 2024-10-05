@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Query,
+  UploadedFiles,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -26,16 +28,27 @@ import {
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { EntityFilesInterceptor } from 'src/upload-media/entity-files.interceptor';
 
-@Controller('admin/brands')
-@UseGuards(RolesGuard, JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
+@Controller('admin/brands')
 export class BrandsAdminController {
   constructor(private readonly brandsService: BrandsAdminService) {}
 
   @Post()
-  async create(@Body() createBrandDto: CreateBrandDto) {
-    const brand = await this.brandsService.create(createBrandDto);
+  @UseInterceptors(
+    EntityFilesInterceptor('brand', [
+      { name: 'image', maxCount: 1 },
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
+  async create(
+    @UploadedFiles() files: { [fieldName: string]: Express.Multer.File[] },
+    @Body() createBrandDto: CreateBrandDto,
+  ) {
+    const brand = await this.brandsService.create(createBrandDto, files);
     return success(brand);
   }
 
@@ -53,16 +66,26 @@ export class BrandsAdminController {
   }
 
   @Patch(':id')
+  @UseInterceptors(
+    EntityFilesInterceptor('brand', [
+      { name: 'image', maxCount: 1 },
+      { name: 'ogImage', maxCount: 1 },
+      { name: 'twitterImage', maxCount: 1 },
+    ]),
+  )
   async update(
     @Param('id') id: string,
     @BodyWithParam({
       paramName: 'id',
       transformTo: transformToTypeTypes.STRING,
     })
+    @UploadedFiles()
+    files: { [fieldName: string]: Express.Multer.File[] },
+
     @Body()
     updateBrandDto: UpdateBrandDto,
   ) {
-    const response = await this.brandsService.update(id, updateBrandDto);
+    const response = await this.brandsService.update(id, updateBrandDto, files);
 
     return showOne(response);
   }
