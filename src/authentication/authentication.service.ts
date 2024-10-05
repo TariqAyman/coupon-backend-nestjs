@@ -54,7 +54,6 @@ export class AuthenticationService {
       role: user.role,
     };
 
-
     // Calculate the expiration time
     const expirationDate = new Date(
       Date.now() + this.parseExpirationTime(jwtConstants.expiresIn) * 1000,
@@ -70,6 +69,8 @@ export class AuthenticationService {
     const refreshToken = this.jwtService.sign(payload, {
       expiresIn: jwtConstants.refreshExpiresIn,
     });
+
+    user.lastLogin = new Date();
 
     return {
       user: payload,
@@ -104,7 +105,7 @@ export class AuthenticationService {
         Date.now() +
           this.parseExpirationTime(jwtConstants.refreshExpiresIn) * 1000,
       );
-      
+
       const newAccessToken = this.jwtService.sign(newPayload);
       const newRefreshToken = this.jwtService.sign(newPayload, {
         expiresIn: jwtConstants.refreshExpiresIn,
@@ -124,8 +125,8 @@ export class AuthenticationService {
     }
   }
 
-  async register(registerDto: RegisterDto) {
-    const user = await this.userService.register(registerDto);
+  async register(registerDto: RegisterDto, avatar: any) {
+    const user = await this.userService.register(registerDto, avatar);
     return user;
   }
 

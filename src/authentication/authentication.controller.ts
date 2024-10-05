@@ -5,6 +5,8 @@ import {
   Body,
   UseGuards,
   Request,
+  UseInterceptors,
+  UploadedFile,
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { LoginDto } from './dto/login.dto';
@@ -19,6 +21,7 @@ import { DeleteAccountDto } from './dto/deleteAccount.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { success } from 'src/common/utils/api-response-wrapper';
+import { EntityFileInterceptor } from 'src/upload-media/entity-file.interceptor';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -43,8 +46,15 @@ export class AuthenticationController {
   }
 
   @Post('register')
-  async register(@Body() registerDto: RegisterDto) {
-    const response = await this.authenticationService.register(registerDto);
+  @UseInterceptors(EntityFileInterceptor('user', 'avatar'))
+  async register(
+    @UploadedFile() avatar: Express.Multer.File,
+    @Body() registerDto: RegisterDto,
+  ) {
+    const response = await this.authenticationService.register(
+      registerDto,
+      avatar,
+    );
     return success(response);
   }
 
