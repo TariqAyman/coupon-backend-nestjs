@@ -7,7 +7,7 @@ export function multerOptions(entityType: string) {
   return {
     storage: diskStorage({
       destination: (req, file, cb) => {
-        const uploadPath = `./src/public/storage/uploads/${entityType}`;
+        const uploadPath = `./public/storage/uploads/${entityType}`;
         fs.mkdirSync(uploadPath, { recursive: true });
         cb(null, uploadPath);
       },

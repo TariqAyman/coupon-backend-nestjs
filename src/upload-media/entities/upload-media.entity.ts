@@ -28,11 +28,11 @@ export class UploadMedia {
   @Column()
   entityId: string; // ID of the related entity
 
-  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
-  createdBy!: User;
+  // @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  // createdBy?: User;
 
-  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
-  updatedBy?: User;
+  // @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
+  // updatedBy?: User;
 
   @Column({ nullable: true })
   createdAt: Date;
@@ -42,8 +42,4 @@ export class UploadMedia {
 
   @Column({ nullable: true })
   deletedAt: Date;
-
-  constructor(partial: Partial<UploadMedia>) {
-    Object.assign(this, partial);
-  }
 }

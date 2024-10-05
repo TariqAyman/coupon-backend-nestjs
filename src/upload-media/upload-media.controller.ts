@@ -19,9 +19,9 @@ import { CreateUploadMediaDto } from './dto/create-upload-media.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { EntityFileInterceptor } from './entity-file.interceptor';
 
-@Controller('admin/upload-media')
-@UseGuards(RolesGuard, JwtAuthGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
+@Controller('admin/upload-media')
 export class UploadMediaController {
   constructor(private readonly uploadMediaService: UploadMediaService) {}
 
@@ -31,13 +31,12 @@ export class UploadMediaController {
     @UploadedFile() uploadFile: Express.Multer.File,
     @Body() body: CreateUploadMediaDto,
   ) {
-
     const savedFile = await this.uploadMediaService.saveFileData(
       uploadFile,
       body.entityType,
       body.entityId,
     );
-    
+
     return success(savedFile, 200, 'File uploaded successfully');
   }
 }

@@ -5,7 +5,7 @@ import {
   mixin,
   Type,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { multerOptions } from './multer-config';
 
 export function EntityFileInterceptor(
