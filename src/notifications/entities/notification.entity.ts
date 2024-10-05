@@ -17,7 +17,7 @@ export class Notification {
   id: string = uuidv4(); // Generates the UUID in the application
 
   @Column('json')
-  header!: {
+  title!: {
     en: string;
     ar: string;
   };
@@ -28,19 +28,12 @@ export class Notification {
     ar: string;
   };
 
-  @ManyToMany(() => User)
-  @JoinTable({
-    name: 'user_notifications',
-    joinColumn: { name: 'notification_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
-  })
-  user!: User[];
+  @Column()
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  userId: string;
 
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   createdBy!: User;
-
-  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
-  updatedBy?: User;
 
   @Column({ default: false })
   isWatched!: boolean;

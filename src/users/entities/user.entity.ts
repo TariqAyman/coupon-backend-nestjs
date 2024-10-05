@@ -37,6 +37,12 @@ export class User {
   @Column()
   phoneNumberCountryCode: string;
 
+  @Column()
+  userLocale: string = 'en';
+
+  @Column()
+  countryCode: string;
+
   @Column({
     type: 'enum',
     enum: UserRole,

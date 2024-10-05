@@ -63,11 +63,6 @@ export class CreateJunctionTables20240909122216 implements MigrationInterface {
         columns: ['user_id', 'coupon_id'],
         referencedTables: ['users', 'coupons'],
       },
-      {
-        name: 'user_notifications',
-        columns: ['user_id', 'notification_id'],
-        referencedTables: ['users', 'notifications'],
-      },
     ];
 
     for (const table of tables) {
@@ -130,7 +125,6 @@ export class CreateJunctionTables20240909122216 implements MigrationInterface {
       'user_favorite_coupons',
       'user_liked_coupons',
       'user_disliked_coupons',
-      'user_notifications',
     ];
 
     for (const tableName of tables) {

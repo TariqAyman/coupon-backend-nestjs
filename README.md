@@ -273,7 +273,7 @@ src/
 ### Notification
 
 - **id**: UUID
-- **header**: { en: string; ar: string }
+- **title**: { en: string; ar: string }
 - **body**: { en: string; ar: string }
 - **isWatched**: boolean
 - **createdAt**: Date

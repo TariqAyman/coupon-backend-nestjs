@@ -19,6 +19,7 @@ export class CreateUsersTable20240909120612 implements MigrationInterface {
           { name: 'phoneNumber', type: 'varchar', isNullable: true },
           { name: 'phoneNumberCountryCode', type: 'varchar', isNullable: true },
           { name: 'countryCode', type: 'varchar', isNullable: true },
+          { name: 'userLocale', type: 'varchar', isNullable: false },
           {
             name: 'role',
             type: 'enum',

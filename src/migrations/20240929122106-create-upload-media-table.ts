@@ -51,6 +51,26 @@ export class CreateUploadMediaTable20240929122106
       }),
       true,
     );
+
+    await queryRunner.createForeignKey(
+      'upload_media',
+      new TableForeignKey({
+        columnNames: ['createdById'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'users',
+        onDelete: 'CASCADE',
+      }),
+    );
+
+    await queryRunner.createForeignKey(
+      'upload_media',
+      new TableForeignKey({
+        columnNames: ['updatedById'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'users',
+        onDelete: 'SET NULL',
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
