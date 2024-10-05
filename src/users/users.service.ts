@@ -14,6 +14,8 @@ import { UserProvider } from 'src/common/enums/UserProvider';
 import { Coupon } from 'src/coupons/entities/coupon.entity';
 import { Brand } from 'src/brands/entities/brand.entity';
 import { UploadMediaService } from 'src/upload-media/upload-media.service';
+import { ProfileDto } from 'src/authentication/dto/profile.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -27,7 +29,7 @@ export class UsersService {
     private readonly uploadMediaService: UploadMediaService,
   ) {}
 
-  async register(registerDto: RegisterDto, avatar: any): Promise<User> {
+  async register(registerDto: RegisterDto, avatar: any): Promise<ProfileDto> {
     const existingUser = await this.usersRepository.findOne({
       where: { email: registerDto.email },
     });
@@ -38,7 +40,7 @@ export class UsersService {
 
     const user = new User();
     user.email = registerDto.email;
-    user.password = registerDto.password;
+    user.password = await bcrypt.hash(registerDto.password, 10);
     user.role = UserRole.User;
     user.status = UserStatus.Online;
     user.fullName = registerDto.fullName;
@@ -62,7 +64,9 @@ export class UsersService {
     user.lastLogin = new Date();
     user.lastLogout = new Date();
     user.verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
-    return this.usersRepository.save(user);
+    const newUser = await this.usersRepository.save(user);
+
+    return new ProfileDto(newUser);
   }
 
   async validateUser(email: string, password: string): Promise<User> {
@@ -90,7 +94,7 @@ export class UsersService {
   }
 
   async findOne(id: string) {
-    return this.usersRepository.findOne({ where: { id } });
+    return await this.usersRepository.findOne({ where: { id } });
   }
 
   // add last login time func

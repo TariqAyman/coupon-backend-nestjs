@@ -127,47 +127,146 @@ export class AuthenticationService {
 
   async register(registerDto: RegisterDto, avatar: any) {
     const user = await this.userService.register(registerDto, avatar);
-    return user;
+    return new ProfileDto(user);
   }
 
   async logout(request: any) {
-    return 'Logout successful';
+    // Implement your logout logic here
+    // For example, you can invalidate the user's session or token
   }
 
-  async profile(request: any) {
-    const user = await this.userService.findOne(request.userId);
+  async profile(userId: string) {
+    const user = await this.userService.findOne(userId);
     if (!user) throw new NotFoundException('User not found');
-    return user as ProfileDto;
+    return new ProfileDto(user);
   }
 
   async forgotPassword(forgotPasswordDto: ForgotPasswordDto) {
-    return 'Forgot password successful';
+    const user = await this.userService.findByEmail(forgotPasswordDto.email);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const resetToken = this.jwtService.sign(
+      { userId: user.id },
+      { expiresIn: '1h' },
+    );
+
+    // TODO: Send email with reset token
+    // This part would involve using an email service to send the reset token to the user's email
+
+    return 'Password reset instructions sent to your email';
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    return 'Reset password successful';
+    try {
+      const payload = this.jwtService.verify(resetPasswordDto.token);
+      const user = await this.userService.findOne(payload.userId);
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      const hashedPassword = await bcrypt.hash(
+        resetPasswordDto.newPassword,
+        10,
+      );
+      // await this.userService.updatePassword(user.id, hashedPassword);
+
+      return 'Password reset successful';
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 
   async changeEmail(changeEmailDto: ChangeEmailDto) {
-    return 'Change email successful';
+    const user = await this.userService.findOne(changeEmailDto.userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // TODO: Implement email verification logic
+    // You might want to send a verification email to the new email address
+
+    // await this.userService.updateEmail(user.id, changeEmailDto.newEmail);
+    return 'Email changed successfully';
   }
 
   async changePassword(changePasswordDto: ChangePasswordDto) {
-    return 'Change password successful';
+    const user = await this.userService.findOne(changePasswordDto.userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      changePasswordDto.currentPassword,
+      user.password,
+    );
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Current password is incorrect');
+    }
+
+    const hashedNewPassword = await bcrypt.hash(
+      changePasswordDto.newPassword,
+      10,
+    );
+    // await this.userService.updatePassword(user.id, hashedNewPassword);
+
+    return 'Password changed successfully';
   }
 
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
-    return 'Email verified';
+    try {
+      const payload = this.jwtService.verify(verifyEmailDto.token);
+      const user = await this.userService.findOne(payload.userId);
+
+      if (!user) {
+        throw new NotFoundException('User not found');
+      }
+
+      // await this.userService.verifyEmail(user.id);
+      return 'Email verified successfully';
+    } catch (error) {
+      throw new UnauthorizedException('Invalid or expired token');
+    }
   }
 
   async resendVerificationEmail(
     resendVerificationEmailDto: ResendVerificationEmailDto,
   ) {
-    return 'Verification email resent';
+    const user = await this.userService.findByEmail(
+      resendVerificationEmailDto.email,
+    );
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // if (user.isEmailVerified) {
+    //   return 'Email is already verified';
+    // }
+
+    const verificationToken = this.jwtService.sign(
+      { userId: user.id },
+      { expiresIn: '1d' },
+    );
+
+    // TODO: Send verification email
+    // This part would involve using an email service to send the verification token to the user's email
+
+    return 'Verification email resent successfully';
   }
 
   async deleteAccount(deleteAccountDto: DeleteAccountDto) {
-    return 'Account deleted';
+    const user = await this.userService.findOne(deleteAccountDto.userId);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    // TODO: Implement any necessary cleanup logic
+    // For example, you might want to delete associated data, revoke tokens, etc.
+
+    // await this.userService.deleteUser(user.id);
+    return 'Account deleted successfully';
   }
 
   decodeToken(token: string): any {

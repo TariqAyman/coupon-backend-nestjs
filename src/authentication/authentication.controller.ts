@@ -68,7 +68,7 @@ export class AuthenticationController {
   @UseGuards(JwtAuthGuard)
   @Get('profile')
   async profile(@Request() req: any) {
-    const response = await this.authenticationService.profile(req.user);
+    const response = await this.authenticationService.profile(req.user.id);
     return success(response);
   }
 

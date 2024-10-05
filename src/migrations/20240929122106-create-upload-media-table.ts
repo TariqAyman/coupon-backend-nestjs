@@ -43,7 +43,7 @@ export class CreateUploadMediaTable20240929122106
             default: 'now()',
           },
           {
-            name: 'deleted_at',
+            name: 'deletedAt',
             type: 'timestamp',
             isNullable: true,
           },
