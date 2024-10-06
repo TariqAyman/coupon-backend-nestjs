@@ -8,6 +8,7 @@ import { handleError } from './common/utils/api-response-wrapper';
 import { connectionSource } from './database/typeorm.config';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import './instrument.ts';
 
 async function bootstrap() {
   await connectionSource.initialize();
