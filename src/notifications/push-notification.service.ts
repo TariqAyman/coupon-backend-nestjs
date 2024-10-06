@@ -13,6 +13,7 @@ import { checkFCMTopicPattern } from './helpers';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserToken } from './entities/user-tokens.entity';
+import { SendNotificationDto } from './dto/send-notification.dto';
 
 @Injectable()
 export class PushNotificationService {
@@ -71,10 +72,12 @@ export class PushNotificationService {
           topics,
         });
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  async sendPushNotification(data: SendNotificationInterface) {
+  async sendPushNotification(data: SendNotificationDto) {
     if (data.action === NotificationAction.singleDevice)
       return await this.sendToSingleDevice(
         data.data.token as string,
@@ -82,7 +85,7 @@ export class PushNotificationService {
       );
     else if (data.action === NotificationAction.topic)
       return await this.sendToSpecificTopic(
-        data.data.token as string,
+        data.data.topic as string,
         data.data.notificationData,
       );
     else if (data.action === NotificationAction.groupOfDevices)
@@ -108,7 +111,9 @@ export class PushNotificationService {
           },
         );
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   async unsubscribeFromTopic(userId: string, data: SubscribeTopicInterface) {
@@ -126,10 +131,12 @@ export class PushNotificationService {
           },
         );
       }
-    } catch (err) {}
+    } catch (err) {
+      console.log(err);
+    }
   }
 
-  async revokeUserToken(userId: string | undefined, token: string) {
+  async revokeUserToken(token: string) {
     const fcmUser = await this.userTokensRepository.findOneBy({ token });
     if (fcmUser) {
       try {
@@ -142,24 +149,66 @@ export class PushNotificationService {
           { id: fcmUser.id },
           { deletedAt: new Date(), topics: [] },
         );
-      } catch (err) {}
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
 
   async sendToSingleDevice(token: string, data: NotificationDataInterface) {
     try {
-      await admin.messaging().sendToDevice(token, {
-        notification: { title: data.title, body: data.body, sound: 'default' },
-      });
-    } catch (err) {}
+      const message: admin.messaging.Message = {
+        token: token,
+        notification: {
+          title: data.title,
+          body: data.body,
+        },
+        android: {
+          notification: {
+            sound: 'default',
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: 'default',
+            },
+          },
+        },
+      };
+
+      await admin.messaging().send(message);
+    } catch (err) {
+      console.error('Error sending notification:', err);
+    }
   }
 
   async sendToSpecificTopic(topic: string, data: NotificationDataInterface) {
     try {
-      await admin.messaging().sendToTopic(topic, {
-        notification: { title: data.title, body: data.body, sound: 'default' },
-      });
-    } catch (err) {}
+      const message: admin.messaging.Message = {
+        topic: topic,
+        notification: {
+          title: data.title,
+          body: data.body,
+        },
+        android: {
+          notification: {
+            sound: 'default',
+          },
+        },
+        apns: {
+          payload: {
+            aps: {
+              sound: 'default',
+            },
+          },
+        },
+      };
+
+      await admin.messaging().send(message);
+    } catch (err) {
+      console.error('Error sending notification to topic:', err);
+    }
   }
 
   async sendToGroupOfDevices(
@@ -167,34 +216,48 @@ export class PushNotificationService {
     data: NotificationDataInterface,
   ) {
     try {
-      await admin
-        .messaging()
-        .sendMulticast({
-          tokens,
-          notification: { title: data.title, body: data.body },
-          android: { notification: { defaultSound: true, priority: 'high' } },
-          apns: {
-            // eslint-disable-next-line @typescript-eslint/naming-convention
-            headers: { 'apns-priority': '10' },
-            payload: { aps: { sound: 'default' } },
+      const message: admin.messaging.MulticastMessage = {
+        tokens: tokens,
+        notification: {
+          title: data.title,
+          body: data.body,
+        },
+        android: {
+          notification: {
+            sound: 'default',
+            priority: 'high',
           },
-        })
-        .then((result) => {
-          // result.responses.forEach((resp, idx) => {
-          //   if (!resp.success) {
-          //     // check if this valid token
-          //     this.checkFCMToken({ token: tokens[idx] });
-          //   }
-          // });
-        });
-    } catch (err) {}
+        },
+        apns: {
+          headers: {
+            'apns-priority': '10',
+          },
+          payload: {
+            aps: {
+              sound: 'default',
+            },
+          },
+        },
+      };
+
+      const result = await admin.messaging().sendEachForMulticast(message);
+
+      result.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          console.error(`Failed to send to ${tokens[idx]}:`, resp.error);
+          this.checkFCMToken({ token: tokens[idx] });
+        }
+      });
+    } catch (err) {
+      console.error('Error sending notification to group of devices:', err);
+    }
   }
 
   @Cron('0 18 * * *')
-  async checkFCMToken(userId?: string, data?: FCMToken): Promise<void> {
+  async checkFCMToken(data?: FCMToken): Promise<void> {
     if (data !== undefined) {
       if (!(await this.isValidFCMToken(data.token))) {
-        this.revokeUserToken(undefined,data.token);
+        this.revokeUserToken(data.token);
       }
     } else {
       this.handleIsValidFCMTokenCronJob();
@@ -214,19 +277,59 @@ export class PushNotificationService {
     try {
       await admin.messaging().send(message, true);
       isValid = true;
-    } catch (error) {}
+    } catch (error) {
+      console.log(error);
+    }
     return isValid;
   }
 
   async handleIsValidFCMTokenCronJob() {
-    const [tokens, total] = await this.userTokensRepository.findBy({
-      deletedAt: undefined,
-    });
+    try {
+      const tokens = await this.userTokensRepository.findBy({
+        deletedAt: undefined,
+      });
 
-    // tokens?.map(async (subscriber: UserToken) => {
-    //   if (!(await this.isValidFCMToken(subscriber.token))) {
-    //     this.revokeUserToken(subscriber.token);
-    //   }
-    // });
+      await Promise.all(
+        tokens.map(async (subscriber: UserToken) => {
+          try {
+            if (!(await this.isValidFCMToken(subscriber.token))) {
+              await this.revokeUserToken(subscriber.token);
+            }
+          } catch (innerError) {
+            console.error(
+              `Error processing token ${subscriber.token}:`,
+              innerError,
+            );
+          }
+        }),
+      );
+    } catch (error) {
+      console.error('Error fetching tokens:', error);
+    }
+  }
+
+  createMessage(
+    token: string,
+    data: NotificationDataInterface,
+  ): admin.messaging.Message {
+    return {
+      token: token,
+      notification: {
+        title: data.title,
+        body: data.body,
+      },
+      android: {
+        notification: {
+          sound: 'default',
+        },
+      },
+      apns: {
+        payload: {
+          aps: {
+            sound: 'default',
+          },
+        },
+      },
+    };
   }
 }

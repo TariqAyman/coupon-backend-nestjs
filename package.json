@@ -36,6 +36,8 @@
     "@nestjs/schedule": "^4.1.0",
     "@nestjs/throttler": "^6.2.1",
     "@nestjs/typeorm": "^10.0.2",
+    "@sentry/nestjs": "^8.33.1",
+    "@sentry/profiling-node": "^8.33.1",
     "@types/bcrypt": "^5.0.2",
     "@types/uuid": "^10.0.0",
     "bcrypt": "^5.1.1",

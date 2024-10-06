@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Post,
-  Body,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { NotificationsAdminService } from './notifications-admin.service';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -13,6 +7,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { SendNotificationInterface } from './interfaces/push-notification.interface';
 import { PushNotificationService } from './push-notification.service';
+import { SendNotificationDto } from './dto/send-notification.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
@@ -24,15 +19,13 @@ export class NotificationsAdminController {
   ) {}
 
   @Post('push-notification')
-  sendPushNotification(
-    @Body() data: SendNotificationInterface | SendNotificationInterface[],
-  ) {
+  sendPushNotification(@Body() data: SendNotificationDto | SendNotificationDto[]) {
     if (Array.isArray(data)) {
       for (const item of data)
         this.pushNotificationService.sendPushNotification(item);
     } else {
       return this.pushNotificationService.sendPushNotification(
-        data as SendNotificationInterface,
+        data as SendNotificationDto,
       );
     }
   }

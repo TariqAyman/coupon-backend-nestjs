@@ -56,9 +56,7 @@ export class PushNotificationController {
     @Req() req: Request,
     @Body() data: UnSubscribeTopicDto,
   ) {
-    const user = (req as any).user as User;
     const response = await this.pushNotificationService.revokeUserToken(
-      user.id,
       data.token,
     );
     return success(response);
@@ -69,8 +67,6 @@ export class PushNotificationController {
     @Req() req: Request,
     @Body() data: FCMTokenDto,
   ): Promise<void> {
-    const user = (req as any).user as User;
-
-    await this.pushNotificationService.checkFCMToken(user.id, data);
+    await this.pushNotificationService.checkFCMToken(data);
   }
 }

@@ -7,14 +7,14 @@ import {
 import { Type } from 'class-transformer';
 import { NotificationDataDto } from './notification-data.dto'; // Import the NotificationDataDto
 
-export class SendNotificationDto {
+export class DataSendNotificationDto {
   @ValidateNested()
   @Type(() => NotificationDataDto)
   notificationData: NotificationDataDto;
 
   @IsOptional()
   @IsString()
-  token?: string;
+  token: string;
 
   @IsOptional()
   @IsString()
