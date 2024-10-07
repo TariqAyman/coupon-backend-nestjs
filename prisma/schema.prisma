@@ -1,0 +1,452 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model ads {
+  id                           String          @id @db.Char(36)
+  name                         String          @db.VarChar(255)
+  link                         String          @db.VarChar(255)
+  image                        String?         @db.VarChar(255)
+  seoDescription               Json?
+  seoKeywords                  Json?
+  ogTitle                      Json?
+  ogDescription                Json?
+  ogImage                      String?         @db.Text
+  ogUrl                        String?         @db.Text
+  twitterCard                  String?         @db.Text
+  twitterTitle                 Json?
+  twitterDescription           Json?
+  twitterImage                 String?         @db.Text
+  createdById                  String?         @db.Char(36)
+  updatedById                  String?         @db.Char(36)
+  createdAt                    DateTime        @default(now()) @db.Timestamp(0)
+  updatedAt                    DateTime        @default(now()) @db.Timestamp(0)
+  deletedAt                    DateTime?       @db.Timestamp(0)
+  users_ads_createdByIdTousers users?          @relation("ads_createdByIdTousers", fields: [createdById], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_0c97a55ed44c338ea0e11dde597")
+  users_ads_updatedByIdTousers users?          @relation("ads_updatedByIdTousers", fields: [updatedById], references: [id], onUpdate: NoAction, map: "FK_1e32cccaa72c21d19febd24047e")
+  ads_countries                ads_countries[]
+
+  @@index([createdById], map: "FK_0c97a55ed44c338ea0e11dde597")
+  @@index([updatedById], map: "FK_1e32cccaa72c21d19febd24047e")
+}
+
+model ads_countries {
+  ads_id     String    @db.Char(36)
+  country_id String    @db.Char(36)
+  createdAt  DateTime  @default(now()) @db.Timestamp(0)
+  updatedAt  DateTime  @default(now()) @db.Timestamp(0)
+  ads        ads       @relation(fields: [ads_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ads_countries_ads_id_foreign_key")
+  countries  countries @relation(fields: [country_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "ads_countries_country_id_foreign_key")
+
+  @@id([ads_id, country_id])
+  @@index([country_id], map: "ads_countries_country_id_foreign_key")
+}
+
+model brand_categories {
+  brand_id    String     @db.Char(36)
+  category_id String     @db.Char(36)
+  createdAt   DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime   @default(now()) @db.Timestamp(0)
+  brands      brands     @relation(fields: [brand_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "brand_categories_brand_id_foreign_key")
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "brand_categories_category_id_foreign_key")
+
+  @@id([brand_id, category_id])
+  @@index([category_id], map: "brand_categories_category_id_foreign_key")
+}
+
+model brand_countries {
+  brand_id   String    @db.Char(36)
+  country_id String    @db.Char(36)
+  createdAt  DateTime  @default(now()) @db.Timestamp(0)
+  updatedAt  DateTime  @default(now()) @db.Timestamp(0)
+  brands     brands    @relation(fields: [brand_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "brand_countries_brand_id_foreign_key")
+  countries  countries @relation(fields: [country_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "brand_countries_country_id_foreign_key")
+
+  @@id([brand_id, country_id])
+  @@index([country_id], map: "brand_countries_country_id_foreign_key")
+}
+
+model brands {
+  id                              String                 @id @db.Char(36)
+  name                            Json
+  slug                            String                 @db.VarChar(255)
+  description                     Json?
+  link                            String                 @db.VarChar(255)
+  image                           String?                @db.VarChar(255)
+  seoDescription                  Json?
+  seoKeywords                     Json?
+  ogTitle                         Json?
+  ogDescription                   Json?
+  ogImage                         String?                @db.Text
+  ogUrl                           String?                @db.Text
+  twitterCard                     String?                @db.Text
+  twitterTitle                    Json?
+  twitterDescription              Json?
+  twitterImage                    String?                @db.Text
+  mostUsed                        Int                    @default(0)
+  mostFollowed                    Int                    @default(0)
+  createdById                     String?                @db.Char(36)
+  updatedById                     String?                @db.Char(36)
+  createdAt                       DateTime               @default(now()) @db.Timestamp(0)
+  updatedAt                       DateTime               @default(now()) @db.Timestamp(0)
+  deletedAt                       DateTime?              @db.Timestamp(0)
+  brand_categories                brand_categories[]
+  brand_countries                 brand_countries[]
+  users_brands_updatedByIdTousers users?                 @relation("brands_updatedByIdTousers", fields: [updatedById], references: [id], onUpdate: NoAction, map: "FK_362fe42f4b94ec5c00b7e9f5b79")
+  users_brands_createdByIdTousers users?                 @relation("brands_createdByIdTousers", fields: [createdById], references: [id], onUpdate: NoAction, map: "FK_906c44274a237e695ffc8d8f8f3")
+  coupon_brands                   coupon_brands[]
+  user_followed_brands            user_followed_brands[]
+
+  @@index([updatedById], map: "FK_362fe42f4b94ec5c00b7e9f5b79")
+  @@index([createdById], map: "FK_906c44274a237e695ffc8d8f8f3")
+}
+
+model categories {
+  id                                  String               @id @db.Char(36)
+  name                                Json
+  slug                                Json
+  description                         Json?
+  image                               String?              @db.VarChar(255)
+  icon                                String?              @db.VarChar(255)
+  color                               String?              @db.VarChar(255)
+  seoDescription                      Json?
+  seoKeywords                         Json?
+  ogTitle                             Json?
+  ogDescription                       Json?
+  ogImage                             String?              @db.Text
+  ogUrl                               String?              @db.Text
+  twitterCard                         String?              @db.Text
+  twitterTitle                        Json?
+  twitterDescription                  Json?
+  twitterImage                        String?              @db.Text
+  createdById                         String?              @db.Char(36)
+  updatedById                         String?              @db.Char(36)
+  createdAt                           DateTime             @default(now()) @db.Timestamp(0)
+  updatedAt                           DateTime             @default(now()) @db.Timestamp(0)
+  deletedAt                           DateTime?            @db.Timestamp(0)
+  brand_categories                    brand_categories[]
+  users_categories_createdByIdTousers users?               @relation("categories_createdByIdTousers", fields: [createdById], references: [id], onUpdate: NoAction, map: "FK_a6ada6f4dcf60db496fe71d7a96")
+  users_categories_updatedByIdTousers users?               @relation("categories_updatedByIdTousers", fields: [updatedById], references: [id], onUpdate: NoAction, map: "FK_e8221f562fcc5898e530aa1be6e")
+  category_countries                  category_countries[]
+  coupon_categories                   coupon_categories[]
+
+  @@index([createdById], map: "FK_a6ada6f4dcf60db496fe71d7a96")
+  @@index([updatedById], map: "FK_e8221f562fcc5898e530aa1be6e")
+}
+
+model category_countries {
+  category_id String     @db.Char(36)
+  country_id  String     @db.Char(36)
+  createdAt   DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime   @default(now()) @db.Timestamp(0)
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "category_countries_category_id_foreign_key")
+  countries   countries  @relation(fields: [country_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "category_countries_country_id_foreign_key")
+
+  @@id([category_id, country_id])
+  @@index([country_id], map: "category_countries_country_id_foreign_key")
+}
+
+model countries {
+  id                                 String               @id @db.Char(36)
+  name                               String               @db.VarChar(255)
+  countryCode                        String               @db.VarChar(255)
+  image                              String?              @db.VarChar(255)
+  seoDescription                     Json?
+  seoKeywords                        Json?
+  ogTitle                            Json?
+  ogDescription                      Json?
+  ogImage                            String?              @db.Text
+  ogUrl                              String?              @db.Text
+  twitterCard                        String?              @db.Text
+  twitterTitle                       Json?
+  twitterDescription                 Json?
+  twitterImage                       String?              @db.Text
+  createdById                        String?              @db.Char(36)
+  updatedById                        String?              @db.Char(36)
+  createdAt                          DateTime             @default(now()) @db.Timestamp(0)
+  updatedAt                          DateTime             @default(now()) @db.Timestamp(0)
+  deletedAt                          DateTime?            @db.Timestamp(0)
+  ads_countries                      ads_countries[]
+  brand_countries                    brand_countries[]
+  category_countries                 category_countries[]
+  users_countries_updatedByIdTousers users?               @relation("countries_updatedByIdTousers", fields: [updatedById], references: [id], onUpdate: NoAction, map: "FK_3e2244849b34c8a2536c35d335d")
+  users_countries_createdByIdTousers users?               @relation("countries_createdByIdTousers", fields: [createdById], references: [id], onUpdate: NoAction, map: "FK_c641ee0320064ee9dced39b5bea")
+  coupon_countries                   coupon_countries[]
+
+  @@index([updatedById], map: "FK_3e2244849b34c8a2536c35d335d")
+  @@index([createdById], map: "FK_c641ee0320064ee9dced39b5bea")
+}
+
+model coupon_brands {
+  coupon_id String   @db.Char(36)
+  brand_id  String   @db.Char(36)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  brands    brands   @relation(fields: [brand_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_brands_brand_id_foreign_key")
+  coupons   coupons  @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_brands_coupon_id_foreign_key")
+
+  @@id([coupon_id, brand_id])
+  @@index([brand_id], map: "coupon_brands_brand_id_foreign_key")
+}
+
+model coupon_categories {
+  coupon_id   String     @db.Char(36)
+  category_id String     @db.Char(36)
+  createdAt   DateTime   @default(now()) @db.Timestamp(0)
+  updatedAt   DateTime   @default(now()) @db.Timestamp(0)
+  categories  categories @relation(fields: [category_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_categories_category_id_foreign_key")
+  coupons     coupons    @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_categories_coupon_id_foreign_key")
+
+  @@id([coupon_id, category_id])
+  @@index([category_id], map: "coupon_categories_category_id_foreign_key")
+}
+
+model coupon_countries {
+  coupon_id  String    @db.Char(36)
+  country_id String    @db.Char(36)
+  createdAt  DateTime  @default(now()) @db.Timestamp(0)
+  updatedAt  DateTime  @default(now()) @db.Timestamp(0)
+  countries  countries @relation(fields: [country_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_countries_country_id_foreign_key")
+  coupons    coupons   @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "coupon_countries_coupon_id_foreign_key")
+
+  @@id([coupon_id, country_id])
+  @@index([country_id], map: "coupon_countries_country_id_foreign_key")
+}
+
+model coupons {
+  id                               String                  @id @db.Char(36)
+  code                             String                  @db.VarChar(255)
+  amount                           Float                   @default(1) @db.Float
+  description                      Json?
+  status                           Json
+  expire                           DateTime?               @db.Timestamp(0)
+  qrCode                           String?                 @db.VarChar(255)
+  link                             String?                 @db.VarChar(255)
+  seoDescription                   Json?
+  seoKeywords                      Json?
+  ogTitle                          Json?
+  ogDescription                    Json?
+  ogImage                          String?                 @db.Text
+  ogUrl                            String?                 @db.Text
+  twitterCard                      String?                 @db.Text
+  twitterTitle                     Json?
+  twitterDescription               Json?
+  twitterImage                     String?                 @db.Text
+  usedCount                        Int                     @default(0)
+  likeCount                        Int                     @default(0)
+  dislikeCount                     Int                     @default(0)
+  createdById                      String?                 @db.Char(36)
+  updatedById                      String?                 @db.Char(36)
+  createdAt                        DateTime                @default(now()) @db.Timestamp(0)
+  updatedAt                        DateTime                @default(now()) @db.Timestamp(0)
+  deletedAt                        DateTime?               @db.Timestamp(0)
+  coupon_brands                    coupon_brands[]
+  coupon_categories                coupon_categories[]
+  coupon_countries                 coupon_countries[]
+  users_coupons_createdByIdTousers users?                  @relation("coupons_createdByIdTousers", fields: [createdById], references: [id], onUpdate: NoAction, map: "FK_0469ba4cb398e58d873e9d8c25a")
+  users_coupons_updatedByIdTousers users?                  @relation("coupons_updatedByIdTousers", fields: [updatedById], references: [id], onUpdate: NoAction, map: "FK_5fb1c171c25220ad4248aaa36d0")
+  user_disliked_coupons            user_disliked_coupons[]
+  user_favorite_coupons            user_favorite_coupons[]
+  user_followed_coupons            user_followed_coupons[]
+  user_liked_coupons               user_liked_coupons[]
+
+  @@index([createdById], map: "FK_0469ba4cb398e58d873e9d8c25a")
+  @@index([updatedById], map: "FK_5fb1c171c25220ad4248aaa36d0")
+}
+
+model migrations {
+  id        Int    @id @default(autoincrement())
+  timestamp BigInt
+  name      String @db.VarChar(255)
+}
+
+model notifications {
+  id                                     String    @id @db.Char(36)
+  title                                  Json
+  body                                   Json
+  isWatched                              Boolean   @default(false)
+  userId                                 String?   @db.Char(36)
+  createdById                            String?   @db.Char(36)
+  sendAt                                 DateTime  @default(now()) @db.Timestamp(0)
+  createdAt                              DateTime  @default(now()) @db.Timestamp(0)
+  deletedAt                              DateTime? @db.Timestamp(0)
+  users_notifications_userIdTousers      users?    @relation("notifications_userIdTousers", fields: [userId], references: [id], onUpdate: NoAction, map: "FK_692a909ee0fa9383e7859f9b406")
+  users_notifications_createdByIdTousers users?    @relation("notifications_createdByIdTousers", fields: [createdById], references: [id], onUpdate: NoAction, map: "FK_fcce8c50a375466676d82dcbadd")
+
+  @@index([userId], map: "FK_692a909ee0fa9383e7859f9b406")
+  @@index([createdById], map: "FK_fcce8c50a375466676d82dcbadd")
+}
+
+model upload_media {
+  id                                    String    @id @db.Char(36)
+  url                                   String?   @db.VarChar(255)
+  filename                              String?   @db.VarChar(255)
+  path                                  String?   @db.VarChar(255)
+  mimetype                              String?   @db.VarChar(255)
+  size                                  Int?
+  entityType                            String?   @db.VarChar(255)
+  entityId                              String?   @db.Char(36)
+  createdById                           String?   @db.Char(36)
+  updatedById                           String?   @db.Char(36)
+  createdAt                             DateTime  @default(now()) @db.Timestamp(0)
+  updatedAt                             DateTime  @default(now()) @db.Timestamp(0)
+  deletedAt                             DateTime? @db.Timestamp(0)
+  users_upload_media_updatedByIdTousers users?    @relation("upload_media_updatedByIdTousers", fields: [updatedById], references: [id], onUpdate: NoAction, map: "FK_8dc3abb31f7faa70a199755a169")
+  users_upload_media_createdByIdTousers users?    @relation("upload_media_createdByIdTousers", fields: [createdById], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_bb5c7cebd4e80a684f17daf33ce")
+
+  @@index([updatedById], map: "FK_8dc3abb31f7faa70a199755a169")
+  @@index([createdById], map: "FK_bb5c7cebd4e80a684f17daf33ce")
+}
+
+model user_disliked_coupons {
+  user_id   String   @db.Char(36)
+  coupon_id String   @db.Char(36)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  coupons   coupons  @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_disliked_coupons_coupon_id_foreign_key")
+  users     users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_disliked_coupons_user_id_foreign_key")
+
+  @@id([user_id, coupon_id])
+  @@index([coupon_id], map: "user_disliked_coupons_coupon_id_foreign_key")
+}
+
+model user_favorite_coupons {
+  user_id   String   @db.Char(36)
+  coupon_id String   @db.Char(36)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  coupons   coupons  @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_favorite_coupons_coupon_id_foreign_key")
+  users     users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_favorite_coupons_user_id_foreign_key")
+
+  @@id([user_id, coupon_id])
+  @@index([coupon_id], map: "user_favorite_coupons_coupon_id_foreign_key")
+}
+
+model user_followed_brands {
+  user_id   String   @db.Char(36)
+  brand_id  String   @db.Char(36)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  brands    brands   @relation(fields: [brand_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_followed_brands_brand_id_foreign_key")
+  users     users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_followed_brands_user_id_foreign_key")
+
+  @@id([user_id, brand_id])
+  @@index([brand_id], map: "user_followed_brands_brand_id_foreign_key")
+}
+
+model user_followed_coupons {
+  user_id   String   @db.Char(36)
+  coupon_id String   @db.Char(36)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  coupons   coupons  @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_followed_coupons_coupon_id_foreign_key")
+  users     users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_followed_coupons_user_id_foreign_key")
+
+  @@id([user_id, coupon_id])
+  @@index([coupon_id], map: "user_followed_coupons_coupon_id_foreign_key")
+}
+
+model user_liked_coupons {
+  user_id   String   @db.Char(36)
+  coupon_id String   @db.Char(36)
+  createdAt DateTime @default(now()) @db.Timestamp(0)
+  updatedAt DateTime @default(now()) @db.Timestamp(0)
+  coupons   coupons  @relation(fields: [coupon_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_liked_coupons_coupon_id_foreign_key")
+  users     users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_liked_coupons_user_id_foreign_key")
+
+  @@id([user_id, coupon_id])
+  @@index([coupon_id], map: "user_liked_coupons_coupon_id_foreign_key")
+}
+
+model user_tokens {
+  id        String    @id @db.Char(36)
+  userId    String    @db.Char(36)
+  token     String    @db.Text
+  os        String    @db.VarChar(255)
+  osVersion String    @db.VarChar(255)
+  model     String    @db.VarChar(255)
+  country   String    @db.VarChar(255)
+  location  String?   @db.VarChar(255)
+  topics    Json?
+  createdAt DateTime? @db.Timestamp(0)
+  updatedAt DateTime? @db.Timestamp(0)
+  deletedAt DateTime? @db.Timestamp(0)
+  users     users     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "FK_92ce9a299624e4c4ffd99b645b6")
+
+  @@index([userId], map: "FK_92ce9a299624e4c4ffd99b645b6")
+}
+
+model users {
+  id                                             String                  @id @db.Char(36)
+  fullName                                       String                  @db.VarChar(255)
+  email                                          String                  @db.VarChar(255)
+  password                                       String                  @db.VarChar(255)
+  changePasswordTime                             DateTime?               @db.Timestamp(0)
+  phoneNumber                                    String?                 @db.VarChar(255)
+  phoneNumberCountryCode                         String?                 @db.VarChar(255)
+  countryCode                                    String?                 @db.VarChar(255)
+  userLocale                                     String                  @db.VarChar(255)
+  role                                           users_role              @default(User)
+  confirmAccount                                 Boolean                 @default(true)
+  status                                         users_status            @default(offline)
+  avatar                                         String?                 @db.VarChar(255)
+  birthday                                       DateTime?               @db.Timestamp(0)
+  joined                                         DateTime?               @db.Timestamp(0)
+  gender                                         users_gender?
+  provider                                       users_provider          @default(system)
+  verificationCode                               String?                 @db.VarChar(255)
+  verificationCodeExpiresAt                      DateTime?               @db.Timestamp(0)
+  createdAt                                      DateTime                @default(now()) @db.Timestamp(0)
+  updatedAt                                      DateTime                @default(now()) @db.Timestamp(0)
+  deletedAt                                      DateTime?               @db.Timestamp(0)
+  lastLogin                                      DateTime?               @db.Timestamp(0)
+  lastLogout                                     DateTime?               @db.Timestamp(0)
+  ads_ads_createdByIdTousers                     ads[]                   @relation("ads_createdByIdTousers")
+  ads_ads_updatedByIdTousers                     ads[]                   @relation("ads_updatedByIdTousers")
+  brands_brands_updatedByIdTousers               brands[]                @relation("brands_updatedByIdTousers")
+  brands_brands_createdByIdTousers               brands[]                @relation("brands_createdByIdTousers")
+  categories_categories_createdByIdTousers       categories[]            @relation("categories_createdByIdTousers")
+  categories_categories_updatedByIdTousers       categories[]            @relation("categories_updatedByIdTousers")
+  countries_countries_updatedByIdTousers         countries[]             @relation("countries_updatedByIdTousers")
+  countries_countries_createdByIdTousers         countries[]             @relation("countries_createdByIdTousers")
+  coupons_coupons_createdByIdTousers             coupons[]               @relation("coupons_createdByIdTousers")
+  coupons_coupons_updatedByIdTousers             coupons[]               @relation("coupons_updatedByIdTousers")
+  notifications_notifications_userIdTousers      notifications[]         @relation("notifications_userIdTousers")
+  notifications_notifications_createdByIdTousers notifications[]         @relation("notifications_createdByIdTousers")
+  upload_media_upload_media_updatedByIdTousers   upload_media[]          @relation("upload_media_updatedByIdTousers")
+  upload_media_upload_media_createdByIdTousers   upload_media[]          @relation("upload_media_createdByIdTousers")
+  user_disliked_coupons                          user_disliked_coupons[]
+  user_favorite_coupons                          user_favorite_coupons[]
+  user_followed_brands                           user_followed_brands[]
+  user_followed_coupons                          user_followed_coupons[]
+  user_liked_coupons                             user_liked_coupons[]
+  user_tokens                                    user_tokens[]
+}
+
+enum users_role {
+  User
+  Admin
+  Employee
+}
+
+enum users_status {
+  offline
+  online
+  blocked
+}
+
+enum users_gender {
+  male
+  female
+}
+
+enum users_provider {
+  system
+  facebook
+  GOOGLE
+}
