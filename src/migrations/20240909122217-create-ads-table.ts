@@ -121,67 +121,9 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
         onDelete: 'SET NULL',
       }),
     );
-
-    await queryRunner.createTable(
-      new Table({
-        name: 'ads_countries',
-        columns: [
-          {
-            name: 'ads_id',
-            type: 'char',
-            length: '36',
-            isNullable: false,
-          },
-          {
-            name: 'country_id',
-            type: 'char',
-            length: '36',
-            isNullable: false,
-          },
-        ],
-      }),
-      true,
-    );
-
-    await queryRunner.createForeignKey(
-      'ads_countries',
-      new TableForeignKey({
-        columnNames: ['ads_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'ads',
-        onDelete: 'CASCADE',
-      }),
-    );
-
-    await queryRunner.createForeignKey(
-      'ads_countries',
-      new TableForeignKey({
-        columnNames: ['country_id'],
-        referencedColumnNames: ['id'],
-        referencedTableName: 'countries',
-        onDelete: 'CASCADE',
-      }),
-    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    const adsCountriesTable = await queryRunner.getTable('ads_countries');
-    if (adsCountriesTable) {
-      const adsForeignKey = adsCountriesTable.foreignKeys.find(
-        (fk) => fk.columnNames.indexOf('ads_id') !== -1,
-      );
-      const countryForeignKey = adsCountriesTable.foreignKeys.find(
-        (fk) => fk.columnNames.indexOf('country_id') !== -1,
-      );
-      if (adsForeignKey) {
-        await queryRunner.dropForeignKey('ads_countries', adsForeignKey);
-      }
-      if (countryForeignKey) {
-        await queryRunner.dropForeignKey('ads_countries', countryForeignKey);
-      }
-      await queryRunner.dropTable('ads_countries');
-    }
-
     const adsTable = await queryRunner.getTable('ads');
     if (adsTable) {
       const createdByForeignKey = adsTable.foreignKeys.find(

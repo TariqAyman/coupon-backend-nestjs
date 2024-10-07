@@ -5,7 +5,7 @@ import {
   TableForeignKey,
 } from 'typeorm';
 
-export class CreateJunctionTables20240909122216 implements MigrationInterface {
+export class CreateJunctionTables20240909122218 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     const tables = [
       {
@@ -62,6 +62,11 @@ export class CreateJunctionTables20240909122216 implements MigrationInterface {
         name: 'user_disliked_coupons',
         columns: ['user_id', 'coupon_id'],
         referencedTables: ['users', 'coupons'],
+      },
+      {
+        name: 'ads_countries',
+        columns: ['ads_id', 'country_id'],
+        referencedTables: ['ads', 'countries'],
       },
     ];
 
@@ -125,6 +130,7 @@ export class CreateJunctionTables20240909122216 implements MigrationInterface {
       'user_favorite_coupons',
       'user_liked_coupons',
       'user_disliked_coupons',
+      'ads_countries',
     ];
 
     for (const tableName of tables) {

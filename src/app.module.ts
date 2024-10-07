@@ -14,10 +14,13 @@ import { UploadMediaModule } from './upload-media/upload-media.module';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
+import { PrismaService } from './PrismaModule/prisma.service';
+import { PrismaModule } from './PrismaModule/prisma.module';
 
 @Module({
   imports: [
     SentryModule.forRoot(),
+    PrismaModule,
     DatabaseModule,
     CommonModule,
     AuthenticationModule,
@@ -32,10 +35,12 @@ import { SentryGlobalFilter } from '@sentry/nestjs/setup';
   ],
   controllers: [],
   providers: [
+    PrismaService,
     {
       provide: APP_FILTER,
       useClass: SentryGlobalFilter,
     },
   ],
+  exports: [PrismaService],
 })
 export class AppModule {}
