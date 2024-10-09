@@ -10,62 +10,62 @@ export class CreateJunctionTables20240909122218 implements MigrationInterface {
     const tables = [
       {
         name: 'category_countries',
-        columns: ['category_id', 'country_id'],
+        columns: ['categoryId', 'countryId'],
         referencedTables: ['categories', 'countries'],
       },
       {
         name: 'brand_categories',
-        columns: ['brand_id', 'category_id'],
+        columns: ['brandId', 'categoryId'],
         referencedTables: ['brands', 'categories'],
       },
       {
         name: 'brand_countries',
-        columns: ['brand_id', 'country_id'],
+        columns: ['brandId', 'countryId'],
         referencedTables: ['brands', 'countries'],
       },
       {
         name: 'user_followed_brands',
-        columns: ['user_id', 'brand_id'],
+        columns: ['userId', 'brandId'],
         referencedTables: ['users', 'brands'],
       },
       {
         name: 'user_followed_coupons',
-        columns: ['user_id', 'coupon_id'],
+        columns: ['userId', 'couponId'],
         referencedTables: ['users', 'coupons'],
       },
       {
         name: 'coupon_countries',
-        columns: ['coupon_id', 'country_id'],
+        columns: ['couponId', 'countryId'],
         referencedTables: ['coupons', 'countries'],
       },
       {
         name: 'coupon_categories',
-        columns: ['coupon_id', 'category_id'],
+        columns: ['couponId', 'categoryId'],
         referencedTables: ['coupons', 'categories'],
       },
       {
         name: 'coupon_brands',
-        columns: ['coupon_id', 'brand_id'],
+        columns: ['couponId', 'brandId'],
         referencedTables: ['coupons', 'brands'],
       },
       {
         name: 'user_favorite_coupons',
-        columns: ['user_id', 'coupon_id'],
+        columns: ['userId', 'couponId'],
         referencedTables: ['users', 'coupons'],
       },
       {
         name: 'user_liked_coupons',
-        columns: ['user_id', 'coupon_id'],
+        columns: ['userId', 'couponId'],
         referencedTables: ['users', 'coupons'],
       },
       {
         name: 'user_disliked_coupons',
-        columns: ['user_id', 'coupon_id'],
+        columns: ['userId', 'couponId'],
         referencedTables: ['users', 'coupons'],
       },
       {
         name: 'ads_countries',
-        columns: ['ads_id', 'country_id'],
+        columns: ['adsId', 'countryId'],
         referencedTables: ['ads', 'countries'],
       },
     ];
@@ -98,7 +98,7 @@ export class CreateJunctionTables20240909122218 implements MigrationInterface {
         true,
       );
 
-      await queryRunner.createPrimaryKey(table.name, table.columns);
+      // await queryRunner.createPrimaryKey(table.name, table.columns);
 
       for (let i = 0; i < table.columns.length; i++) {
         const column = table.columns[i];

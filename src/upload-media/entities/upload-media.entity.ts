@@ -1,11 +1,17 @@
-import { User } from 'src/users/entities/user.entity';
-import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, DeleteDateColumn } from 'typeorm';
+import { User } from '../../users/entities/user.entity';
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  ManyToOne,
+  DeleteDateColumn,
+} from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 
 @Entity('upload_media')
 export class UploadMedia {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidv4(); // Generates the UUID in the application
+  id!: string;
 
   @Column()
   filename: string;
@@ -28,11 +34,11 @@ export class UploadMedia {
   @Column()
   entityId: string; // ID of the related entity
 
-  // @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
-  // createdBy?: User;
+  @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
+  createdBy?: User;
 
-  // @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
-  // updatedBy?: User;
+  @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
+  updatedBy?: User;
 
   @Column({ nullable: true })
   createdAt: Date;

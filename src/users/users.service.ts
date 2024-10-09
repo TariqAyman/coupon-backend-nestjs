@@ -11,7 +11,7 @@ import { RegisterDto } from 'src/authentication/dto/register.dto';
 import { UserRole } from 'src/common/enums/UserRole';
 import { UserStatus } from 'src/common/enums/UserStatus';
 import { UserProvider } from 'src/common/enums/UserProvider';
-import { Coupon } from 'src/coupons/entities/coupon.entity';
+import { Coupon } from '../coupons/entities/coupon.entity';
 import { Brand } from 'src/brands/entities/brand.entity';
 import { UploadMediaService } from 'src/upload-media/upload-media.service';
 import { ProfileDto } from 'src/authentication/dto/profile.dto';

@@ -12,11 +12,13 @@ import { User } from '../../users/entities/user.entity';
 import { Country } from '../../countries/entities/country.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { IsOptional, IsString, IsUrl } from 'class-validator';
+import { Brand } from '../../brands/entities/brand.entity';
+import { Coupon } from '../../coupons/entities/coupon.entity';
 
 @Entity('categories')
 export class Category {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidv4(); // Generates the UUID in the application
+  id!: string;
 
   @Column('json')
   name!: { en: string; ar: string };
@@ -72,13 +74,24 @@ export class Category {
   @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy?: User;
 
-  @ManyToMany(() => Country)
-  @JoinTable({
-    name: 'category_countries',
-    joinColumn: { name: 'category_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'country_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany(() => Country, (country) => country.categories)
   countries!: Country[];
+
+  @ManyToMany(() => Brand, (brand) => brand.categories)
+  @JoinTable({
+    name: 'brand_categories',
+    joinColumn: { name: 'categoryId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'brandId', referencedColumnName: 'id' },
+  })
+  brands!: Brand[];
+
+  @ManyToMany(() => Coupon, (coupon) => coupon.categories)
+  @JoinTable({
+    name: 'coupon_categories',
+    joinColumn: { name: 'categoryId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'couponId', referencedColumnName: 'id' },
+  })
+  coupons!: Coupon[];
 
   @Column()
   createdAt!: Date;

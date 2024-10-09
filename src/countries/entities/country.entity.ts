@@ -4,14 +4,20 @@ import {
   PrimaryGeneratedColumn,
   ManyToOne,
   DeleteDateColumn,
+  ManyToMany,
+  JoinTable,
 } from 'typeorm';
 import { User } from '../../users/entities/user.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { Ads } from '../../ads/entities/ad.entity';
+import { Category } from '../../categories/entities/category.entity';
+import { Brand } from '../../brands/entities/brand.entity';
+import { Coupon } from '../../coupons/entities/coupon.entity';
 
 @Entity('countries')
 export class Country {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidv4(); // Generates the UUID in the application
+  id!: string;
 
   @Column({ unique: true })
   name!: string;
@@ -66,6 +72,38 @@ export class Country {
 
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
+
+  @ManyToMany((type) => Ads, (ads) => ads.countries)
+  @JoinTable({
+    name: 'ads_countries',
+    joinColumn: { name: 'countryId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'adsId', referencedColumnName: 'id' },
+  })
+  ads!: Ads[];
+
+  @ManyToMany((type) => Category, (category) => category.countries)
+  @JoinTable({
+    name: 'category_countries',
+    joinColumn: { name: 'countryId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'categoryId', referencedColumnName: 'id' },
+  })
+  categories!: Category[];
+
+  @ManyToMany((type) => Brand, (brand) => brand.countries)
+  @JoinTable({
+    name: 'brand_countries',
+    joinColumn: { name: 'countryId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'brandId', referencedColumnName: 'id' },
+  })
+  brands: Brand[];
+
+  @ManyToMany((type) => Coupon, (coupon) => coupon.countries)
+  @JoinTable({
+    name: 'coupon_countries',
+    joinColumn: { name: 'countryId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'couponId', referencedColumnName: 'id' },
+  })
+  coupons!: Coupon[];
 
   constructor(partial: Partial<Country>) {
     Object.assign(this, partial);

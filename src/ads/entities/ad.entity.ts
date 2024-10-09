@@ -21,7 +21,7 @@ import { IsOptional, IsString, IsUrl } from 'class-validator';
 @Entity('ads')
 export class Ads {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidv4(); // Generates the UUID in the application
+  id!: string;
 
   @Column()
   name!: string;
@@ -70,12 +70,7 @@ export class Ads {
   @JoinColumn({ name: 'updatedById' })
   updatedBy!: User;
 
-  @ManyToMany(() => Country)
-  @JoinTable({
-    name: 'ads_countries',
-    joinColumn: { name: 'ads_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'country_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany((type) => Country, (country) => country.ads)
   countries!: Country[];
 
   @CreateDateColumn()

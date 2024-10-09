@@ -18,6 +18,7 @@ const databaseConfig = {
   autoLoadEntities: true,
   synchronize: false,
   logging: `${process.env.NODE_ENV}` === 'development',
+  logger: 'advanced-console',
   cli: {
     entitiesDir: 'dist/**/entities',
     migrationsDir: 'dist/migrations',

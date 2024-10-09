@@ -16,11 +16,12 @@ import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
 import { Country } from '../../countries/entities/country.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { Coupon } from '../../coupons/entities/coupon.entity';
 
 @Entity('brands')
 export class Brand {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidv4(); // Generates the UUID in the application
+  id!: string;
 
   @Column('json')
   @IsNotEmpty()
@@ -70,12 +71,7 @@ export class Brand {
   @Column({ nullable: true })
   twitterImage?: string;
 
-  @ManyToMany(() => Category, { cascade: true })
-  @JoinTable({
-    name: 'brand_categories',
-    joinColumn: { name: 'brand_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany((type) => Category, (category) => category.brands)
   categories!: Category[];
 
   @Column({ default: 0 })
@@ -90,20 +86,13 @@ export class Brand {
   @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy!: User | null;
 
-  @ManyToMany(() => Country, { cascade: true })
-  @JoinTable({
-    name: 'brand_countries',
-    joinColumn: { name: 'brand_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'country_id', referencedColumnName: 'id' },
-  })
-  countries!: Country[];
+  @ManyToMany(() => Country, (country) => country.brands)
+  countries: Country[];
 
-  @ManyToMany(() => User, { cascade: true })
-  @JoinTable({
-    name: 'user_followed_brands',
-    joinColumn: { name: 'brand_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany(() => Coupon, (coupon) => coupon.brands)
+  coupons: Coupon[];
+
+  @ManyToMany(() => User, (user) => user.followedBrands)
   userFollowed!: User[];
 
   @CreateDateColumn()

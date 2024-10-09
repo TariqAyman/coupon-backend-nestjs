@@ -6,7 +6,7 @@ import { User } from './entities/user.entity';
 import { UsersAdminController } from './users-admin.controller';
 import { UsersAdminService } from './users-admin.service';
 import { Brand } from 'src/brands/entities/brand.entity';
-import { Coupon } from 'src/coupons/entities/coupon.entity';
+import { Coupon } from '../coupons/entities/coupon.entity';
 import { UploadMediaModule } from 'src/upload-media/upload-media.module';
 
 @Module({

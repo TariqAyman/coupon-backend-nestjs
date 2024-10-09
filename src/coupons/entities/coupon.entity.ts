@@ -19,7 +19,7 @@ import { CouponStatusAr, CouponStatusEn } from 'src/common/enums/CouponStatus';
 @Entity('coupons')
 export class Coupon {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidv4(); // Generates the UUID in the application
+  id!: string;
 
   @Column()
   @Index({ unique: true })
@@ -94,28 +94,16 @@ export class Coupon {
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
 
-  @ManyToMany(() => User)
-  @JoinTable({
-    name: 'user_favorite_coupons',
-    joinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany(() => User , (user) => user.favoriteCoupons)
   userFavorite!: User[];
 
-  @ManyToMany(() => User)
-  @JoinTable({
-    name: 'user_liked_coupons',
-    joinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany(() => User , (user) => user.followedCoupons)
+  userFollowed!: User[];
+
+  @ManyToMany(() => User , (user) => user.likedCoupons)
   userLiked!: User[];
 
-  @ManyToMany(() => User)
-  @JoinTable({
-    name: 'user_disliked_coupons',
-    joinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'user_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany(() => User , (user) => user.dislikedCoupons)
   userDisLiked!: User[];
 
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
@@ -124,27 +112,17 @@ export class Coupon {
   @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy?: User;
 
-  @ManyToMany(() => Country)
-  @JoinTable({
-    name: 'coupon_countries',
-    joinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'country_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany(() => Country , (country) => country.coupons)
   countries!: Country[];
 
-  @ManyToMany(() => Category)
-  @JoinTable({
-    name: 'coupon_categories',
-    joinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'category_id', referencedColumnName: 'id' },
-  })
+  @ManyToMany(() => Category , (category) => category.coupons)
   categories!: Category[];
 
-  @ManyToMany(() => Brand)
+  @ManyToMany(() => Brand, (brand) => brand.coupons)
   @JoinTable({
     name: 'coupon_brands',
-    joinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'brand_id', referencedColumnName: 'id' },
+    joinColumn: { name: 'couponId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'brandId', referencedColumnName: 'id' },
   })
   brands!: Brand[];
 

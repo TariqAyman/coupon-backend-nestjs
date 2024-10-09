@@ -11,7 +11,14 @@ import { NestExpressApplication } from '@nestjs/platform-express';
 import './instrument';
 
 async function bootstrap() {
-  await connectionSource.initialize();
+  await connectionSource
+    .initialize()
+    .then(() => {
+      console.log('Data Source has been initialized!');
+    })
+    .catch((err) => {
+      console.error('Error during Data Source initialization', err);
+    });
 
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
@@ -50,6 +57,6 @@ async function bootstrap() {
     prefix: '/public/storage/uploads/',
   });
 
-  await app.listen(3000);
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

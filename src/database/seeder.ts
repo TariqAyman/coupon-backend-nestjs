@@ -291,7 +291,7 @@ async function seedCoupons(
   return coupons;
 }
 
-async function seedAds(users: User[], countries: any[]) {
+async function seedAds() {
   const adsRepository = dataSource.getRepository(Ads);
   const ads = [];
   for (let i = 0; i < 100; i++) {
@@ -328,13 +328,14 @@ async function seedAds(users: User[], countries: any[]) {
         ar: faker.lorem.sentence(),
       },
       twitterImage: faker.image.url(),
-      createdById: users[Math.floor(Math.random() * users.length)],
-      countries: [countries[Math.floor(Math.random() * countries.length)]],
+      // createdById: users[Math.floor(Math.random() * users.length)],
+      // countries: [countries[Math.floor(Math.random() * countries.length)]],
       createdAt: new Date(),
       updatedAt: new Date(),
     });
   }
   await adsRepository.save(ads);
+  return ads;
 }
 
 async function seedBrandCategories(brands: Brand[], categories: Category[]) {
@@ -362,6 +363,20 @@ async function seedBrandCountries(brands: Brand[], countries: Country[]) {
     });
     brand.countries = brandCountries;
     await brandRepository.save(brand);
+  }
+}
+
+async function seedAdsCountries(ads: Ads[], countries: Country[]) {
+  const adsRepository = dataSource.getRepository(Ads);
+
+  for (const ad of ads) {
+    // Randomly select 1-3 countries for each brand
+    const adsCountries = faker.helpers.arrayElements(countries, {
+      min: 1,
+      max: 3,
+    });
+    ad.countries = adsCountries;
+    await adsRepository.save(ad);
   }
 }
 
@@ -397,7 +412,15 @@ async function seedCouponBrands(coupons: Coupon[], brands: Brand[]) {
 }
 
 async function runSeeders() {
-  await dataSource.initialize();
+  await dataSource
+    .initialize()
+    .then(() => {
+      console.log('Data Source has been initialized!');
+    })
+    .catch((err) => {
+      console.error('Error during Data Source initialization', err);
+    });
+
   const users = await seedUsers();
   const categories = await seedCategories();
   const brands = await seedBrands();
@@ -408,7 +431,7 @@ async function runSeeders() {
     brands,
     countries,
   );
-  await seedAds(users as any, countries);
+  const ads = await seedAds();
 
   // Establish relationships
   const userRepository = dataSource.getRepository(User);
@@ -435,6 +458,7 @@ async function runSeeders() {
   // Seed additional relationships
   await seedBrandCategories(brands as any, categories as any);
   await seedBrandCountries(brands as any, countries as any);
+  await seedAdsCountries(ads as any, countries as any);
   await seedCategoryCountries(categories as any, countries as any);
   await seedCouponBrands(coupons as any, brands as any);
 

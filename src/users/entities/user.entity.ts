@@ -5,19 +5,18 @@ import {
   ManyToMany,
   JoinTable,
 } from 'typeorm';
-import bcrypt from 'bcrypt';
-import { v4 as uuidv4 } from 'uuid'; // Add this import
 import { Coupon } from '../../coupons/entities/coupon.entity';
 import { Brand } from '../../brands/entities/brand.entity';
 import { UserRole } from '../../common/enums/UserRole';
 import { UserStatus } from '../../common/enums/UserStatus';
 import { UserGender } from '../../common/enums/UserGender';
 import { UserProvider } from '../../common/enums/UserProvider';
+import { Exclude } from 'class-transformer';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string = uuidv4(); // Generates the UUID in the application
+  id!: string;
 
   @Column()
   fullName!: string;
@@ -25,6 +24,7 @@ export class User {
   @Column({ unique: true })
   email!: string;
 
+  @Exclude()
   @Column()
   password!: string;
 
@@ -104,47 +104,43 @@ export class User {
   @Column({ nullable: true })
   lastLogout!: Date;
 
-  @ManyToMany(() => Coupon)
+  @ManyToMany(() => Coupon, (coupon) => coupon.userLiked)
   @JoinTable({
     name: 'user_liked_coupons',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'couponId', referencedColumnName: 'id' },
   })
   likedCoupons: Coupon[];
 
-  @ManyToMany(() => Coupon)
+  @ManyToMany(() => Coupon, (coupon) => coupon.userFollowed)
   @JoinTable({
     name: 'user_followed_coupons',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'couponId', referencedColumnName: 'id' },
   })
   followedCoupons: Coupon[];
 
-  @ManyToMany(() => Coupon)
+  @ManyToMany(() => Coupon, (coupon) => coupon.userFavorite)
   @JoinTable({
     name: 'user_favorite_coupons',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'couponId', referencedColumnName: 'id' },
   })
   favoriteCoupons: Coupon[];
 
-  @ManyToMany(() => Coupon)
+  @ManyToMany(() => Coupon, (coupon) => coupon.userDisLiked)
   @JoinTable({
     name: 'user_disliked_coupons',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'coupon_id', referencedColumnName: 'id' },
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'couponId', referencedColumnName: 'id' },
   })
   dislikedCoupons: Coupon[];
 
-  @ManyToMany(() => Brand)
+  @ManyToMany(() => Brand, (brand) => brand.userFollowed)
   @JoinTable({
     name: 'user_followed_brands',
-    joinColumn: { name: 'user_id', referencedColumnName: 'id' },
-    inverseJoinColumn: { name: 'brand_id', referencedColumnName: 'id' },
+    joinColumn: { name: 'userId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'brandId', referencedColumnName: 'id' },
   })
   followedBrands: Brand[];
-
-  // constructor(partial: Partial<User>) {
-  //   Object.assign(this, partial);
-  // }
 }
