@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { ThrottlerModule } from '@nestjs/throttler';
 import { UsersModule } from './users/users.module';
 import { AdsModule } from './ads/ads.module';
 import { BrandsModule } from './brands/brands.module';
@@ -14,13 +13,10 @@ import { UploadMediaModule } from './upload-media/upload-media.module';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
-import { PrismaService } from './PrismaModule/prisma.service';
-import { PrismaModule } from './PrismaModule/prisma.module';
 
 @Module({
   imports: [
     SentryModule.forRoot(),
-    PrismaModule,
     DatabaseModule,
     CommonModule,
     AuthenticationModule,
@@ -35,12 +31,11 @@ import { PrismaModule } from './PrismaModule/prisma.module';
   ],
   controllers: [],
   providers: [
-    PrismaService,
     {
       provide: APP_FILTER,
       useClass: SentryGlobalFilter,
     },
   ],
-  exports: [PrismaService],
+  exports: [],
 })
 export class AppModule {}
