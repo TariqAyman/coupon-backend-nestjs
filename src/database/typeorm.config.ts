@@ -2,7 +2,7 @@ import { registerAs } from '@nestjs/config';
 import { config as dotenvConfig } from 'dotenv';
 import { ActionByUserSubscriber } from '../common/subscribers/action-by-user.subscriber';
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { LocaleSubscriber } from 'src/common/subscribers/locale.subscriber';
+import { LocaleSubscriber } from '../common/subscribers/locale.subscriber';
 
 const result = dotenvConfig({ path: '.env' });
 
