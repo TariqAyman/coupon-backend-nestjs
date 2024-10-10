@@ -11,7 +11,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Entity('upload_media')
 export class UploadMedia {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string = uuidv4();
 
   @Column()
   filename: string;

@@ -1,11 +1,15 @@
-import { IsString, IsNotEmpty } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsNotEmpty, ValidateNested } from 'class-validator';
+import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
 export class NotificationDataDto {
   @IsNotEmpty()
-  @IsString()
-  title: string;
+  @ValidateNested()
+  @Type(() => BilingualString)
+  title: BilingualString;
 
   @IsNotEmpty()
-  @IsString()
-  body: string;
+  @ValidateNested()
+  @Type(() => BilingualString)
+  body: BilingualString;
 }

@@ -91,6 +91,7 @@ export class CreateJunctionTables20240909122218 implements MigrationInterface {
               name: 'updatedAt',
               type: 'timestamp',
               default: 'CURRENT_TIMESTAMP',
+              onUpdate: 'CURRENT_TIMESTAMP',
               isNullable: false,
             },
           ],

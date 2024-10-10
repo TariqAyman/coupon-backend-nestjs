@@ -6,7 +6,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { IsNull, Not, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { PaginationDto } from 'src/common/dto/pagination.dto';
 
@@ -67,5 +67,22 @@ export class UsersAdminService {
     if (!user) throw new NotFoundException(`User with ID "${id}" not found`);
 
     return this.usersRepository.softDelete(id);
+  }
+
+  async getUsersHasTokens() {
+    const users = await this.usersRepository.find({
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+      },
+      where: {
+        userTokens: {
+          token: Not(IsNull()),
+        },
+      }
+    });
+
+    return users;
   }
 }

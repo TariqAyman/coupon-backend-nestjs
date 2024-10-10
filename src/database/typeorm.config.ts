@@ -2,6 +2,7 @@ import { registerAs } from '@nestjs/config';
 import { config as dotenvConfig } from 'dotenv';
 import { ActionByUserSubscriber } from '../common/subscribers/action-by-user.subscriber';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { LocaleSubscriber } from 'src/common/subscribers/locale.subscriber';
 
 const result = dotenvConfig({ path: '.env' });
 
@@ -14,7 +15,7 @@ const databaseConfig = {
   database: `${process.env.DATABASE_NAME}`,
   entities: [__dirname + '/../**/*.entity{.ts,.js}'],
   migrations: ['dist/migrations/*.js'],
-  subscribers: [ActionByUserSubscriber],
+  subscribers: [ActionByUserSubscriber, LocaleSubscriber],
   autoLoadEntities: true,
   synchronize: false,
   logging: `${process.env.NODE_ENV}` === 'development',

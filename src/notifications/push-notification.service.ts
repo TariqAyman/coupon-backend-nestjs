@@ -1,9 +1,5 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
-import {
-  NotificationAction,
-  NotificationDataInterface,
-  SendNotificationInterface,
-} from './interfaces/push-notification.interface';
+import { NotificationAction } from './interfaces/push-notification.interface';
 import { NewSubscriberInterface } from './interfaces/subscriber.interface';
 import * as admin from 'firebase-admin';
 import { SubscribeTopicInterface } from './interfaces/subscribe-topic.interface';
@@ -14,6 +10,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserToken } from './entities/user-tokens.entity';
 import { SendNotificationDto } from './dto/send-notification.dto';
+import { NotificationDataDto } from './dto/notification-data.dto';
 
 @Injectable()
 export class PushNotificationService {
@@ -155,13 +152,13 @@ export class PushNotificationService {
     }
   }
 
-  async sendToSingleDevice(token: string, data: NotificationDataInterface) {
+  async sendToSingleDevice(token: string, data: NotificationDataDto) {
     try {
       const message: admin.messaging.Message = {
         token: token,
         notification: {
-          title: data.title,
-          body: data.body,
+          title: data.title.ar,
+          body: data.body.ar,
         },
         android: {
           notification: {
@@ -183,13 +180,13 @@ export class PushNotificationService {
     }
   }
 
-  async sendToSpecificTopic(topic: string, data: NotificationDataInterface) {
+  async sendToSpecificTopic(topic: string, data: NotificationDataDto) {
     try {
       const message: admin.messaging.Message = {
         topic: topic,
         notification: {
-          title: data.title,
-          body: data.body,
+          title: data.title.ar,
+          body: data.body.ar,
         },
         android: {
           notification: {
@@ -211,16 +208,13 @@ export class PushNotificationService {
     }
   }
 
-  async sendToGroupOfDevices(
-    tokens: string[],
-    data: NotificationDataInterface,
-  ) {
+  async sendToGroupOfDevices(tokens: string[], data: NotificationDataDto) {
     try {
       const message: admin.messaging.MulticastMessage = {
         tokens: tokens,
         notification: {
-          title: data.title,
-          body: data.body,
+          title: data.title.ar,
+          body: data.body.ar,
         },
         android: {
           notification: {
@@ -308,15 +302,28 @@ export class PushNotificationService {
     }
   }
 
+  async findTopics() {
+    const topics = await this.userTokensRepository.query(`
+    SELECT DISTINCT topic 
+    FROM user_tokens, 
+         JSON_TABLE(user_tokens.topics, '$[*]' COLUMNS (topic VARCHAR(255) PATH '$')) AS topics_table
+  `);
+
+    // Extract the 'topic' values and return as a single array
+    const uniqueTopics = topics.map((row: any) => row.topic);
+
+    return uniqueTopics;
+  }
+
   createMessage(
     token: string,
-    data: NotificationDataInterface,
+    data: NotificationDataDto,
   ): admin.messaging.Message {
     return {
       token: token,
       notification: {
-        title: data.title,
-        body: data.body,
+        title: data.title.ar,
+        body: data.body.ar,
       },
       android: {
         notification: {

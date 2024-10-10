@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { Module, MiddlewareConsumer } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { AdsModule } from './ads/ads.module';
 import { BrandsModule } from './brands/brands.module';
@@ -13,6 +13,7 @@ import { UploadMediaModule } from './upload-media/upload-media.module';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
+import { LocaleMiddleware } from './common/middleware/locale.middleware';
 
 @Module({
   imports: [
@@ -38,4 +39,9 @@ import { SentryGlobalFilter } from '@sentry/nestjs/setup';
   ],
   exports: [],
 })
-export class AppModule {}
+export class AppModule {
+  configure(consumer: MiddlewareConsumer) {
+    // Apply the LocaleMiddleware to all routes
+    consumer.apply(LocaleMiddleware).forRoutes('*');
+  }
+}

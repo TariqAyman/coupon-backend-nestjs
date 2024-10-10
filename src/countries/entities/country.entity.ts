@@ -17,7 +17,7 @@ import { Coupon } from '../../coupons/entities/coupon.entity';
 @Entity('countries')
 export class Country {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string = uuidv4();
 
   @Column({ unique: true })
   name!: string;

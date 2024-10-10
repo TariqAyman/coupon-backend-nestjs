@@ -6,7 +6,7 @@ import { config as dotenvConfig } from 'dotenv';
 const result = dotenvConfig({ path: '.env' });
 
 Sentry.init({
-  dsn: `${process.env.SENTRY_DSN_URL}`,
+  dsn: `${process.env.SENTRY_DSN_UR || ''}`,
   integrations: [nodeProfilingIntegration()],
   // Tracing
   tracesSampleRate: 1.0, //  Capture 100% of the transactions

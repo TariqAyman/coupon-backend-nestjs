@@ -11,6 +11,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as admin from 'firebase-admin';
 import { User } from 'src/users/entities/user.entity';
 import { UserToken } from './entities/user-tokens.entity';
+import { UsersModule } from 'src/users/users.module';
 
 const firebaseProvider = {
   provide: 'FIREBASE_APP',
@@ -30,6 +31,7 @@ const firebaseProvider = {
   imports: [
     ConfigModule,
     TypeOrmModule.forFeature([Notification, User, UserToken]),
+    UsersModule,
   ],
   controllers: [
     NotificationsController,

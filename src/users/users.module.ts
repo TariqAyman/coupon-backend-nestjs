@@ -13,6 +13,6 @@ import { UploadMediaModule } from 'src/upload-media/upload-media.module';
   imports: [TypeOrmModule.forFeature([User, Brand, Coupon]), UploadMediaModule],
   controllers: [UsersController, UsersAdminController],
   providers: [UsersService, UsersAdminService],
-  exports: [UsersService],
+  exports: [UsersService, UsersAdminService],
 })
 export class UsersModule {}

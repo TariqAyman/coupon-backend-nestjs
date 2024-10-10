@@ -1,11 +1,6 @@
-import {
-  IsString,
-  IsOptional,
-  IsArray,
-  ValidateNested,
-} from 'class-validator';
+import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
-import { NotificationDataDto } from './notification-data.dto'; // Import the NotificationDataDto
+import { NotificationDataDto } from './notification-data.dto';
 
 export class DataSendNotificationDto {
   @ValidateNested()

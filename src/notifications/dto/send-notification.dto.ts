@@ -15,9 +15,10 @@ export class SendNotificationDto {
   @IsIn([
     NotificationAction.singleDevice,
     NotificationAction.topic,
+    NotificationAction.topics,
     NotificationAction.groupOfDevices,
   ])
-  action: string; // Ensure you have the NotificationAction type defined elsewhere
+  action: string;
 
   @IsOptional()
   @IsString()

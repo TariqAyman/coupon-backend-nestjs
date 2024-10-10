@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Entity('notifications')
 export class Notification {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string = uuidv4();
 
   @Column('json')
   title!: {

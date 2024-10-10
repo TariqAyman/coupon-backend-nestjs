@@ -89,6 +89,7 @@ export class CreateCouponsTable20240909122031 implements MigrationInterface {
             name: 'updatedAt',
             type: 'timestamp',
             default: 'CURRENT_TIMESTAMP',
+            onUpdate: 'CURRENT_TIMESTAMP',
             isNullable: false,
           },
           { name: 'deletedAt', type: 'timestamp', isNullable: true },

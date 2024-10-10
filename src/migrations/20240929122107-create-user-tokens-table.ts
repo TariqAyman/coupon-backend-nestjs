@@ -51,12 +51,15 @@ export class CreateUserTokensTable20240929122107 implements MigrationInterface {
           {
             name: 'createdAt',
             type: 'timestamp',
-            isNullable: true,
+            default: 'CURRENT_TIMESTAMP',
+            isNullable: false,
           },
           {
             name: 'updatedAt',
             type: 'timestamp',
-            isNullable: true,
+            default: 'CURRENT_TIMESTAMP',
+            onUpdate: 'CURRENT_TIMESTAMP',
+            isNullable: false,
           },
           { name: 'deletedAt', type: 'timestamp', isNullable: true },
         ],

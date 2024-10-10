@@ -1,14 +1,18 @@
+import { User } from 'src/users/entities/user.entity';
 import {
   Entity,
   Column,
   PrimaryGeneratedColumn,
   DeleteDateColumn,
+  ManyToOne,
+  OneToMany,
 } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 @Entity('user_tokens')
 export class UserToken {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string = uuidv4();
 
   @Column()
   userId: string;
@@ -42,4 +46,7 @@ export class UserToken {
 
   @Column({ type: 'json', nullable: true })
   topics: string[];
+
+  @ManyToOne(() => User, (user) => user.userTokens)
+  user: User;
 }

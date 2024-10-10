@@ -4,6 +4,8 @@ import {
   Column,
   ManyToMany,
   JoinTable,
+  ManyToOne,
+  OneToMany,
 } from 'typeorm';
 import { Coupon } from '../../coupons/entities/coupon.entity';
 import { Brand } from '../../brands/entities/brand.entity';
@@ -12,11 +14,13 @@ import { UserStatus } from '../../common/enums/UserStatus';
 import { UserGender } from '../../common/enums/UserGender';
 import { UserProvider } from '../../common/enums/UserProvider';
 import { Exclude } from 'class-transformer';
+import { v4 as uuidv4 } from 'uuid';
+import { UserToken } from 'src/notifications/entities/user-tokens.entity';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string = uuidv4();
 
   @Column()
   fullName!: string;
@@ -38,7 +42,7 @@ export class User {
   phoneNumberCountryCode: string;
 
   @Column()
-  userLocale: string = 'en';
+  userLocale: string;
 
   @Column()
   countryCode: string;
@@ -143,4 +147,7 @@ export class User {
     inverseJoinColumn: { name: 'brandId', referencedColumnName: 'id' },
   })
   followedBrands: Brand[];
+
+  @OneToMany(() => UserToken, (userToken) => userToken.user)
+  userTokens: UserToken[];
 }

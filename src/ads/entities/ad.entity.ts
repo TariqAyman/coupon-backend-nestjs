@@ -21,7 +21,7 @@ import { IsOptional, IsString, IsUrl } from 'class-validator';
 @Entity('ads')
 export class Ads {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string = uuidv4();
 
   @Column()
   name!: string;

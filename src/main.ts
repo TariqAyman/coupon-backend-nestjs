@@ -57,6 +57,12 @@ async function bootstrap() {
     prefix: '/public/storage/uploads/',
   });
 
+  app.enableCors({
+    origin: true, // This allows all domains
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+  });
+
   await app.listen(process.env.PORT || 3000);
 }
 bootstrap();

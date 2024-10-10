@@ -19,7 +19,7 @@ import { CouponStatusAr, CouponStatusEn } from 'src/common/enums/CouponStatus';
 @Entity('coupons')
 export class Coupon {
   @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  id: string = uuidv4();
 
   @Column()
   @Index({ unique: true })
@@ -94,16 +94,16 @@ export class Coupon {
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
 
-  @ManyToMany(() => User , (user) => user.favoriteCoupons)
+  @ManyToMany(() => User, (user) => user.favoriteCoupons)
   userFavorite!: User[];
 
-  @ManyToMany(() => User , (user) => user.followedCoupons)
+  @ManyToMany(() => User, (user) => user.followedCoupons)
   userFollowed!: User[];
 
-  @ManyToMany(() => User , (user) => user.likedCoupons)
+  @ManyToMany(() => User, (user) => user.likedCoupons)
   userLiked!: User[];
 
-  @ManyToMany(() => User , (user) => user.dislikedCoupons)
+  @ManyToMany(() => User, (user) => user.dislikedCoupons)
   userDisLiked!: User[];
 
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
@@ -112,10 +112,10 @@ export class Coupon {
   @ManyToOne(() => User, { nullable: true, onDelete: 'CASCADE' })
   updatedBy?: User;
 
-  @ManyToMany(() => Country , (country) => country.coupons)
+  @ManyToMany(() => Country, (country) => country.coupons)
   countries!: Country[];
 
-  @ManyToMany(() => Category , (category) => category.coupons)
+  @ManyToMany(() => Category, (category) => category.coupons)
   categories!: Category[];
 
   @ManyToMany(() => Brand, (brand) => brand.coupons)

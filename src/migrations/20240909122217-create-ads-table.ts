@@ -85,12 +85,15 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
           {
             name: 'createdAt',
             type: 'timestamp',
-            default: 'now()',
+            default: 'CURRENT_TIMESTAMP',
+            isNullable: false,
           },
           {
             name: 'updatedAt',
             type: 'timestamp',
-            default: 'now()',
+            default: 'CURRENT_TIMESTAMP',
+            onUpdate: 'CURRENT_TIMESTAMP',
+            isNullable: false,
           },
           {
             name: 'deletedAt',
