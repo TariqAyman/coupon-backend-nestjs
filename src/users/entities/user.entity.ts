@@ -15,7 +15,7 @@ import { UserGender } from '../../common/enums/UserGender';
 import { UserProvider } from '../../common/enums/UserProvider';
 import { Exclude } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
-import { UserToken } from 'src/notifications/entities/user-tokens.entity';
+import { UserToken } from '../../notifications/entities/user-tokens.entity';
 
 @Entity('users')
 export class User {
