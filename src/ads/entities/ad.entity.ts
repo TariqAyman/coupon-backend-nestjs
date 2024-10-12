@@ -17,14 +17,15 @@ import { User } from '../../users/entities/user.entity';
 import { Country } from '../../countries/entities/country.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { IsOptional, IsString, IsUrl } from 'class-validator';
+import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
 @Entity('ads')
 export class Ads {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuidv4();
 
-  @Column()
-  name!: string;
+  @Column('json')
+  name!: BilingualString;
 
   @Column()
   link!: string;
@@ -33,16 +34,16 @@ export class Ads {
   image?: string;
 
   @Column('json', { nullable: true })
-  seoDescription?: { en: string; ar: string };
+  seoDescription?: BilingualString;
 
   @Column('json', { nullable: true })
-  seoKeywords?: { en: string; ar: string };
+  seoKeywords?: BilingualString;
 
   @Column('json', { nullable: true })
-  ogTitle?: { en: string; ar: string };
+  ogTitle?: BilingualString;
 
   @Column('json', { nullable: true })
-  ogDescription?: { en: string; ar: string };
+  ogDescription?: BilingualString;
 
   @Column({ nullable: true })
   ogImage?: string;
@@ -54,10 +55,10 @@ export class Ads {
   twitterCard?: string;
 
   @Column('json', { nullable: true })
-  twitterTitle?: { en: string; ar: string };
+  twitterTitle?: BilingualString;
 
   @Column('json', { nullable: true })
-  twitterDescription?: { en: string; ar: string };
+  twitterDescription?: BilingualString;
 
   @Column({ nullable: true })
   twitterImage?: string;

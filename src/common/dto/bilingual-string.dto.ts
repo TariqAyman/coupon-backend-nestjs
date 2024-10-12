@@ -7,3 +7,8 @@ export class BilingualString {
   @IsString()
   ar: string;
 }
+
+export interface BilingualStringObject {
+  en: string;
+  ar: string;
+}

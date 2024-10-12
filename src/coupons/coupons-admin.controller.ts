@@ -22,7 +22,7 @@ import {
   showOne,
   success,
 } from 'src/common/utils/api-response-wrapper';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { EntityFilesInterceptor } from 'src/upload-media/entity-files.interceptor';
 
@@ -48,7 +48,7 @@ export class CouponsAdminController {
   }
 
   @Get()
-  async findAll(@Query() pagination: PaginationDto) {
+  async findAll(@Query() pagination: PaginationOptionsDto) {
     const { data, total, pageNumber, limitNumber } =
       await this.couponsService.findAll(pagination);
     return paginate(data, total, pageNumber, limitNumber);

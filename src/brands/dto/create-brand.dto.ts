@@ -11,13 +11,12 @@ import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
 export class CreateBrandDto {
   @IsNotEmpty()
-  name: { en: string; ar: string };
-
-  @IsNotEmpty()
-  slug: string;
+  @ValidateNested()
+  @Type(() => BilingualString)
+  name: BilingualString;
 
   @IsOptional()
-  description?: { en: string; ar: string };
+  description?: BilingualString;
 
   @IsUrl()
   link: string;

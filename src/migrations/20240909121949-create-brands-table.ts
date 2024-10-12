@@ -18,7 +18,7 @@ export class CreateBrandsTable20240909121949 implements MigrationInterface {
             isPrimary: true,
           },
           { name: 'name', type: 'json', isNullable: false },
-          { name: 'slug', type: 'varchar', isNullable: false },
+          { name: 'slug', type: 'json', isNullable: false },
           { name: 'description', type: 'json', isNullable: true },
           { name: 'link', type: 'varchar', isNullable: false },
           { name: 'image', type: 'varchar', isNullable: true },

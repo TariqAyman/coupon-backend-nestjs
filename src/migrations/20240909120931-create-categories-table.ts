@@ -21,7 +21,6 @@ export class CreateCategoriesTable20240909120931 implements MigrationInterface {
           { name: 'slug', type: 'json', isNullable: false },
           { name: 'description', type: 'json', isNullable: true },
           { name: 'image', type: 'varchar', isNullable: true },
-          { name: 'icon', type: 'varchar', isNullable: true },
           { name: 'color', type: 'varchar', isNullable: true },
           {
             name: 'seoDescription',

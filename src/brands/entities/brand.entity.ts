@@ -17,6 +17,7 @@ import { User } from '../../users/entities/user.entity';
 import { Country } from '../../countries/entities/country.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { Coupon } from '../../coupons/entities/coupon.entity';
+import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
 @Entity('brands')
 export class Brand {
@@ -25,14 +26,14 @@ export class Brand {
 
   @Column('json')
   @IsNotEmpty()
-  name!: { en: string; ar: string };
+  name!: BilingualString;
 
-  @Column({ unique: true })
+  @Column('json', { unique: true })
   @Index()
-  slug!: string;
+  slug!: BilingualString;
 
   @Column('json', { nullable: true })
-  description?: { en: string; ar: string };
+  description?: BilingualString;
 
   @Column()
   @IsUrl()
@@ -42,16 +43,16 @@ export class Brand {
   image?: string;
 
   @Column('json', { nullable: true })
-  seoDescription?: { en: string; ar: string };
+  seoDescription?: BilingualString;
 
   @Column('json', { nullable: true })
-  seoKeywords?: { en: string; ar: string };
+  seoKeywords?: BilingualString;
 
   @Column('json', { nullable: true })
-  ogTitle?: { en: string; ar: string };
+  ogTitle?: BilingualString;
 
   @Column('json', { nullable: true })
-  ogDescription?: { en: string; ar: string };
+  ogDescription?: BilingualString;
 
   @Column({ nullable: true })
   ogImage?: string;
@@ -63,10 +64,10 @@ export class Brand {
   twitterCard?: string;
 
   @Column('json', { nullable: true })
-  twitterTitle?: { en: string; ar: string };
+  twitterTitle?: BilingualString;
 
   @Column('json', { nullable: true })
-  twitterDescription?: { en: string; ar: string };
+  twitterDescription?: BilingualString;
 
   @Column({ nullable: true })
   twitterImage?: string;

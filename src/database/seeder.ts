@@ -95,7 +95,6 @@ async function seedCategories() {
       slug: { en: faker.lorem.slug(), ar: faker.lorem.slug() },
       description: { en: faker.lorem.sentence(), ar: faker.lorem.sentence() },
       image: faker.image.url(),
-      icon: faker.image.url(),
       color: faker.color.rgb(),
       seoDescription: {
         en: faker.lorem.sentence(),
@@ -141,7 +140,7 @@ async function seedBrands() {
     brands.push({
       id: uuidv4(),
       name: { en: faker.company.name(), ar: faker.company.name() },
-      slug: faker.lorem.slug(),
+      slug: { en: faker.company.name(), ar: faker.company.name() },
       description: { en: faker.lorem.sentence(), ar: faker.lorem.sentence() },
       link: faker.internet.url(),
       image: faker.image.url(),
@@ -241,6 +240,7 @@ async function seedCoupons(
   for (let i = 0; i < 100; i++) {
     coupons.push({
       id: uuidv4(),
+      name: { en: faker.company.name(), ar: faker.company.name() },
       code: faker.string.alphanumeric(10),
       amount: faker.number.int({ min: 5, max: 50 }),
       status: {
@@ -297,7 +297,7 @@ async function seedAds() {
   for (let i = 0; i < 100; i++) {
     ads.push({
       id: uuidv4(),
-      name: faker.company.catchPhrase(),
+      name: { en: faker.company.name(), ar: faker.company.name() },
       link: faker.internet.url(),
       image: faker.image.url(),
       seoDescription: {

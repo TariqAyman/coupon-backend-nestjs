@@ -1,22 +1,25 @@
 import { Type } from 'class-transformer';
-import { IsArray, IsNotEmpty, IsOptional, IsString, IsUrl, ValidateNested } from 'class-validator';
+import {
+  IsArray,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  IsUrl,
+  ValidateNested,
+} from 'class-validator';
 import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
 export class CreateCategoryDto {
   @IsNotEmpty()
-  name: { en: string; ar: string };
-
-  @IsNotEmpty()
-  slug: { en: string; ar: string };
+  @ValidateNested()
+  @Type(() => BilingualString)
+  name: BilingualString;
 
   @IsOptional()
-  description?: { en: string; ar: string };
+  description?: BilingualString;
 
   @IsOptional()
   image?: string;
-
-  @IsOptional()
-  icon?: string;
 
   @IsOptional()
   color?: string;

@@ -26,7 +26,7 @@ import {
   BodyWithParam,
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { EntityFilesInterceptor } from 'src/upload-media/entity-files.interceptor';
 import { EntityFileInterceptor } from 'src/upload-media/entity-file.interceptor';
@@ -54,7 +54,7 @@ export class AdsAdminController {
   }
 
   @Get()
-  async findAll(@Query() pagination: PaginationDto) {
+  async findAll(@Query() pagination: PaginationOptionsDto) {
     const { data, total, pageNumber, limitNumber } =
       await this.adsAdminService.findAll(pagination);
     return paginate(data, total, pageNumber, limitNumber);

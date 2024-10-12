@@ -229,8 +229,8 @@ src/
 - **id**: UUID
 - **code**: string
 - **amount**: number
-- **description**: { en: string; ar: string }
-- **status**: { en: string; ar: string }
+- **description**: BilingualString
+- **status**: BilingualString
 - **expire**: Date
 - **qrCode**: string
 - **link**: string
@@ -261,11 +261,10 @@ src/
 ### Category
 
 - **id**: UUID
-- **name**: { en: string; ar: string }
-- **slug**: { en: string; ar: string }
-- **description**: { en: string; ar: string }
+- **name**: BilingualString
+- **slug**: BilingualString
+- **description**: BilingualString
 - **image**: string
-- **icon**: string
 - **color**: string
 - **createdAt**: Date
 - **updatedAt**: Date
@@ -273,8 +272,8 @@ src/
 ### Notification
 
 - **id**: UUID
-- **title**: { en: string; ar: string }
-- **body**: { en: string; ar: string }
+- **title**: BilingualString
+- **body**: BilingualString
 - **isWatched**: boolean
 - **createdAt**: Date
 - **updatedAt**: Date

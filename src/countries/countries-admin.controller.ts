@@ -23,7 +23,7 @@ import {
   success,
   successCreate,
 } from 'src/common/utils/api-response-wrapper';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import {
   BodyWithParam,
   transformToTypeTypes,
@@ -54,7 +54,7 @@ export class CountriesAdminController {
   }
 
   @Get()
-  async findAll(@Query() pagination: PaginationDto) {
+  async findAll(@Query() pagination: PaginationOptionsDto) {
     const { data, total, pageNumber, limitNumber } =
       await this.countriesService.findAll(pagination);
     return paginate(data, total, pageNumber, limitNumber);

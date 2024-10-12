@@ -4,8 +4,9 @@ import { UpdateCountryDto } from './dto/update-country.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Country } from './entities/country.entity';
 import { Repository } from 'typeorm';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { UploadMediaService } from 'src/upload-media/upload-media.service';
+import { findWithPagination } from 'src/common/utils/pagination.util';
 
 @Injectable()
 export class CountriesAdminService {
@@ -48,26 +49,13 @@ export class CountriesAdminService {
     return await this.countryRepository.save(country);
   }
 
-  async findAll(pagination: PaginationDto): Promise<{
+  async findAll(pagination: PaginationOptionsDto): Promise<{
     data: Country[];
     total: number;
     pageNumber: number;
     limitNumber: number;
   }> {
-    const pageNumber = Number(pagination.page);
-    const limitNumber = Number(pagination.limit);
-
-    if (isNaN(pageNumber) || isNaN(limitNumber)) {
-      throw new Error('Invalid page or limit value');
-    }
-
-    const [data, total] = await this.countryRepository.findAndCount({
-      skip: (pageNumber - 1) * limitNumber,
-      take: limitNumber,
-      order: { createdAt: 'DESC' },
-    });
-
-    return { data, total, pageNumber, limitNumber };
+    return findWithPagination(this.countryRepository, pagination);
   }
 
   async findOne(id: string): Promise<Country | null> {

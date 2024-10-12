@@ -8,7 +8,8 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { IsNull, Not, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
+import { findWithPagination } from 'src/common/utils/pagination.util';
 
 @Injectable()
 export class UsersAdminService {
@@ -30,26 +31,13 @@ export class UsersAdminService {
     });
   }
 
-  async findAll(pagination: PaginationDto): Promise<{
+  async findAll(pagination: PaginationOptionsDto): Promise<{
     data: User[];
     total: number;
     pageNumber: number;
     limitNumber: number;
   }> {
-    const pageNumber = Number(pagination.page);
-    const limitNumber = Number(pagination.limit);
-
-    if (isNaN(pageNumber) || isNaN(limitNumber)) {
-      throw new Error('Invalid page or limit value');
-    }
-
-    const [data, total] = await this.usersRepository.findAndCount({
-      skip: (pageNumber - 1) * limitNumber,
-      take: limitNumber,
-      order: { createdAt: 'DESC' },
-    });
-
-    return { data, total, pageNumber, limitNumber };
+    return findWithPagination(this.usersRepository, pagination);
   }
 
   async findOne(id: string) {
@@ -80,7 +68,7 @@ export class UsersAdminService {
         userTokens: {
           token: Not(IsNull()),
         },
-      }
+      },
     });
 
     return users;

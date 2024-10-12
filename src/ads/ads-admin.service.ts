@@ -4,9 +4,10 @@ import { In, Repository } from 'typeorm';
 import { CreateAdDto } from './dto/create-ad.dto';
 import { UpdateAdDto } from './dto/update-ad.dto';
 import { Ads } from './entities/ad.entity';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { Country } from 'src/countries/entities/country.entity';
 import { UploadMediaService } from 'src/upload-media/upload-media.service';
+import { findWithPagination } from 'src/common/utils/pagination.util';
 
 @Injectable()
 export class AdsAdminService {
@@ -51,27 +52,13 @@ export class AdsAdminService {
     return this.findOne(ads.id);
   }
 
-  async findAll(pagination: PaginationDto): Promise<{
+  async findAll(pagination: PaginationOptionsDto): Promise<{
     data: Ads[];
     total: number;
     pageNumber: number;
     limitNumber: number;
   }> {
-    const pageNumber = Number(pagination.page);
-    const limitNumber = Number(pagination.limit);
-
-    if (isNaN(pageNumber) || isNaN(limitNumber)) {
-      throw new Error('Invalid page or limit value');
-    }
-
-    const [data, total] = await this.adsRepository.findAndCount({
-      skip: (pageNumber - 1) * limitNumber,
-      take: limitNumber,
-      relations: ['countries'],
-      order: { createdAt: 'DESC' },
-    });
-
-    return { data, total, pageNumber, limitNumber };
+    return findWithPagination(this.adsRepository, pagination, ['countries']);
   }
 
   async findOne(id: string) {

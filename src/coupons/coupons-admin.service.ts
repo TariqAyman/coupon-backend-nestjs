@@ -5,12 +5,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Coupon } from './entities/coupon.entity';
 import { DeepPartial, In, Repository } from 'typeorm';
 import { CouponStatusAr, CouponStatusEn } from 'src/common/enums/CouponStatus';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { UploadMediaService } from 'src/upload-media/upload-media.service';
 import { Country } from 'src/countries/entities/country.entity';
 import { Brand } from 'src/brands/entities/brand.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { File } from 'buffer';
+import { findWithPagination } from 'src/common/utils/pagination.util';
 
 @Injectable()
 export class CouponsAdminService {
@@ -87,27 +88,17 @@ export class CouponsAdminService {
     return this.findOne(coupon.id);
   }
 
-  async findAll(pagination: PaginationDto): Promise<{
+  async findAll(pagination: PaginationOptionsDto): Promise<{
     data: Coupon[];
     total: number;
     pageNumber: number;
     limitNumber: number;
   }> {
-    const pageNumber = Number(pagination.page);
-    const limitNumber = Number(pagination.limit);
-
-    if (isNaN(pageNumber) || isNaN(limitNumber)) {
-      throw new Error('Invalid page or limit value');
-    }
-
-    const [data, total] = await this.couponRepository.findAndCount({
-      skip: (pageNumber - 1) * limitNumber,
-      take: limitNumber,
-      relations: ['categories', 'countries', 'brands'],
-      order: { createdAt: 'DESC' },
-    });
-
-    return { data, total, pageNumber, limitNumber };
+    return findWithPagination(this.couponRepository, pagination, [
+      'categories',
+      'countries',
+      'brands',
+    ]);
   }
 
   async findOne(id: string) {

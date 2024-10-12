@@ -15,11 +15,15 @@ import { Category } from '../../categories/entities/category.entity';
 import { Brand } from '../../brands/entities/brand.entity';
 import { v4 as uuidv4 } from 'uuid';
 import { CouponStatusAr, CouponStatusEn } from 'src/common/enums/CouponStatus';
+import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
 @Entity('coupons')
 export class Coupon {
   @PrimaryGeneratedColumn('uuid')
   id: string = uuidv4();
+
+  @Column('json')
+  name!: BilingualString;
 
   @Column()
   @Index({ unique: true })
@@ -29,7 +33,7 @@ export class Coupon {
   amount!: number;
 
   @Column('json', { nullable: true })
-  description?: { en: string; ar: string };
+  description?: BilingualString;
 
   @Column('json')
   status!: {
@@ -47,16 +51,16 @@ export class Coupon {
   link?: string;
 
   @Column('json', { nullable: true })
-  seoDescription?: { en: string; ar: string };
+  seoDescription?: BilingualString;
 
   @Column('json', { nullable: true })
-  seoKeywords?: { en: string; ar: string };
+  seoKeywords?: BilingualString;
 
   @Column('json', { nullable: true })
-  ogTitle?: { en: string; ar: string };
+  ogTitle?: BilingualString;
 
   @Column('json', { nullable: true })
-  ogDescription?: { en: string; ar: string };
+  ogDescription?: BilingualString;
 
   @Column({ nullable: true })
   ogImage?: string;
@@ -68,10 +72,10 @@ export class Coupon {
   twitterCard?: string;
 
   @Column('json', { nullable: true })
-  twitterTitle?: { en: string; ar: string };
+  twitterTitle?: BilingualString;
 
   @Column('json', { nullable: true })
-  twitterDescription?: { en: string; ar: string };
+  twitterDescription?: BilingualString;
 
   @Column({ nullable: true })
   twitterImage?: string;

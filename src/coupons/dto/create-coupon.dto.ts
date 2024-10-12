@@ -16,6 +16,11 @@ import { Transform, Type } from 'class-transformer';
 
 export class CreateCouponDto {
   @IsNotEmpty()
+  @ValidateNested()
+  @Type(() => BilingualString)
+  name: BilingualString;
+
+  @IsNotEmpty()
   @IsString()
   @IsUnique(Coupon, 'code', { message: 'Coupon code must be unique' })
   @Transform(({ value }) => value?.toString().trim())
@@ -31,11 +36,11 @@ export class CreateCouponDto {
   @IsNotEmpty()
   @Type(() => Object)
   // @Transform(({ value }) => JSON.parse(value))
-  status: { en: string; ar: string };
+  status: BilingualString;
 
   @IsOptional()
   @Type(() => Object)
-  description?: { en: string; ar: string };
+  description?: BilingualString;
 
   @IsOptional()
   @IsDateString()

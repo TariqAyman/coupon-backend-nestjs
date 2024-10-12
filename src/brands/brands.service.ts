@@ -2,7 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Brand } from './entities/brand.entity';
 import { Repository } from 'typeorm';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
+import { findWithPagination } from 'src/common/utils/pagination.util';
 
 @Injectable()
 export class BrandsService {
@@ -11,27 +12,16 @@ export class BrandsService {
     private brandRepository: Repository<Brand>,
   ) {}
 
-  async findAll(pagination: PaginationDto): Promise<{
+  async findAll(pagination: PaginationOptionsDto): Promise<{
     data: Brand[];
     total: number;
     pageNumber: number;
     limitNumber: number;
   }> {
-    const pageNumber = Number(pagination.page);
-    const limitNumber = Number(pagination.limit);
-
-    if (isNaN(pageNumber) || isNaN(limitNumber)) {
-      throw new Error('Invalid page or limit value');
-    }
-
-    const [data, total] = await this.brandRepository.findAndCount({
-      skip: (pageNumber - 1) * limitNumber,
-      take: limitNumber,
-      relations: ['categories', 'countries'],
-      order: { createdAt: 'DESC' },
-    });
-
-    return { data, total, pageNumber, limitNumber };
+    return findWithPagination(this.brandRepository, pagination, [
+      'categories',
+      'countries',
+    ]);
   }
 
   async findOne(id: string) {

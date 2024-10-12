@@ -14,8 +14,9 @@ import { BilingualString } from '../../common/dto/bilingual-string.dto';
 
 export class CreateAdDto {
   @IsNotEmpty()
-  @IsString()
-  name: string;
+  @ValidateNested()
+  @Type(() => BilingualString)
+  name: BilingualString;
 
   @IsNotEmpty()
   @IsUrl()

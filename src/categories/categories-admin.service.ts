@@ -3,10 +3,12 @@ import { CreateCategoryDto } from './dto/create-category.dto';
 import { UpdateCategoryDto } from './dto/update-category.dto';
 import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { In, Repository } from 'typeorm';
 import { Country } from 'src/countries/entities/country.entity';
 import { UploadMediaService } from 'src/upload-media/upload-media.service';
+import { findWithPagination } from 'src/common/utils/pagination.util';
+import { generateUniqueSlug } from 'src/common/utils/generate-unique-slug.util';
 
 @Injectable()
 export class CategoriesAdminService {
@@ -32,8 +34,14 @@ export class CategoriesAdminService {
       });
     }
 
+    const slug = await generateUniqueSlug(
+      this.categoryRepository,
+      createCategoryDto.name,
+    );
+
     let category = this.categoryRepository.create({
       ...createCategoryDto,
+      slug,
       countries,
     });
 
@@ -66,27 +74,15 @@ export class CategoriesAdminService {
     return this.findOne(category.id);
   }
 
-  async findAll(pagination: PaginationDto): Promise<{
+  async findAll(pagination: PaginationOptionsDto): Promise<{
     data: Category[];
     total: number;
     pageNumber: number;
     limitNumber: number;
   }> {
-    const pageNumber = Number(pagination.page);
-    const limitNumber = Number(pagination.limit);
-
-    if (isNaN(pageNumber) || isNaN(limitNumber)) {
-      throw new Error('Invalid page or limit value');
-    }
-
-    const [data, total] = await this.categoryRepository.findAndCount({
-      skip: (pageNumber - 1) * limitNumber,
-      take: limitNumber,
-      relations: ['countries'],
-      order: { createdAt: 'DESC' },
-    });
-
-    return { data, total, pageNumber, limitNumber };
+    return findWithPagination(this.categoryRepository, pagination, [
+      'countries',
+    ]);
   }
 
   async findOne(id: string) {
@@ -103,7 +99,8 @@ export class CategoriesAdminService {
   ) {
     const category = await this.findOne(id);
 
-    if (!category) throw new NotFoundException(`category with ID "${id}" not found`);
+    if (!category)
+      throw new NotFoundException(`category with ID "${id}" not found`);
 
     category.twitterImage =
       (

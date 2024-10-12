@@ -14,6 +14,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { IsOptional, IsString, IsUrl } from 'class-validator';
 import { Brand } from '../../brands/entities/brand.entity';
 import { Coupon } from '../../coupons/entities/coupon.entity';
+import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
 @Entity('categories')
 export class Category {
@@ -21,34 +22,31 @@ export class Category {
   id: string = uuidv4();
 
   @Column('json')
-  name!: { en: string; ar: string };
+  name!: BilingualString;
 
   @Column('json')
-  slug!: { en: string; ar: string };
+  slug!: BilingualString;
 
   @Column('json', { nullable: true })
-  description?: { en: string; ar: string };
+  description?: BilingualString;
 
   @Column({ nullable: true })
   image?: string;
 
   @Column({ nullable: true })
-  icon?: string;
-
-  @Column({ nullable: true })
   color?: string;
 
   @Column('json', { nullable: true })
-  seoDescription?: { en: string; ar: string };
+  seoDescription?: BilingualString;
 
   @Column('json', { nullable: true })
-  seoKeywords?: { en: string; ar: string };
+  seoKeywords?: BilingualString;
 
   @Column('json', { nullable: true })
-  ogTitle?: { en: string; ar: string };
+  ogTitle?: BilingualString;
 
   @Column('json', { nullable: true })
-  ogDescription?: { en: string; ar: string };
+  ogDescription?: BilingualString;
 
   @Column({ nullable: true })
   ogImage?: string;
@@ -60,10 +58,10 @@ export class Category {
   twitterCard?: string;
 
   @Column('json', { nullable: true })
-  twitterTitle?: { en: string; ar: string };
+  twitterTitle?: BilingualString;
 
   @Column('json', { nullable: true })
-  twitterDescription?: { en: string; ar: string };
+  twitterDescription?: BilingualString;
 
   @Column({ nullable: true })
   twitterImage?: string;

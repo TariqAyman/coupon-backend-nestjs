@@ -20,7 +20,7 @@ import {
   showOne,
   success,
 } from 'src/common/utils/api-response-wrapper';
-import { PaginationDto } from 'src/common/dto/pagination.dto';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import {
   BodyWithParam,
   transformToTypeTypes,
@@ -40,7 +40,7 @@ export class UsersAdminController {
   }
 
   @Get()
-  async findAll(@Query() pagination: PaginationDto) {
+  async findAll(@Query() pagination: PaginationOptionsDto) {
     const { data, total, pageNumber, limitNumber } =
       await this.usersService.findAll(pagination);
     return paginate(data, total, pageNumber, limitNumber);

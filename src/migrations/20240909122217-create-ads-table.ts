@@ -17,10 +17,7 @@ export class CreateAdsTable120240909122217 implements MigrationInterface {
             length: '36', // UUID will be inserted by the application or query
             isPrimary: true,
           },
-          {
-            name: 'name',
-            type: 'varchar',
-          },
+          { name: 'name', type: 'json', isNullable: false },
           {
             name: 'link',
             type: 'varchar',
