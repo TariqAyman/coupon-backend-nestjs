@@ -1,4 +1,4 @@
-import { Module, MiddlewareConsumer } from '@nestjs/common';
+import { MiddlewareConsumer, Module, RequestMethod } from '@nestjs/common';
 import { UsersModule } from './users/users.module';
 import { AdsModule } from './ads/ads.module';
 import { BrandsModule } from './brands/brands.module';
@@ -13,11 +13,42 @@ import { UploadMediaModule } from './upload-media/upload-media.module';
 import { SentryModule } from '@sentry/nestjs/setup';
 import { APP_FILTER } from '@nestjs/core';
 import { SentryGlobalFilter } from '@sentry/nestjs/setup';
+import {
+  AcceptLanguageResolver,
+  HeaderResolver,
+  I18nModule,
+  I18nService,
+  QueryResolver,
+} from 'nestjs-i18n';
+import * as path from 'path';
+import { LocaleSubscriber } from './common/subscribers/locale.subscriber';
 import { LocaleMiddleware } from './common/middleware/locale.middleware';
+import { YcI18nService } from './common/yc-i18n/yc-i18n.service';
 
 @Module({
   imports: [
     SentryModule.forRoot(),
+    I18nModule.forRoot({
+      fallbackLanguage: process.env.FALLBACK_LANGUAGE ?? 'en',
+      loaderOptions: {
+        path: path.join(__dirname, '/locales/'),
+        watch: true,
+      },
+      typesOutputPath: path.join(
+        __dirname,
+        '../src/generated/i18n.generated.ts',
+      ),
+      resolvers: [
+        new QueryResolver(['lang']),
+        AcceptLanguageResolver,
+        new HeaderResolver([
+          'Accept-Language',
+          'x-lang',
+          'x-language',
+          'x-locale',
+        ]),
+      ],
+    }),
     DatabaseModule,
     CommonModule,
     AuthenticationModule,
@@ -36,12 +67,15 @@ import { LocaleMiddleware } from './common/middleware/locale.middleware';
       provide: APP_FILTER,
       useClass: SentryGlobalFilter,
     },
+    LocaleSubscriber,
+    YcI18nService,
   ],
-  exports: [],
+  exports: [LocaleSubscriber, YcI18nService],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
-    // Apply the LocaleMiddleware to all routes
-    consumer.apply(LocaleMiddleware).forRoutes('*');
+    consumer
+      .apply(LocaleMiddleware)
+      .forRoutes({ path: '*', method: RequestMethod.ALL }); // Apply globally
   }
 }

@@ -9,6 +9,7 @@ import { connectionSource } from './database/typeorm.config';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import './instrument';
+import { I18nService, I18nValidationExceptionFilter, I18nValidationPipe } from 'nestjs-i18n';
 
 async function bootstrap() {
   await connectionSource
@@ -45,6 +46,13 @@ async function bootstrap() {
     }),
   );
 
+  app.useGlobalPipes(new I18nValidationPipe());
+  app.useGlobalFilters(
+    new I18nValidationExceptionFilter({
+      detailedErrors: true,
+    }),
+  );
+
   app.useGlobalInterceptors(new LocaleInterceptor());
 
   // const allExceptionsFilter = app.get(AllExceptionsFilter);
@@ -63,6 +71,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  await app.listen(process.env.PORT || 3000);
+  await app.listen(process.env.PORT ?? 3000);
 }
 bootstrap();

@@ -1,4 +1,9 @@
-import { EntitySubscriberInterface, EventSubscriber, LoadEvent } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import {
+  EventSubscriber,
+  EntitySubscriberInterface,
+} from 'typeorm';
+import { I18nContext } from 'nestjs-i18n';
 
 // Utility function to extract locale-specific data from JSON fields
 function extractLocaleFromEntity(entity: any, locale: string): any {
@@ -18,37 +23,21 @@ function extractLocaleFromEntity(entity: any, locale: string): any {
   return newEntity;
 }
 
+@Injectable()
 @EventSubscriber()
 export class LocaleSubscriber implements EntitySubscriberInterface {
-  // Listen to load events for all entities
   listenTo() {
-    console.log('listenTo:');
-    return Object; // This will make the subscriber apply to all entities
-  }
-
-  // Before an entity is loaded, manipulate the data based on the locale
-  beforeLoad(event: LoadEvent<any>) {
-    const locale = event.connection.options.extra?.locale || 'en'; // Get locale from request context or default to 'en'
-
-    console.log('Locale:', locale);
-
-    if (event.entity) {
-      event.entity = extractLocaleFromEntity(event.entity, locale);
-    }
+    return Object;
   }
 
   // Triggered after the entity has been loaded, regardless of relations
-//   afterLoad(entity: any) {
-//     const locale = this.getLocaleFromConnection(); // Get locale from request context (you'll need to implement this)
+  afterLoad(entity: any) {
+    const i18nContext = I18nContext.current();
+    const locale = i18nContext ? i18nContext.lang : 'en';
 
-//     if (entity) {
-//       this.extractLocaleFromEntity(entity, locale);
-//     }
-//   }
-
-  // Helper to get locale from TypeORM's connection or some context (if applicable)
-  private getLocaleFromConnection(): string {
-    return 'en'; // You need to implement a way to get the locale (e.g., from request context)
+    if (entity && locale) {
+      this.extractLocaleFromEntity(entity, locale);
+    }
   }
 
   // Transform JSON columns based on locale

@@ -3,10 +3,12 @@ import { CurrentUserProvider } from './providers/current-user.provider';
 import { ActionByUserSubscriber } from './subscribers/action-by-user.subscriber';
 import { IsUniqueConstraint } from './validator/is-unique.constraint';
 import { APP_INTERCEPTOR } from '@nestjs/core';
-import { AuthInterceptor } from 'src/common/interceptor/auth.interceptor';
 import { UsersModule } from 'src/users/users.module';
 import { AuthenticationModule } from 'src/authentication/authentication.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { LocaleSubscriber } from './subscribers/locale.subscriber';
+import { YcI18nService } from './yc-i18n/yc-i18n.service';
+import { I18nService } from 'nestjs-i18n';
 
 @Module({
   imports: [
@@ -25,8 +27,11 @@ import { ThrottlerModule } from '@nestjs/throttler';
     CurrentUserProvider,
     ActionByUserSubscriber,
     IsUniqueConstraint,
-    // AllExceptionsFilter,
+
   ],
-  exports: [CurrentUserProvider, ActionByUserSubscriber],
+  exports: [
+    CurrentUserProvider,
+    ActionByUserSubscriber,
+  ],
 })
 export class CommonModule {}
