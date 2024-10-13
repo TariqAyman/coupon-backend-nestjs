@@ -33,8 +33,8 @@ export class LocaleSubscriber implements EntitySubscriberInterface {
   // Triggered after the entity has been loaded, regardless of relations
   afterLoad(entity: any) {
     const i18nContext = I18nContext.current();
-    const locale = i18nContext ? i18nContext.lang : 'en';
-
+    const locale = i18nContext ? i18nContext.lang : null;
+ 
     if (entity && locale) {
       this.extractLocaleFromEntity(entity, locale);
     }

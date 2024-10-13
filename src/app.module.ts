@@ -29,7 +29,7 @@ import { YcI18nService } from './common/yc-i18n/yc-i18n.service';
   imports: [
     SentryModule.forRoot(),
     I18nModule.forRoot({
-      fallbackLanguage: process.env.FALLBACK_LANGUAGE ?? 'en',
+      fallbackLanguage: '',
       loaderOptions: {
         path: path.join(__dirname, '/locales/'),
         watch: true,
