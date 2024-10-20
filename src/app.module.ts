@@ -42,10 +42,10 @@ import { YcI18nService } from './common/yc-i18n/yc-i18n.service';
         new QueryResolver(['lang']),
         AcceptLanguageResolver,
         new HeaderResolver([
-          'Accept-Language',
-          'x-lang',
-          'x-language',
           'x-locale',
+          'x-language',
+          'x-lang',
+          'Accept-Language',
         ]),
       ],
     }),
