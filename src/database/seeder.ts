@@ -7,7 +7,7 @@ import { Ads } from '../ads/entities/ad.entity';
 import { v4 as uuidv4 } from 'uuid';
 import * as bcrypt from 'bcrypt';
 import { connectionSource } from './typeorm.config';
-import { faker } from '@faker-js/faker';
+import { faker, fakerAR } from '@faker-js/faker';
 import { UserRole } from '../common/enums/UserRole';
 import { UserStatus } from '../common/enums/UserStatus';
 import { CouponStatusAr, CouponStatusEn } from '../common/enums/CouponStatus';
@@ -90,38 +90,38 @@ async function seedCategories() {
       id: uuidv4(),
       name: {
         en: faker.commerce.department(),
-        ar: faker.commerce.department(),
+        ar: fakerAR.commerce.department(),
       },
-      slug: { en: faker.lorem.slug(), ar: faker.lorem.slug() },
-      description: { en: faker.lorem.sentence(), ar: faker.lorem.sentence() },
+      slug: { en: faker.lorem.slug(), ar: fakerAR.lorem.slug() },
+      description: { en: faker.lorem.sentence(), ar: fakerAR.lorem.sentence() },
       image: faker.image.url(),
       color: faker.color.rgb(),
       seoDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       seoKeywords: {
         en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: faker.lorem.words({ min: 10, max: 20 }),
+        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
       },
       ogTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       ogDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       ogImage: faker.image.url(),
       ogUrl: faker.internet.url(),
       twitterCard: 'summary_large_image',
       twitterTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       twitterDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       twitterImage: faker.image.url(),
       createdById: null as any,
@@ -139,37 +139,37 @@ async function seedBrands() {
   for (let i = 0; i < 100; i++) {
     brands.push({
       id: uuidv4(),
-      name: { en: faker.company.name(), ar: faker.company.name() },
-      slug: { en: faker.company.name(), ar: faker.company.name() },
-      description: { en: faker.lorem.sentence(), ar: faker.lorem.sentence() },
+      name: { en: faker.company.name(), ar: fakerAR.company.name() },
+      slug: { en: faker.company.name(), ar: fakerAR.company.name() },
+      description: { en: faker.lorem.sentence(), ar: fakerAR.lorem.sentence() },
       link: faker.internet.url(),
       image: faker.image.url(),
       seoDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       seoKeywords: {
         en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: faker.lorem.words({ min: 10, max: 20 }),
+        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
       },
       ogTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       ogDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       ogImage: faker.image.url(),
       ogUrl: faker.internet.url(),
       twitterCard: 'summary_large_image',
       twitterTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       twitterDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       twitterImage: faker.image.url(),
       createdById: null as any,
@@ -194,30 +194,30 @@ async function seedCountries() {
       image: faker.image.url(),
       seoDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       seoKeywords: {
         en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: faker.lorem.words({ min: 10, max: 20 }),
+        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
       },
       ogTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       ogDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       ogImage: faker.image.url(),
       ogUrl: faker.internet.url(),
       twitterCard: 'summary_large_image',
       twitterTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       twitterDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       twitterImage: faker.image.url(),
       createdById: null as any,
@@ -240,43 +240,43 @@ async function seedCoupons(
   for (let i = 0; i < 100; i++) {
     coupons.push({
       id: uuidv4(),
-      name: { en: faker.company.name(), ar: faker.company.name() },
+      name: { en: faker.company.name(), ar: fakerAR.company.name() },
       code: faker.string.alphanumeric(10),
       amount: faker.number.int({ min: 5, max: 50 }),
       status: {
         en: CouponStatusEn.DISCOUNT,
         ar: CouponStatusAr.DISCOUNT,
       },
-      description: { en: faker.lorem.sentence(), ar: faker.lorem.sentence() },
+      description: { en: faker.lorem.sentence(), ar: fakerAR.lorem.sentence() },
       expire: faker.date.future(),
       qrCode: faker.string.alphanumeric(10),
       link: faker.internet.url(),
       seoDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       seoKeywords: {
         en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: faker.lorem.words({ min: 10, max: 20 }),
+        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
       },
       ogTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       ogDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       ogImage: faker.image.url(),
       ogUrl: faker.internet.url(),
       twitterCard: 'summary_large_image',
       twitterTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       twitterDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       twitterImage: faker.image.url(),
       createdById: users[Math.floor(Math.random() * users.length)],
@@ -297,35 +297,35 @@ async function seedAds() {
   for (let i = 0; i < 100; i++) {
     ads.push({
       id: uuidv4(),
-      name: { en: faker.company.name(), ar: faker.company.name() },
+      name: { en: faker.company.name(), ar: fakerAR.company.name() },
       link: faker.internet.url(),
       image: faker.image.url(),
       seoDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       seoKeywords: {
         en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: faker.lorem.words({ min: 10, max: 20 }),
+        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
       },
       ogTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       ogDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       ogImage: faker.image.url(),
       ogUrl: faker.internet.url(),
       twitterCard: 'summary_large_image',
       twitterTitle: {
         en: faker.lorem.words(5),
-        ar: faker.lorem.words(5),
+        ar: fakerAR.lorem.words(5),
       },
       twitterDescription: {
         en: faker.lorem.sentence(),
-        ar: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
       },
       twitterImage: faker.image.url(),
       // createdById: users[Math.floor(Math.random() * users.length)],
