@@ -50,4 +50,8 @@ export class RegisterDto {
 
   @IsEnum(UserProvider)
   provider: UserProvider;
+
+  @IsString()
+  @IsNotEmpty()
+  userLocale: string = 'en';
 }

@@ -16,6 +16,7 @@ export class ProfileDto {
   joined: Date;
   gender: UserGender;
   provider: UserProvider;
+  userLocale: string;
   confirmAccount: boolean = false;
   lastLogin: Date;
   lastLogout: Date;
@@ -35,6 +36,7 @@ export class ProfileDto {
     this.joined = user.joined;
     this.gender = user.gender;
     this.provider = user.provider;
+    this.userLocale = user.userLocale;
     this.confirmAccount = user.confirmAccount;
     this.lastLogin = user.lastLogin;
     this.lastLogout = user.lastLogout;

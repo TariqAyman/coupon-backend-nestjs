@@ -64,6 +64,7 @@ export class UsersService {
     user.lastLogin = new Date();
     user.lastLogout = new Date();
     user.verificationCode = Math.floor(1000 + Math.random() * 9000).toString();
+    user.userLocale = registerDto.userLocale;
     const newUser = await this.usersRepository.save(user);
 
     return new ProfileDto(newUser);
