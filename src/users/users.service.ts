@@ -1,6 +1,7 @@
 import {
   ConflictException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -70,6 +71,43 @@ export class UsersService {
     return new ProfileDto(newUser);
   }
 
+  async registerGoogleUser(googleUser: any) {
+    try {
+      const existingUser = await this.usersRepository.findOne({
+        where: { email: googleUser.email },
+      });
+
+      if (existingUser) {
+        throw new ConflictException('Email already exists');
+      }
+
+      const user = new User();
+      user.email = googleUser.email;
+      user.password = await bcrypt.hash(googleUser.email, 10);
+      user.role = UserRole.User;
+      user.status = UserStatus.Online;
+      user.fullName = googleUser.firstName + ' ' + googleUser.lastName;
+      // user.phoneNumber = googleUser.phoneNumber;
+      // user.phoneNumberCountryCode = registerDto.phoneNumberCountryCode;
+
+      user.avatar = googleUser.picture;
+
+      user.joined = new Date();
+      user.provider = UserProvider.Google;
+      user.confirmAccount = true;
+      user.createdAt = new Date();
+      user.updatedAt = new Date();
+      user.lastLogin = new Date();
+      user.lastLogout = new Date();
+      user.userLocale = 'en';
+      const newUser = await this.usersRepository.save(user);
+
+      return new ProfileDto(newUser);
+    } catch {
+      return null;
+    }
+  }
+
   async validateUser(email: string, password: string): Promise<User> {
     const user = await this.usersRepository.findOne({ where: { email } });
 
@@ -85,13 +123,12 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  findByEmail(email: string): Promise<User> {
-    return this.usersRepository.findOne({ where: { email } }).then((user) => {
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-      return user;
-    });
+  findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository
+      .findOne({ where: { email } })
+      .then((user: any) => {
+        return user ?? null;
+      });
   }
 
   async findOne(id: string) {

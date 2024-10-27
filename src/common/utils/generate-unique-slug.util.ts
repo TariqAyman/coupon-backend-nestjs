@@ -20,8 +20,6 @@ export async function generateUniqueSlug(
 
   let slug = { en: baseSlugEn, ar: baseSlugAr }; // Default slug structure in both languages
 
-  console.log(slug);
-
   // Use a raw SQL query to check for slug existence using JSON_EXTRACT
   let existingSlug = await repository
     .createQueryBuilder('entity')

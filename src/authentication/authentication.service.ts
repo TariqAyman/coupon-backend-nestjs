@@ -1,6 +1,8 @@
 import {
+  BadRequestException,
   Inject,
   Injectable,
+  InternalServerErrorException,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -17,6 +19,7 @@ import { ChangeEmailDto } from './dto/changeEmail.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
+import { log } from 'console';
 
 @Injectable()
 export class AuthenticationService {
@@ -34,19 +37,7 @@ export class AuthenticationService {
     return null;
   }
 
-  async login(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
-
-    if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, user.password);
-
-    if (!isPasswordValid) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-
+  async generateAccessToken(user: any) {
     const payload = {
       id: user.id,
       email: user.email,
@@ -84,42 +75,27 @@ export class AuthenticationService {
     };
   }
 
+  async login(email: string, password: string) {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
+    return this.generateAccessToken(user);
+  }
+
   async refresh(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken);
 
-      const newPayload = {
-        id: payload.id,
-        email: payload.email,
-        fullName: payload.fullName,
-        role: payload.role,
-      };
-
-      // Calculate the expiration time
-      const expirationDate = new Date(
-        Date.now() + this.parseExpirationTime(jwtConstants.expiresIn) * 1000,
-      );
-
-      // Calculate the expiration time
-      const refreshExpirationDate = new Date(
-        Date.now() +
-          this.parseExpirationTime(jwtConstants.refreshExpiresIn) * 1000,
-      );
-
-      const newAccessToken = this.jwtService.sign(newPayload);
-      const newRefreshToken = this.jwtService.sign(newPayload, {
-        expiresIn: jwtConstants.refreshExpiresIn,
-      });
-
-      return {
-        token: {
-          type: 'Bearer',
-          access_token: newAccessToken,
-          access_token_expire: expirationDate.toISOString(),
-          refresh_token: newRefreshToken,
-          refresh_token_expire: refreshExpirationDate.toISOString(),
-        },
-      };
+      return this.generateAccessToken(payload);
     } catch (e) {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -267,6 +243,37 @@ export class AuthenticationService {
 
     // await this.userService.deleteUser(user.id);
     return 'Account deleted successfully';
+  }
+
+  async signInByGoogle(user: any): Promise<any> {
+    if (!user) {
+      throw new BadRequestException('Unauthenticated');
+    }
+
+    let userExists = await this.userService.findByEmail(user.email);
+
+    log('userExists', userExists);
+
+    if (!userExists) {
+      const userExists = await this.userService.registerGoogleUser(user);
+
+      if (!userExists) {
+        throw new InternalServerErrorException('Failed to register user');
+      }
+    }
+
+    return await this.generateAccessToken(userExists);
+  }
+  
+  googleLogin(req: any) {
+    if (!req.user) {
+      return 'No user from google';
+    }
+
+    return {
+      message: 'User information from google',
+      user: req.user,
+    };
   }
 
   decodeToken(token: string): any {

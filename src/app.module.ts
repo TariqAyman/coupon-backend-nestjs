@@ -24,6 +24,8 @@ import * as path from 'path';
 import { LocaleSubscriber } from './common/subscribers/locale.subscriber';
 import { LocaleMiddleware } from './common/middleware/locale.middleware';
 import { YcI18nService } from './common/yc-i18n/yc-i18n.service';
+import { LoggerMiddleware } from './common/middleware/log.middleware';
+import { AppLoggerMiddleware } from './common/middleware/app-log.middleware';
 
 @Module({
   imports: [
@@ -75,7 +77,7 @@ import { YcI18nService } from './common/yc-i18n/yc-i18n.service';
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {
     consumer
-      .apply(LocaleMiddleware)
+      .apply(LoggerMiddleware, AppLoggerMiddleware)
       .forRoutes({ path: '*', method: RequestMethod.ALL }); // Apply globally
   }
 }

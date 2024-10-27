@@ -11,7 +11,7 @@ export class AuthMiddleware implements NestMiddleware {
 
   public async use(req: any, res: Response, next: NextFunction) {
     const tag = 'AuthMiddleware';
-    console.log(tag);
+
     const { authorization } = req.headers;
     if (!authorization) {
       throw new HttpException(

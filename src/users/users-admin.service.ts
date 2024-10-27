@@ -22,13 +22,12 @@ export class UsersAdminService {
     return this.usersRepository.save(createUserDto);
   }
 
-  findByEmail(email: string): Promise<User> {
-    return this.usersRepository.findOne({ where: { email } }).then((user) => {
-      if (!user) {
-        throw new UnauthorizedException('User not found');
-      }
-      return user;
-    });
+  findByEmail(email: string): Promise<User | null> {
+    return this.usersRepository
+      .findOne({ where: { email } })
+      .then((user: any) => {
+        return user ?? null;
+      });
   }
 
   async findAll(pagination: PaginationOptionsDto): Promise<{

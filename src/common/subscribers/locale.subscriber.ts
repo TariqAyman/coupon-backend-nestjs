@@ -11,8 +11,6 @@ function extractLocaleFromEntity(entity: any, locale: string): any {
   for (const key in entity) {
     if (entity.hasOwnProperty(key)) {
       if (typeof entity[key] === 'object' && entity[key] !== null) {
-        console.log('Locale:', locale);
-
         if ('en' in entity[key] || 'ar' in entity[key]) {
           // Assuming the JSON contains locale keys
           newEntity[key] = entity[key][locale] || entity[key]['en']; // Default to 'en' if locale not found

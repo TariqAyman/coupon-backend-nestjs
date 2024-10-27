@@ -4,21 +4,38 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { jwtConstants } from '../constants';
 import { UsersService } from 'src/users/users.service';
 
+export type JwtPayload = {
+  sub: string;
+  email: string;
+};
+
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor(private usersService: UsersService) {
+    const extractJwtFromCookie = (req: any) => {
+      let token = null;
+      if (req && req.cookies) {
+        token = req.cookies['access_token'];
+      }
+      return token || ExtractJwt.fromAuthHeaderAsBearerToken()(req);
+    };
+
     super({
-      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      jwtFromRequest: extractJwtFromCookie,
       ignoreExpiration: false,
       secretOrKey: jwtConstants.secret,
     });
   }
 
   async validate(payload: any) {
-    const user = await this.usersService.findOne(payload.id);
+    const user =
+      (await this.usersService.findOne(payload.id)) ??
+      (await this.usersService.findOne(payload.email));
+
     if (!user) {
       throw new UnauthorizedException();
     }
-    return user; // Attach the full user object to req.user
+
+    return user;
   }
 }

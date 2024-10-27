@@ -1,7 +1,8 @@
-import { UserProvider } from 'firebase-admin/lib/auth/auth-config';
 import { UserGender } from 'src/common/enums/UserGender';
+import { UserProvider } from 'src/common/enums/UserProvider';
 import { UserRole } from 'src/common/enums/UserRole';
 import { UserStatus } from 'src/common/enums/UserStatus';
+import { User } from 'src/users/entities/user.entity';
 
 export class ProfileDto {
   id: string;
@@ -22,20 +23,24 @@ export class ProfileDto {
   lastLogout: Date;
   createdAt: Date;
   updatedAt: Date;
+  password: string;
+  changePasswordTime: Date;
+  countryCode: string;
+  verificationCode: string;
 
   constructor(user: any) {
     this.id = user.id;
     this.fullName = user.fullName;
     this.email = user.email;
-    this.role = user.role;
-    this.status = user.status;
-    this.phoneNumber = user.phoneNumber;
-    this.phoneNumberCountryCode = user.phoneNumberCountryCode;
-    this.avatar = user.avatar;
+    this.role = user.role as UserRole;
+    this.status = user.status as  UserStatus;;
+    this.phoneNumber = user?.phoneNumber;
+    this.phoneNumberCountryCode = user?.phoneNumberCountryCode;
+    this.avatar = user.avatar as string;
     this.birthday = user.birthday;
     this.joined = user.joined;
-    this.gender = user.gender;
-    this.provider = user.provider;
+    this.gender = user.gender as UserGender;
+    this.provider = user.provider as UserProvider;
     this.userLocale = user.userLocale;
     this.confirmAccount = user.confirmAccount;
     this.lastLogin = user.lastLogin;

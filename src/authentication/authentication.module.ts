@@ -7,6 +7,8 @@ import { LocalStrategy } from './strategy/local.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { JwtStrategy } from './strategy/jwt.strategy';
 import { jwtConstants } from './constants';
+import { GoogleStrategy } from './strategy/google.strategy';
+import { AuthenticationGoogleController } from './authentication-google.controller';
 
 @Module({
   imports: [
@@ -17,8 +19,13 @@ import { jwtConstants } from './constants';
       signOptions: { expiresIn: jwtConstants.expiresIn },
     }),
   ],
-  controllers: [AuthenticationController],
-  providers: [AuthenticationService, LocalStrategy, JwtStrategy],
+  controllers: [AuthenticationController, AuthenticationGoogleController],
+  providers: [
+    AuthenticationService,
+    LocalStrategy,
+    JwtStrategy,
+    GoogleStrategy,
+  ],
   exports: [AuthenticationService],
 })
 export class AuthenticationModule {}
