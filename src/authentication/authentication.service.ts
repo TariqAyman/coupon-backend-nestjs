@@ -104,7 +104,7 @@ export class AuthenticationService {
     }
 
     if (!user) {
-      throw new UnauthorizedException('Invalid credentials');
+      throw new UnauthorizedException('Invalid credentials.');
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);

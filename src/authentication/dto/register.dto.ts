@@ -9,6 +9,7 @@ import {
   MaxLength,
   MinLength,
   ValidateIf,
+  IsOptional,
 } from 'class-validator';
 import { UserGender } from 'src/common/enums/UserGender';
 import { UserProvider } from 'src/common/enums/UserProvider';
@@ -47,16 +48,18 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   fullName: string;
-
+  
+  @IsOptional()
   @IsEnum(UserGender)
   gender: UserGender;
 
+  @IsOptional()
   @IsDate()
   @Type(() => Date)
   birthday: Date;
 
   @IsEnum(UserProvider)
-  provider: UserProvider;
+  provider: UserProvider = UserProvider.System;
 
   @IsString()
   @IsNotEmpty()
