@@ -30,22 +30,34 @@ export class UsersService {
     private readonly uploadMediaService: UploadMediaService,
   ) {}
 
-  async register(registerDto: RegisterDto, avatar: any): Promise<ProfileDto> {
-    const existingUser = await this.usersRepository.findOne({
-      where: { email: registerDto.email },
-    });
+  async register(
+    registerMethod: string,
+    registerDto: RegisterDto,
+    avatar: any,
+  ): Promise<ProfileDto> {
+    let existingUser: User | null = null;
+
+    if (registerMethod === 'email') {
+      existingUser = await this.findByEmail(registerDto.email as string);
+    }
+    if (registerMethod === 'phoneNumber') {
+      existingUser = await this.findByPhoneNumberAndCountryCode(
+        registerDto.phoneNumber as string,
+        registerDto.phoneNumberCountryCode as string,
+      );
+    }
 
     if (existingUser) {
-      throw new ConflictException('Email already exists');
+      throw new ConflictException('Email or Phone already exists');
     }
 
     const user = new User();
-    user.email = registerDto.email;
+    user.email = registerDto?.email;
     user.password = await bcrypt.hash(registerDto.password, 10);
     user.role = UserRole.User;
     user.status = UserStatus.Online;
     user.fullName = registerDto.fullName;
-    user.phoneNumber = registerDto.phoneNumber;
+    user.phoneNumber = registerDto?.phoneNumber;
     user.phoneNumberCountryCode = registerDto.phoneNumberCountryCode;
 
     const uploadedAvatar = await this.uploadMediaService.saveOneFile(
@@ -123,7 +135,7 @@ export class UsersService {
     return this.usersRepository.save(user);
   }
 
-  findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<User | null> {
     return this.usersRepository
       .findOne({ where: { email } })
       .then((user: any) => {
@@ -131,7 +143,31 @@ export class UsersService {
       });
   }
 
-  async findOne(id: string) {
+  async findByPhoneNumber(phoneNumber: string): Promise<User | null> {
+    return this.usersRepository
+      .findOne({ where: { phoneNumber } })
+      .then((user: any) => {
+        return user ?? null;
+      });
+  }
+
+  async findByPhoneNumberAndCountryCode(
+    phoneNumber: string,
+    countryCode: string,
+  ): Promise<User | null> {
+    return this.usersRepository
+      .findOne({
+        where: {
+          phoneNumber,
+          phoneNumberCountryCode: countryCode,
+        },
+      })
+      .then((user: any) => {
+        return user ?? null;
+      });
+  }
+
+  async findOne(id: string): Promise<User | null> {
     return await this.usersRepository.findOne({ where: { id } });
   }
 

@@ -13,7 +13,7 @@ export class CreateUsersTable20240909120612 implements MigrationInterface {
             isPrimary: true,
           },
           { name: 'fullName', type: 'varchar', isNullable: false },
-          { name: 'email', type: 'varchar', isNullable: false },
+          { name: 'email', type: 'varchar', isNullable: true },
           { name: 'password', type: 'varchar', isNullable: false },
           { name: 'changePasswordTime', type: 'timestamp', isNullable: true },
           { name: 'phoneNumber', type: 'varchar', isNullable: true },

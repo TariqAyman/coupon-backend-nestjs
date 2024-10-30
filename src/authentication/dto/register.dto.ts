@@ -6,9 +6,9 @@ import {
   IsEnum,
   IsDate,
   IsPhoneNumber,
-  Max,
   MaxLength,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 import { UserGender } from 'src/common/enums/UserGender';
 import { UserProvider } from 'src/common/enums/UserProvider';
@@ -16,9 +16,29 @@ import { CountryCode } from 'libphonenumber-js/max';
 import { IsPhoneNumberWithCountryCode } from 'src/common/validator/is-phone-number-with-Country-code';
 
 export class RegisterDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsEnum(['email', 'phone'])
+  registerMethod: 'email' | 'phone';
+
+  @ValidateIf((o) => o.registerMethod === 'email')
   @IsEmail()
   @IsNotEmpty()
-  email: string;
+  email?: string;
+
+  @ValidateIf((o) => o.registerMethod === 'phone')
+  @IsString()
+  @IsNotEmpty()
+  @IsPhoneNumberWithCountryCode('phoneNumberCountryCode', {
+    message: 'Invalid phone number for the provided country code',
+  })
+  phoneNumber?: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MinLength(2)
+  @MaxLength(3)
+  phoneNumberCountryCode: CountryCode;
 
   @IsString()
   @IsNotEmpty()
@@ -27,19 +47,6 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   fullName: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @IsPhoneNumberWithCountryCode('phoneNumberCountryCode', {
-    message: 'Invalid phone number for the provided country code',
-  })
-  phoneNumber: string;
-
-  @IsString()
-  @IsNotEmpty()
-  @MinLength(2)
-  @MaxLength(3)
-  phoneNumberCountryCode: CountryCode;
 
   @IsEnum(UserGender)
   gender: UserGender;

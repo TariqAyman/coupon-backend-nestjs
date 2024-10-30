@@ -20,6 +20,7 @@ import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { log } from 'console';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -42,6 +43,8 @@ export class AuthenticationService {
       id: user.id,
       email: user.email,
       fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      phoneNumberCountryCode: user.phoneNumberCountryCode,
       role: user.role,
     };
 
@@ -75,8 +78,30 @@ export class AuthenticationService {
     };
   }
 
-  async login(email: string, password: string) {
-    const user = await this.userService.findByEmail(email);
+  async login(loginDto: LoginDto) {
+    const {
+      loginMethod,
+      email,
+      phoneNumber,
+      phoneNumberCountryCode,
+      password,
+    } = loginDto;
+
+    let user;
+    if (loginMethod === 'email' && email) {
+      user = await this.userService.findByEmail(email);
+    } else if (
+      loginMethod === 'phone' &&
+      phoneNumber &&
+      phoneNumberCountryCode
+    ) {
+      user = await this.userService.findByPhoneNumberAndCountryCode(
+        phoneNumber,
+        phoneNumberCountryCode,
+      );
+    } else {
+      throw new BadRequestException('Invalid login method');
+    }
 
     if (!user) {
       throw new UnauthorizedException('Invalid credentials');
@@ -102,7 +127,25 @@ export class AuthenticationService {
   }
 
   async register(registerDto: RegisterDto, avatar: any) {
-    const user = await this.userService.register(registerDto, avatar);
+    const { registerMethod, email, phoneNumber } = registerDto;
+
+    let user;
+
+    if (registerMethod === 'email' && email) {
+      user = await this.userService.findByEmail(email);
+      if (user) {
+        throw new BadRequestException('Email already in use');
+      }
+    } else if (registerMethod === 'phone' && phoneNumber) {
+      user = await this.userService.findByPhoneNumber(phoneNumber);
+      if (user) {
+        throw new BadRequestException('Phone number already in use');
+      }
+    } else {
+      throw new BadRequestException('Invalid registration method');
+    }
+
+    user = await this.userService.register(registerMethod, registerDto, avatar);
     return new ProfileDto(user);
   }
 
@@ -264,7 +307,7 @@ export class AuthenticationService {
 
     return await this.generateAccessToken(userExists);
   }
-  
+
   googleLogin(req: any) {
     if (!req.user) {
       return 'No user from google';

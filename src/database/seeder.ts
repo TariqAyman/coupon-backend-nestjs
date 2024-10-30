@@ -40,11 +40,10 @@ async function seedUsers() {
   users.push({
     id: uuidv4(),
     fullName: 'User',
-    email: 'user@user.com',
     password: await bcrypt.hash('password', 10),
     phoneNumber: '01003003201',
     phoneNumberCountryCode: 'EG',
-    userLocale: 'en',
+    userLocale: 'ar',
     role: UserRole.User,
     confirmAccount: true,
     status: UserStatus.Online,
@@ -56,28 +55,32 @@ async function seedUsers() {
     dislikedCoupons: [] as Coupon[],
     followedBrands: [] as Brand[],
   });
+  await userRepository.save(users);
 
-  for (let i = 0; i < 100; i++) {
-    users.push({
-      id: uuidv4(),
-      fullName: faker.person.fullName(),
-      email: faker.internet.email(),
-      password: await bcrypt.hash('password', 10),
-      phoneNumber: faker.phone.number(),
-      phoneNumberCountryCode: faker.location.countryCode(),
-      userLocale: 'en',
-      role: i % 2 === 0 ? UserRole.Admin : UserRole.User,
-      confirmAccount: true,
-      status: UserStatus.Online,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      likedCoupons: [] as Coupon[],
-      followedCoupons: [] as Coupon[],
-      favoriteCoupons: [] as Coupon[],
-      dislikedCoupons: [] as Coupon[],
-      followedBrands: [] as Brand[],
-    });
+  if (process.env.NODE_ENV === 'development') {
+    for (let i = 0; i < 100; i++) {
+      users.push({
+        id: uuidv4(),
+        fullName: faker.person.fullName(),
+        email: faker.internet.email(),
+        password: await bcrypt.hash('password', 10),
+        phoneNumber: faker.phone.number(),
+        phoneNumberCountryCode: faker.location.countryCode(),
+        userLocale: 'en',
+        role: i % 2 === 0 ? UserRole.Admin : UserRole.User,
+        confirmAccount: true,
+        status: UserStatus.Online,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        likedCoupons: [] as Coupon[],
+        followedCoupons: [] as Coupon[],
+        favoriteCoupons: [] as Coupon[],
+        dislikedCoupons: [] as Coupon[],
+        followedBrands: [] as Brand[],
+      });
+    }
   }
+
   await userRepository.save(users);
   return users;
 }

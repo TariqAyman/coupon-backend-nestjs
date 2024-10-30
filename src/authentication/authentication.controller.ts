@@ -30,10 +30,7 @@ export class AuthenticationController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
   async login(@Body() loginDto: LoginDto) {
-    const response = await this.authenticationService.login(
-      loginDto.email,
-      loginDto.password,
-    );
+    const response = await this.authenticationService.login(loginDto);
     return success(response);
   }
 

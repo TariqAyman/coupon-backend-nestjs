@@ -25,8 +25,8 @@ export class User {
   @Column()
   fullName!: string;
 
-  @Column({ unique: true })
-  email!: string;
+  @Column({ unique: true, nullable: true })
+  email?: string;
 
   @Exclude()
   @Column()
@@ -35,11 +35,11 @@ export class User {
   @Column({ nullable: true })
   changePasswordTime!: Date;
 
-  @Column()
-  phoneNumber: string;
+  @Column({ nullable: true })
+  phoneNumber?: string;
 
-  @Column()
-  phoneNumberCountryCode: string;
+  @Column({ nullable: true })
+  phoneNumberCountryCode?: string;
 
   @Column()
   userLocale: string;
