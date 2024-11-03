@@ -133,7 +133,7 @@ export class DashboardService {
     customEntityRepository: any,
     filters: any,
     groupBy?: string | null,
-  ): Promise<Record<string, number>> {
+  ): Promise<any> {
     const from = filters.start_date
       ? moment(filters.start_date)
       : moment().subtract(1, 'year').startOf('month');
@@ -186,13 +186,10 @@ export class DashboardService {
       current.add(1, 'month');
     }
 
-    return counts;
+    return { keys: Object.keys(counts), values: Object.values(counts) };
   }
 
-  async countsPerDay(
-    customEntityRepository: any,
-    filters: any,
-  ): Promise<Record<string, number>> {
+  async countsPerDay(customEntityRepository: any, filters: any): Promise<any> {
     const from = filters.start_date
       ? moment(filters.start_date)
       : moment().subtract(1, 'month').startOf('month');
@@ -230,7 +227,7 @@ export class DashboardService {
       current.add(1, 'day');
     }
 
-    return counts;
+    return { keys: Object.keys(counts), values: Object.values(counts) };
   }
 
   private parseMonthsDate(yearMonth: string): string {
