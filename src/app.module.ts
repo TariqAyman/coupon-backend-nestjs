@@ -26,6 +26,7 @@ import { LocaleMiddleware } from './common/middleware/locale.middleware';
 import { YcI18nService } from './common/yc-i18n/yc-i18n.service';
 import { LoggerMiddleware } from './common/middleware/log.middleware';
 import { AppLoggerMiddleware } from './common/middleware/app-log.middleware';
+import { DashboardModule } from './dashboard/dashboard.module';
 
 @Module({
   imports: [
@@ -62,6 +63,7 @@ import { AppLoggerMiddleware } from './common/middleware/app-log.middleware';
     CountriesModule,
     NotificationsModule,
     UploadMediaModule,
+    DashboardModule,
   ],
   controllers: [],
   providers: [

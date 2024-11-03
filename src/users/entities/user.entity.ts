@@ -6,6 +6,7 @@ import {
   JoinTable,
   ManyToOne,
   OneToMany,
+  DeleteDateColumn,
 } from 'typeorm';
 import { Coupon } from '../../coupons/entities/coupon.entity';
 import { Brand } from '../../brands/entities/brand.entity';
@@ -99,7 +100,7 @@ export class User {
   @Column({ nullable: true })
   updatedAt!: Date;
 
-  @Column({ nullable: true })
+  @DeleteDateColumn({ nullable: true })
   deletedAt!: Date;
 
   @Column({ nullable: true })
