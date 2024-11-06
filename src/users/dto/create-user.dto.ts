@@ -8,6 +8,7 @@ import {
   IsString,
   MinLength,
   MaxLength,
+  IsDate,
 } from 'class-validator';
 import { UserProvider } from '../../common/enums/UserProvider';
 import { UserRole } from '../../common/enums/UserRole';
@@ -15,14 +16,18 @@ import { UserGender } from '../../common/enums/UserGender';
 import { UserStatus } from 'src/common/enums/UserStatus';
 import { IsPhoneNumberWithCountryCode } from 'src/common/validator/is-phone-number-with-Country-code';
 import { CountryCode } from 'libphonenumber-js/max';
+import { Type } from 'class-transformer';
 
 export class CreateUserDto {
+  @IsString()
   @IsNotEmpty()
   fullName: string;
 
   @IsEmail()
-  email: string;
+  @IsNotEmpty()
+  email?: string;
 
+  @IsString()
   @IsNotEmpty()
   password: string;
 
@@ -31,7 +36,7 @@ export class CreateUserDto {
   @IsPhoneNumberWithCountryCode('phoneNumberCountryCode', {
     message: 'Invalid phone number for the provided country code',
   })
-  phoneNumber: string;
+  phoneNumber?: string;
 
   @IsString()
   @IsNotEmpty()
@@ -39,24 +44,24 @@ export class CreateUserDto {
   @MaxLength(3)
   phoneNumberCountryCode: CountryCode;
 
+  @IsOptional()
   @IsEnum(UserRole)
   role: UserRole;
 
   @IsOptional()
-  @IsDateString()
+  @IsDate()
+  @Type(() => Date)
   birthday?: Date;
 
   @IsOptional()
   @IsEnum(UserGender)
-  gender?: UserGender;
-
-  @IsEnum(UserProvider)
-  provider: UserProvider;
+  gender: UserGender;
 
   @IsOptional()
   @IsEnum(UserStatus)
   status!: UserStatus;
 
-  @IsOptional()
-  joined!: Date;
+  @IsString()
+  @IsNotEmpty()
+  userLocale: string = 'en';
 }

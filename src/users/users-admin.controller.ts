@@ -8,6 +8,8 @@ import {
   Delete,
   UseGuards,
   Query,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -26,6 +28,7 @@ import {
   transformToTypeTypes,
 } from 'src/common/decorators/body-with-param.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { EntityFileInterceptor } from 'src/upload-media/entity-file.interceptor';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
@@ -33,9 +36,13 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 export class UsersAdminController {
   constructor(private readonly usersService: UsersAdminService) {}
 
+  @UseInterceptors(EntityFileInterceptor('user', 'avatar'))
   @Post()
-  async create(@Body() createUserDto: CreateUserDto) {
-    const user = await this.usersService.create(createUserDto);
+  async create(
+    @UploadedFile() avatar: Express.Multer.File,
+    @Body() createUserDto: CreateUserDto,
+  ) {
+    const user = await this.usersService.create(createUserDto, avatar);
     return showOne(user);
   }
 
@@ -55,14 +62,11 @@ export class UsersAdminController {
   @Patch(':id')
   async update(
     @Param('id') id: string,
-    @BodyWithParam({
-      paramName: 'id',
-      transformTo: transformToTypeTypes.STRING,
-    })
+    @UploadedFile() avatar: Express.Multer.File,
     @Body()
     updateUserDto: UpdateUserDto,
   ) {
-    const response = await this.usersService.update(id, updateUserDto);
+    const response = await this.usersService.update(id, updateUserDto, avatar);
 
     return showOne(response);
   }
