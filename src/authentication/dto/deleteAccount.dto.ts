@@ -1,3 +1,1 @@
-export class DeleteAccountDto {
-  userId: string;
-}
+export class DeleteAccountDto {}

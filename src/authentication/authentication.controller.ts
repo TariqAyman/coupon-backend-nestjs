@@ -73,22 +73,27 @@ export class AuthenticationController {
   async forgotPassword(@Body() forgotPasswordDto: ForgotPasswordDto) {
     const response =
       await this.authenticationService.forgotPassword(forgotPasswordDto);
-    return success(response);
+    return success({ message: response });
   }
 
   @Post('reset-password')
   async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
     const response =
       await this.authenticationService.resetPassword(resetPasswordDto);
-    return success(response);
+    return success({ message: response });
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('change-password')
-  async changePassword(@Body() changePasswordDto: ChangePasswordDto) {
-    const response =
-      await this.authenticationService.changePassword(changePasswordDto);
-    return success(response);
+  async changePassword(
+    @Request() req: any,
+    @Body() changePasswordDto: ChangePasswordDto,
+  ) {
+    const response = await this.authenticationService.changePassword(
+      req.user.id,
+      changePasswordDto,
+    );
+    return success({ message: response });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -96,7 +101,7 @@ export class AuthenticationController {
   async verifyEmail(@Body() verifyEmailDto: VerifyEmailDto) {
     const response =
       await this.authenticationService.verifyEmail(verifyEmailDto);
-    return success(response);
+    return success({ message: response });
   }
 
   @UseGuards(JwtAuthGuard)
@@ -107,22 +112,28 @@ export class AuthenticationController {
     const response = await this.authenticationService.resendVerificationEmail(
       resendVerificationEmailDto,
     );
-    return success(response);
+    return success({ message: response });
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('change-email')
-  async changeEmail(@Body() changeEmailDto: ChangeEmailDto) {
-    const response =
-      await this.authenticationService.changeEmail(changeEmailDto);
-    return success(response);
+  async changeEmail(
+    @Request() req: any,
+    @Body() changeEmailDto: ChangeEmailDto,
+  ) {
+    const response = await this.authenticationService.changeEmail(
+      req.user.id,
+      changeEmailDto,
+    );
+    return success({ message: response });
   }
 
   @UseGuards(JwtAuthGuard)
   @Post('delete-account')
-  async deleteAccount(@Body() deleteAccountDto: DeleteAccountDto) {
-    const response =
-      await this.authenticationService.deleteAccount(deleteAccountDto);
-    return success(response);
+  async deleteAccount(@Request() req: any) {
+    const response = await this.authenticationService.deleteAccount(
+      req.user.id,
+    );
+    return success({ message: response });
   }
 }

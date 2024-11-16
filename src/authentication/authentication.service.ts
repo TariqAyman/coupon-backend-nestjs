@@ -21,16 +21,27 @@ import { JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { log } from 'console';
 import { LoginDto } from './dto/login.dto';
+import { ResetPasswordToken } from './entities/reset-password-token.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { MoreThan, Repository } from 'typeorm';
+import { MailService } from 'src/common/services/mail.service';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
+    @InjectRepository(ResetPasswordToken)
+    private readonly resetPasswordTokenRepository: Repository<ResetPasswordToken>,
     private readonly userService: UsersService,
     private jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
-  async validateUser(email: string, pass: string): Promise<any> {
-    const user = await this.userService.findByEmail(email);
+  async validateUser(identifier: string, pass: string): Promise<any> {
+    const user = identifier.includes('@')
+      ? await this.userService.findByEmail(identifier)
+      : await this.userService.findByPhoneNumber(identifier);
+
     if (user && (await bcrypt.compare(pass, user.password))) {
       const { password, ...result } = user;
       return result;
@@ -79,24 +90,19 @@ export class AuthenticationService {
   }
 
   async login(loginDto: LoginDto) {
-    const {
-      loginMethod,
-      email,
-      phoneNumber,
-      phoneNumberCountryCode,
-      password,
-    } = loginDto;
+    const { loginMethod, identifier, phoneNumberCountryCode, password } =
+      loginDto;
 
     let user;
-    if (loginMethod === 'email' && email) {
-      user = await this.userService.findByEmail(email);
+    if (loginMethod === 'email' && identifier) {
+      user = await this.userService.findByEmail(identifier);
     } else if (
       loginMethod === 'phone' &&
-      phoneNumber &&
+      identifier &&
       phoneNumberCountryCode
     ) {
       user = await this.userService.findByPhoneNumberAndCountryCode(
-        phoneNumber,
+        identifier,
         phoneNumberCountryCode,
       );
     } else {
@@ -166,40 +172,60 @@ export class AuthenticationService {
       throw new NotFoundException('User not found');
     }
 
-    const resetToken = this.jwtService.sign(
-      { userId: user.id },
-      { expiresIn: '1h' },
-    );
+    const token = crypto.randomBytes(20).toString('hex');
 
-    // TODO: Send email with reset token
-    // This part would involve using an email service to send the reset token to the user's email
+    const encryptedToken = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex');
+
+    const tokenValidity = new Date(Date.now() + 20 * 60 * 1000); // valid for 20 minutes
+
+    const resetPasswordURL = `${process.env.FRONTEND_DOMAIN}/reset-password?token=${token}`;
+
+    await this.resetPasswordTokenRepository.save({
+      email: user.email,
+      resetToken: encryptedToken,
+      expiresAt: tokenValidity,
+    });
+
+    await this.mailService.sendMail({
+      to: user.email as string,
+      subject: 'Reset Your Password',
+      html: `Here is the link to reset your password. The link is valid for 20 minutes: <a href="${resetPasswordURL}">${resetPasswordURL}</a>`,
+    });
 
     return 'Password reset instructions sent to your email';
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    try {
-      const payload = this.jwtService.verify(resetPasswordDto.token);
-      const user = await this.userService.findOne(payload.userId);
+    console.log(resetPasswordDto);
 
-      if (!user) {
-        throw new NotFoundException('User not found');
-      }
+    const encryptedToken = crypto
+      .createHash('sha256')
+      .update(resetPasswordDto.token)
+      .digest('hex');
 
-      const hashedPassword = await bcrypt.hash(
-        resetPasswordDto.newPassword,
-        10,
-      );
-      // await this.userService.updatePassword(user.id, hashedPassword);
+    const user = await this.resetPasswordTokenRepository.findOne({
+      where: { resetToken: encryptedToken, expiresAt: MoreThan(new Date()) },
+      relations: ['user'],
+    });
 
-      return 'Password reset successful';
-    } catch (error) {
-      throw new UnauthorizedException('Invalid or expired token');
+    if (!user) {
+      throw new BadRequestException('Invalid request or link expired');
     }
+
+    const hashedPassword = await bcrypt.hash(resetPasswordDto.newPassword, 10);
+    await this.userService.updatePassword(user.email, hashedPassword);
+    await this.resetPasswordTokenRepository.delete({
+      resetToken: encryptedToken,
+    });
+
+    return 'Password changed successfully';
   }
 
-  async changeEmail(changeEmailDto: ChangeEmailDto) {
-    const user = await this.userService.findOne(changeEmailDto.userId);
+  async changeEmail(userId: string, changeEmailDto: ChangeEmailDto) {
+    const user = await this.userService.findOne(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -211,8 +237,10 @@ export class AuthenticationService {
     return 'Email changed successfully';
   }
 
-  async changePassword(changePasswordDto: ChangePasswordDto) {
-    const user = await this.userService.findOne(changePasswordDto.userId);
+  async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
+    log(userId);
+    const user = await this.userService.findOne(userId);
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
@@ -221,6 +249,7 @@ export class AuthenticationService {
       changePasswordDto.currentPassword,
       user.password,
     );
+
     if (!isPasswordValid) {
       throw new UnauthorizedException('Current password is incorrect');
     }
@@ -229,7 +258,11 @@ export class AuthenticationService {
       changePasswordDto.newPassword,
       10,
     );
-    // await this.userService.updatePassword(user.id, hashedNewPassword);
+
+    await this.userService.updatePassword(
+      user.email as string,
+      hashedNewPassword,
+    );
 
     return 'Password changed successfully';
   }
@@ -237,15 +270,17 @@ export class AuthenticationService {
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     try {
       const payload = this.jwtService.verify(verifyEmailDto.token);
+      log(payload);
       const user = await this.userService.findOne(payload.userId);
 
       if (!user) {
         throw new NotFoundException('User not found');
       }
 
-      // await this.userService.verifyEmail(user.id);
+      await this.userService.verifyUserEmail(user.email as string);
       return 'Email verified successfully';
     } catch (error) {
+      log(error);
       throw new UnauthorizedException('Invalid or expired token');
     }
   }
@@ -256,27 +291,33 @@ export class AuthenticationService {
     const user = await this.userService.findByEmail(
       resendVerificationEmailDto.email,
     );
+
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
-    // if (user.isEmailVerified) {
-    //   return 'Email is already verified';
-    // }
+    if (user.confirmAccount) {
+      return 'Email is already verified';
+    }
 
     const verificationToken = this.jwtService.sign(
       { userId: user.id },
       { expiresIn: '1d' },
     );
 
-    // TODO: Send verification email
-    // This part would involve using an email service to send the verification token to the user's email
+    const verificationEmailURL = `${process.env.FRONTEND_DOMAIN}/reset-password?token=${verificationToken}`;
+
+    await this.mailService.sendMail({
+      to: user.email as string,
+      subject: 'Request Verification Your Email',
+      html: `Here is the link to verify your email. The link is valid for 20 minutes: <a href="${verificationEmailURL}">${verificationEmailURL}</a>`,
+    });
 
     return 'Verification email resent successfully';
   }
 
-  async deleteAccount(deleteAccountDto: DeleteAccountDto) {
-    const user = await this.userService.findOne(deleteAccountDto.userId);
+  async deleteAccount(userId: string) {
+    const user = await this.userService.findOne(userId);
     if (!user) {
       throw new NotFoundException('User not found');
     }

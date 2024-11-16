@@ -17,6 +17,7 @@ import { UserProvider } from '../../common/enums/UserProvider';
 import { Exclude } from 'class-transformer';
 import { v4 as uuidv4 } from 'uuid';
 import { UserToken } from '../../notifications/entities/user-tokens.entity';
+import { ResetPasswordToken } from 'src/authentication/entities/reset-password-token.entity';
 
 @Entity('users')
 export class User {
@@ -151,4 +152,7 @@ export class User {
 
   @OneToMany(() => UserToken, (userToken) => userToken.user)
   userTokens: UserToken[];
+
+  @OneToMany(() => ResetPasswordToken, (token) => token.user)
+  resetPasswordTokens: ResetPasswordToken[];
 }

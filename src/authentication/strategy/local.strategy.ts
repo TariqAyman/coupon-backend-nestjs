@@ -7,16 +7,18 @@ import { AuthenticationService } from '../authentication.service';
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private authService: AuthenticationService) {
     super({
-      usernameField: 'email',
+      usernameField: 'identifier',
       passwordField: 'password',
     });
   }
 
-  async validate(username: string, password: string): Promise<any> {
-    const user = await this.authService.validateUser(username, password);
+  async validate(identifier: string, password: string): Promise<any> {
+    const user = await this.authService.validateUser(identifier, password);
+
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid credentials.');
     }
+
     return user;
   }
 }

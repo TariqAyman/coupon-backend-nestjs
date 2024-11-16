@@ -17,18 +17,14 @@ export class LoginDto {
   loginMethod: 'email' | 'phone';
 
   @ValidateIf((o) => o.loginMethod === 'email')
-  @IsEmail({}, { message: 'Enter a valid email address' })
-  @IsNotEmpty()
-  @MinLength(5, { message: 'Email must be at least 5 characters long' })
-  email?: string;
-
-  @ValidateIf((o) => o.registerMethod === 'phone')
+  @ValidateIf((o) => o.loginMethod === 'phone')
   @IsString()
-  @IsNotEmpty()
+  @IsEmail({}, { message: 'Enter a valid email address' })
+  @MinLength(5, { message: 'Email must be at least 5 characters long' })
   @IsPhoneNumberWithCountryCode('phoneNumberCountryCode', {
     message: 'Invalid phone number for the provided country code',
   })
-  phoneNumber?: string;
+  identifier: string;
 
   @ValidateIf((o) => o.loginMethod === 'phone')
   @IsString()

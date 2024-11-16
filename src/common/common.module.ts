@@ -9,6 +9,8 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { LocaleSubscriber } from './subscribers/locale.subscriber';
 import { YcI18nService } from './yc-i18n/yc-i18n.service';
 import { I18nService } from 'nestjs-i18n';
+import { MailService } from './services/mail.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -22,16 +24,14 @@ import { I18nService } from 'nestjs-i18n';
     }),
     AuthenticationModule,
     UsersModule,
+    ConfigModule,
   ],
   providers: [
     CurrentUserProvider,
     ActionByUserSubscriber,
     IsUniqueConstraint,
-
+    MailService,
   ],
-  exports: [
-    CurrentUserProvider,
-    ActionByUserSubscriber,
-  ],
+  exports: [CurrentUserProvider, ActionByUserSubscriber, MailService],
 })
 export class CommonModule {}

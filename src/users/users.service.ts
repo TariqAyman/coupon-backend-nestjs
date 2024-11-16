@@ -2,6 +2,7 @@ import {
   ConflictException,
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -361,5 +362,26 @@ export class UsersService {
       return this.usersRepository.save(user);
     }
     throw new Error('User not found');
+  }
+
+  async updatePassword(email: string, newPassword: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { email } });
+
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+
+    user.password = newPassword;
+
+    return await this.usersRepository.save(user);
+  }
+
+  async verifyUserEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ where: { email } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
+    user.confirmAccount = true;
+    return await this.usersRepository.save(user);
   }
 }

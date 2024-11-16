@@ -35,6 +35,7 @@ export class RegisterDto {
   })
   phoneNumber?: string;
 
+  @ValidateIf((o) => o.loginMethod === 'phone')
   @IsString()
   @IsNotEmpty()
   @MinLength(2)
@@ -48,7 +49,7 @@ export class RegisterDto {
   @IsString()
   @IsNotEmpty()
   fullName: string;
-  
+
   @IsOptional()
   @IsEnum(UserGender)
   gender: UserGender;

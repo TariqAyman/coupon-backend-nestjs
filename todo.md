@@ -1,0 +1,4 @@
+- [ ] filter all models by country id
+- [ ] translate all response messages
+- [ ] confirmAccount & resetPassword by email 
+- [ ] sendEmailToChangePassword
