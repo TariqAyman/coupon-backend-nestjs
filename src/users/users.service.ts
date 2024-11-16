@@ -18,6 +18,7 @@ import { Brand } from 'src/brands/entities/brand.entity';
 import { UploadMediaService } from 'src/upload-media/upload-media.service';
 import { ProfileDto } from 'src/authentication/dto/profile.dto';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
@@ -29,6 +30,7 @@ export class UsersService {
     @InjectRepository(Brand)
     private readonly brandsRepository: Repository<Brand>,
     private readonly uploadMediaService: UploadMediaService,
+    private jwtService: JwtService,
   ) {}
 
   async register(
@@ -129,6 +131,18 @@ export class UsersService {
     }
 
     return user;
+  }
+
+  async validateUserToken(token: string): Promise<User> {
+    const decoded = this.jwtService.verify(token);
+
+    return await this.usersRepository
+      .findOne({
+        where: { email: decoded.email },
+      })
+      .then((user: any) => {
+        return user ?? null;
+      });
   }
 
   async create(createUserDto: CreateUserDto): Promise<User> {

@@ -33,8 +33,8 @@ export class AuthenticationService {
     @InjectRepository(ResetPasswordToken)
     private readonly resetPasswordTokenRepository: Repository<ResetPasswordToken>,
     private readonly userService: UsersService,
-    private jwtService: JwtService,
     private readonly mailService: MailService,
+    private jwtService: JwtService,
   ) {}
 
   async validateUser(identifier: string, pass: string): Promise<any> {
@@ -133,17 +133,18 @@ export class AuthenticationService {
   }
 
   async register(registerDto: RegisterDto, avatar: any) {
-    const { registerMethod, email, phoneNumber } = registerDto;
-
     let user;
 
-    if (registerMethod === 'email' && email) {
-      user = await this.userService.findByEmail(email);
+    if (registerDto.registerMethod === 'email') {
+      user = await this.userService.findByEmail(registerDto.email as string);
       if (user) {
         throw new BadRequestException('Email already in use');
       }
-    } else if (registerMethod === 'phone' && phoneNumber) {
-      user = await this.userService.findByPhoneNumber(phoneNumber);
+    } else if (
+      registerDto.registerMethod === 'phone' &&
+      registerDto.phoneNumber
+    ) {
+      user = await this.userService.findByPhoneNumber(registerDto.phoneNumber);
       if (user) {
         throw new BadRequestException('Phone number already in use');
       }
@@ -151,7 +152,11 @@ export class AuthenticationService {
       throw new BadRequestException('Invalid registration method');
     }
 
-    user = await this.userService.register(registerMethod, registerDto, avatar);
+    user = await this.userService.register(
+      registerDto.registerMethod,
+      registerDto,
+      avatar,
+    );
     return new ProfileDto(user);
   }
 
@@ -270,7 +275,7 @@ export class AuthenticationService {
   async verifyEmail(verifyEmailDto: VerifyEmailDto) {
     try {
       const payload = this.jwtService.verify(verifyEmailDto.token);
-      log(payload);
+
       const user = await this.userService.findOne(payload.userId);
 
       if (!user) {

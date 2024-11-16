@@ -11,9 +11,19 @@ import { YcI18nService } from './yc-i18n/yc-i18n.service';
 import { I18nService } from 'nestjs-i18n';
 import { MailService } from './services/mail.service';
 import { ConfigModule } from '@nestjs/config';
+import { UsersService } from 'src/users/users.service';
+import { JwtAuthOrGuestGuard } from './guards/jwt-auth-or-guest.guard';
+import { JwtStrategy } from 'src/authentication/strategy/jwt.strategy';
+import { LocalStrategy } from 'src/authentication/strategy/local.strategy';
+import { jwtConstants } from 'src/authentication/constants';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
+    JwtModule.register({
+      secret: jwtConstants.secret,
+      signOptions: { expiresIn: jwtConstants.expiresIn },
+    }),
     ThrottlerModule.forRoot({
       throttlers: [
         {
@@ -27,6 +37,8 @@ import { ConfigModule } from '@nestjs/config';
     ConfigModule,
   ],
   providers: [
+    LocalStrategy,
+    JwtStrategy,
     CurrentUserProvider,
     ActionByUserSubscriber,
     IsUniqueConstraint,
