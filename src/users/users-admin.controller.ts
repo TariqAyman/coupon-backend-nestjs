@@ -29,6 +29,10 @@ import {
 } from 'src/common/decorators/body-with-param.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { EntityFileInterceptor } from 'src/upload-media/entity-file.interceptor';
+import {
+  AddParamToBodyInterceptor,
+  TransformToTypeTypes,
+} from 'src/common/interceptor/add-param-to-body-interceptor';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
@@ -60,13 +64,23 @@ export class UsersAdminController {
   }
 
   @Patch(':id')
+  @UseInterceptors(
+    new AddParamToBodyInterceptor({
+      paramName: 'id',
+      transformTo: TransformToTypeTypes.string,
+    }),
+  )
+  @UseInterceptors(EntityFileInterceptor('user', 'avatar'))
   async update(
     @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
     @UploadedFile() avatar: Express.Multer.File,
-    @Body()
-    updateUserDto: UpdateUserDto,
   ) {
-    const response = await this.usersService.update(id, updateUserDto, avatar);
+    const response = await this.usersService.update(
+      updateUserDto.id,
+      updateUserDto,
+      avatar,
+    );
 
     return showOne(response);
   }

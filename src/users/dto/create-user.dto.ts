@@ -17,6 +17,8 @@ import { UserStatus } from 'src/common/enums/UserStatus';
 import { IsPhoneNumberWithCountryCode } from 'src/common/validator/is-phone-number-with-Country-code';
 import { CountryCode } from 'libphonenumber-js/max';
 import { Type } from 'class-transformer';
+import { User } from '../entities/user.entity';
+import { IsUnique } from 'src/common/decorators/is-unique.decorator';
 
 export class CreateUserDto {
   @IsString()
@@ -25,6 +27,7 @@ export class CreateUserDto {
 
   @IsEmail()
   @IsNotEmpty()
+  @IsUnique(User, 'email')
   email?: string;
 
   @IsString()
@@ -36,6 +39,7 @@ export class CreateUserDto {
   @IsPhoneNumberWithCountryCode('phoneNumberCountryCode', {
     message: 'Invalid phone number for the provided country code',
   })
+  @IsUnique(User, 'phoneNumber')
   phoneNumber?: string;
 
   @IsString()
@@ -44,9 +48,9 @@ export class CreateUserDto {
   @MaxLength(3)
   phoneNumberCountryCode: CountryCode;
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsEnum(UserRole)
-  role: UserRole;
+  role: string;
 
   @IsOptional()
   @IsDate()

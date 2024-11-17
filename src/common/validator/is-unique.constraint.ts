@@ -6,6 +6,7 @@ import {
 import { Injectable } from '@nestjs/common';
 import { DataSource, Not } from 'typeorm';
 import { InjectDataSource } from '@nestjs/typeorm';
+import { log } from 'console';
 
 @ValidatorConstraint({ async: true })
 @Injectable()
@@ -13,7 +14,7 @@ export class IsUniqueConstraint implements ValidatorConstraintInterface {
   constructor(@InjectDataSource() private dataSource: DataSource) {}
 
   async validate(value: any, args: ValidationArguments) {
-    const [entityClass, column, ignoreId] = args.constraints;
+    const [entityClass, column] = args.constraints;
 
     try {
       // Get the repository dynamically

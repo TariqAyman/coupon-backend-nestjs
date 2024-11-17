@@ -43,14 +43,14 @@ export class UsersAdminService {
         );
     }
 
-    // if (userByEmail ||  userByPhoneNumber) {{
-    //   throw new ConflictException('Email or Phone already exists');
-    // }
+    if (userByEmail || userByPhoneNumber) {
+      throw new ConflictException('Email or Phone already exists');
+    }
 
     const user = new User();
     user.email = createUserDto?.email;
     user.password = await bcrypt.hash(createUserDto.password, 10);
-    user.role = UserRole.User;
+    user.role = createUserDto.role;
     user.status = createUserDto.status;
     user.fullName = createUserDto.fullName;
     user.phoneNumber = createUserDto?.phoneNumber;
