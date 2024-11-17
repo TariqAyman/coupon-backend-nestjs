@@ -28,9 +28,8 @@ export class Notification {
     ar: string;
   };
 
-  @Column()
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
-  userId: string;
+  user: string;
 
   @ManyToOne(() => User, { nullable: false, onDelete: 'CASCADE' })
   createdBy!: User;
@@ -40,9 +39,6 @@ export class Notification {
 
   @Column()
   createdAt!: Date;
-
-  @Column()
-  updatedAt!: Date;
 
   @DeleteDateColumn({ nullable: true })
   deletedAt?: Date;
