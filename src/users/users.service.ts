@@ -7,7 +7,7 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { RegisterDto } from 'src/authentication/dto/register.dto';
 import { UserRole } from 'src/common/enums/UserRole';
@@ -31,6 +31,7 @@ export class UsersService {
     private readonly brandsRepository: Repository<Brand>,
     private readonly uploadMediaService: UploadMediaService,
     private jwtService: JwtService,
+    private readonly dataSource: DataSource, // Inject DataSource for transactions
   ) {}
 
   async register(
@@ -189,83 +190,128 @@ export class UsersService {
   // add last login time func
 
   async addDislikedCoupon(userId: string, couponId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['dislikedCoupons'],
-    });
-    const coupon = await this.couponsRepository.findOne({
-      where: { id: couponId },
-    });
+    await this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['dislikedCoupons'],
+      });
 
-    if (coupon && user) {
-      user.dislikedCoupons.push(coupon);
-      await this.usersRepository.save(user);
-    }
+      const coupon = await manager.findOne(Coupon, {
+        where: { id: couponId },
+      });
+
+      if (coupon && user) {
+        // Check if the coupon is already disliked by the user
+        if (!user.dislikedCoupons.some((c) => c.id === couponId)) {
+          user.dislikedCoupons.push(coupon);
+          await manager.save(user);
+
+          // Recalculate dislikeCount
+          const dislikeCount = await manager
+            .createQueryBuilder('user_liked_coupons', 'ulcc')
+            .where('ulcc.couponId = :couponId', { couponId })
+            .getCount();
+
+          // Update coupon dislikeCount
+          await manager.update(Coupon, couponId, { dislikeCount });
+        }
+      }
+    });
   }
 
   async addFavoriteCoupon(userId: string, couponId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['favoriteCoupons'],
-    });
-    const coupon = await this.couponsRepository.findOne({
-      where: { id: couponId },
-    });
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['favoriteCoupons'],
+      });
+      const coupon = await manager.findOne(Coupon, { where: { id: couponId } });
 
-    if (user && coupon) {
-      user.favoriteCoupons.push(coupon);
-      return this.usersRepository.save(user);
-    }
-    throw new Error('User or coupon not found');
+      if (user && coupon) {
+        if (!user.favoriteCoupons.some((c) => c.id === couponId)) {
+          user.favoriteCoupons.push(coupon);
+          await manager.save(user);
+        }
+        return user;
+      }
+      throw new Error('User or coupon not found');
+    });
   }
 
   async followBrand(userId: string, brandId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['followedBrands'],
-    });
-    const brand = await this.brandsRepository.findOne({
-      where: { id: brandId },
-    });
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['followedBrands'],
+      });
+      const brand = await manager.findOne(Brand, { where: { id: brandId } });
 
-    if (user && brand) {
-      user.followedBrands.push(brand);
-      return this.usersRepository.save(user);
-    }
-    throw new Error('User or brand not found');
+      if (user && brand) {
+        if (!user.followedBrands.some((b) => b.id === brandId)) {
+          user.followedBrands.push(brand);
+          await manager.save(user);
+        }
+
+        // Recalculate likeCount
+        const mostFollowed = await manager
+          .createQueryBuilder('user_followed_brands', 'ulcc')
+          .where('ulcc.brandId = :brandId', { brandId })
+          .getCount();
+
+        // Update coupon likeCount
+        await manager.update(Brand, brandId, { mostFollowed });
+
+        return user;
+      }
+      throw new Error('User or brand not found');
+    });
   }
 
   async followCoupon(userId: string, couponId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['followedCoupons'],
-    });
-    const coupon = await this.couponsRepository.findOne({
-      where: { id: couponId },
-    });
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['followedCoupons'],
+      });
+      const coupon = await manager.findOne(Coupon, { where: { id: couponId } });
 
-    if (user && coupon) {
-      user.followedCoupons.push(coupon);
-      return this.usersRepository.save(user);
-    }
-
-    throw new Error('User or coupon not found');
+      if (user && coupon) {
+        if (!user.followedCoupons.some((c) => c.id === couponId)) {
+          user.followedCoupons.push(coupon);
+          await manager.save(user);
+        }
+        return user;
+      }
+      throw new Error('User or coupon not found');
+    });
   }
 
   async likeCoupon(userId: string, couponId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['likedCoupons'],
-    });
-    const coupon = await this.couponsRepository.findOne({
-      where: { id: couponId },
-    });
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['likedCoupons'],
+      });
+      const coupon = await manager.findOne(Coupon, { where: { id: couponId } });
 
-    if (user && coupon) {
-      user.likedCoupons.push(coupon);
-      return this.usersRepository.save(user);
-    }
-    throw new Error('User or coupon not found');
+      if (user && coupon) {
+        if (!user.likedCoupons.some((c) => c.id === couponId)) {
+          user.likedCoupons.push(coupon);
+          await manager.save(user);
+
+          // Recalculate likeCount
+          const likeCount = await manager
+            .createQueryBuilder('user_liked_coupons', 'ulcc')
+            .where('ulcc.couponId = :couponId', { couponId })
+            .getCount();
+
+          // Update coupon likeCount
+          await manager.update(Coupon, couponId, { likeCount });
+        }
+        return user;
+      }
+      throw new Error('User or coupon not found');
+    });
   }
 
   async getUserDislikedCoupons(userId: string) {
@@ -277,17 +323,27 @@ export class UsersService {
   }
 
   async removeDislikedCoupon(userId: string, couponId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['dislikedCoupons'],
-    });
-    if (user) {
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['dislikedCoupons'],
+      });
+      if (!user) throw new Error('User not found');
+
       user.dislikedCoupons = user.dislikedCoupons.filter(
         (coupon) => coupon.id !== couponId,
       );
-      return this.usersRepository.save(user);
-    }
-    throw new Error('User not found');
+      await manager.save(user);
+
+      // Recalculate dislikeCount
+      const dislikeCount = await manager
+        .createQueryBuilder('user_liked_coupons', 'ulcc')
+        .where('ulcc.couponId = :couponId', { couponId })
+        .getCount();
+
+      // Update coupon dislikeCount
+      await manager.update(Coupon, couponId, { dislikeCount });
+    });
   }
 
   async getUserFavoriteCoupons(userId: string) {
@@ -299,17 +355,18 @@ export class UsersService {
   }
 
   async removeFavoriteCoupon(userId: string, couponId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['favoriteCoupons'],
-    });
-    if (user) {
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['favoriteCoupons'],
+      });
+      if (!user) throw new Error('User not found');
+
       user.favoriteCoupons = user.favoriteCoupons.filter(
         (coupon) => coupon.id !== couponId,
       );
-      return this.usersRepository.save(user);
-    }
-    throw new Error('User not found');
+      await manager.save(user);
+    });
   }
 
   async getUserFollowedBrands(userId: string) {
@@ -321,17 +378,18 @@ export class UsersService {
   }
 
   async unfollowBrand(userId: string, brandId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['followedBrands'],
-    });
-    if (user) {
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['followedBrands'],
+      });
+      if (!user) throw new Error('User not found');
+
       user.followedBrands = user.followedBrands.filter(
         (brand) => brand.id !== brandId,
       );
-      return this.usersRepository.save(user);
-    }
-    throw new Error('User not found');
+      await manager.save(user);
+    });
   }
 
   async getUserFollowedCoupons(userId: string) {
@@ -343,17 +401,18 @@ export class UsersService {
   }
 
   async unfollowCoupon(userId: string, couponId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['followedCoupons'],
-    });
-    if (user) {
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['followedCoupons'],
+      });
+      if (!user) throw new Error('User not found');
+
       user.followedCoupons = user.followedCoupons.filter(
         (coupon) => coupon.id !== couponId,
       );
-      return this.usersRepository.save(user);
-    }
-    throw new Error('User not found');
+      await manager.save(user);
+    });
   }
 
   async getUserLikedCoupons(userId: string) {
@@ -365,17 +424,27 @@ export class UsersService {
   }
 
   async unlikeCoupon(userId: string, couponId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['likedCoupons'],
-    });
-    if (user) {
+    return this.dataSource.transaction(async (manager) => {
+      const user = await manager.findOne(User, {
+        where: { id: userId },
+        relations: ['likedCoupons'],
+      });
+      if (!user) throw new Error('User not found');
+
       user.likedCoupons = user.likedCoupons.filter(
         (coupon) => coupon.id !== couponId,
       );
-      return this.usersRepository.save(user);
-    }
-    throw new Error('User not found');
+      await manager.save(user);
+
+      // Recalculate likeCount
+      const likeCount = await manager
+        .createQueryBuilder('user_liked_coupons', 'ulcc')
+        .where('ulcc.couponId = :couponId', { couponId })
+        .getCount();
+
+      // Update coupon likeCount
+      await manager.update(Coupon, couponId, { likeCount });
+    });
   }
 
   async updatePassword(email: string, newPassword: string): Promise<User> {
