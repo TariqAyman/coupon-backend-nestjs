@@ -133,4 +133,36 @@ export class Coupon {
   constructor(partial: Partial<Coupon>) {
     Object.assign(this, partial);
   }
+
+  @Column({
+    nullable: true,
+    select: false,
+    update: false,
+    default: 0,
+  })
+  isDisliked: number;
+
+  @Column({
+    nullable: true,
+    select: false,
+    update: false,
+    default: 0,
+  })
+  isLiked: number;
+
+  @Column({
+    nullable: true,
+    select: false,
+    update: false,
+    default: 0,
+  })
+  isFavorite: number;
+
+  @Column({
+    nullable: true,
+    select: false,
+    update: false,
+    default: 0,
+  })
+  isFollowed: number;
 }

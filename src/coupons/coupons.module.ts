@@ -11,11 +11,14 @@ import { Category } from 'src/categories/entities/category.entity';
 import { Brand } from 'src/brands/entities/brand.entity';
 import { Country } from 'src/countries/entities/country.entity';
 import { User } from 'src/users/entities/user.entity';
+import { UsersService } from 'src/users/users.service';
+import { UsersModule } from 'src/users/users.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Coupon, Country, Brand, Category, User]),
     UploadMediaModule,
+    UsersModule,
   ],
   controllers: [CouponsController, CouponsAdminController],
   providers: [CouponsService, CouponsAdminService, IsUniqueConstraint],

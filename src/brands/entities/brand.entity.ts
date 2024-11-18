@@ -108,4 +108,12 @@ export class Brand {
   constructor(partial: Partial<Brand>) {
     Object.assign(this, partial);
   }
+
+  @Column({
+    nullable: true,
+    select: false,
+    update: false,
+    default: 0,
+  })
+  isFollowed: number;
 }

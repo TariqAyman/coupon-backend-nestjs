@@ -2,8 +2,10 @@ import {
   Repository,
   ObjectLiteral,
   getMetadataArgsStorage,
+  SelectQueryBuilder,
 } from 'typeorm';
 import { PaginationOptionsDto } from '../dto/pagination-options.dto';
+import { log } from 'console';
 
 class PaginationOptions<Entity> extends PaginationOptionsDto {}
 
@@ -11,6 +13,7 @@ export async function findWithPagination<Entity extends ObjectLiteral>(
   repository: Repository<Entity>,
   options: PaginationOptions<Entity>,
   relations?: string[],
+  modifyQueryBuilder?: (queryBuilder: SelectQueryBuilder<Entity>) => void,
 ): Promise<{
   data: Entity[];
   total: number;
@@ -40,7 +43,7 @@ export async function findWithPagination<Entity extends ObjectLiteral>(
   const validFields: string[] = getMetadataArgsStorage()
     .columns.filter((column) => column.target === repository.target)
     .map((column) => column.propertyName);
-  
+
   // Create query builder for the entity
   const queryBuilder = repository.createQueryBuilder('entity'); // 'entity' is an alias for the main entity
 
@@ -86,6 +89,11 @@ export async function findWithPagination<Entity extends ObjectLiteral>(
     }
 
     queryBuilder.select(selectFields);
+  }
+
+  // Apply the custom query modifications if provided
+  if (modifyQueryBuilder) {
+    modifyQueryBuilder(queryBuilder);
   }
 
   // Apply pagination
