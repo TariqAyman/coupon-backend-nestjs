@@ -30,6 +30,7 @@ export async function findWithPagination<Entity extends ObjectLiteral>(
     relationFilterBy,
     relationFilterValue,
     simple,
+    hiddenRelationFilterBy,
   } = options;
 
   const pageNumber = Number(page);
@@ -50,7 +51,11 @@ export async function findWithPagination<Entity extends ObjectLiteral>(
   // Add joins for relations if provided
   if (relations) {
     relations.forEach((relation: string) => {
-      queryBuilder.leftJoinAndSelect(`entity.${relation}`, relation);
+      if (hiddenRelationFilterBy?.includes(relation)) {
+        queryBuilder.leftJoin(`entity.${relation}`, relation);
+      } else {
+        queryBuilder.leftJoinAndSelect(`entity.${relation}`, relation);
+      }
     });
   }
 

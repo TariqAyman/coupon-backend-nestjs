@@ -19,6 +19,15 @@ import { UploadMediaService } from 'src/upload-media/upload-media.service';
 import { ProfileDto } from 'src/authentication/dto/profile.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
+import { findWithPagination } from 'src/common/utils/pagination.util';
+import {
+  createDislikedSubQuery,
+  createFavoriteSubQuery,
+  createFollowedBrandSubQuery,
+  createFollowedSubQuery,
+  createLikedSubQuery,
+} from 'src/common/utils/sub-query';
 
 @Injectable()
 export class UsersService {
@@ -346,12 +355,43 @@ export class UsersService {
     });
   }
 
-  async getUserFavoriteCoupons(userId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['favoriteCoupons'],
-    });
-    return user?.favoriteCoupons || [];
+  async getUserFavoriteCoupons(
+    pagination: PaginationOptionsDto,
+    userId: string,
+  ): Promise<{
+    data: Coupon[];
+    total: number;
+    pageNumber: number;
+    limitNumber: number;
+  }> {
+    const options: PaginationOptionsDto = {
+      ...pagination,
+      relationFilterBy: 'userFavorite_entity.userId',
+      relationFilterValue: userId,
+      hiddenRelationFilterBy: ['userFavorite'],
+    };
+    return await findWithPagination(
+      this.couponsRepository,
+      options,
+      ['userFavorite', 'categories', 'countries', 'brands'],
+      (queryBuilder: any) => {
+        if (userId) {
+          queryBuilder.addSelect(
+            createDislikedSubQuery(userId),
+            'entity_isDisliked',
+          );
+          queryBuilder.addSelect(
+            createFavoriteSubQuery(userId),
+            'entity_isFavorite',
+          );
+          queryBuilder.addSelect(
+            createFollowedSubQuery(userId),
+            'entity_isFollowed',
+          );
+          queryBuilder.addSelect(createLikedSubQuery(userId), 'entity_isLiked');
+        }
+      },
+    );
   }
 
   async removeFavoriteCoupon(userId: string, couponId: string) {
@@ -369,12 +409,35 @@ export class UsersService {
     });
   }
 
-  async getUserFollowedBrands(userId: string) {
-    const user = await this.usersRepository.findOne({
-      where: { id: userId },
-      relations: ['followedBrands'],
-    });
-    return user?.followedBrands || [];
+  async getUserFollowedBrands(
+    pagination: PaginationOptionsDto,
+    userId: string,
+  ): Promise<{
+    data: Brand[];
+    total: number;
+    pageNumber: number;
+    limitNumber: number;
+  }> {
+    const options: PaginationOptionsDto = {
+      ...pagination,
+      relationFilterBy: 'userFollowed_entity.userId',
+      relationFilterValue: userId,
+      hiddenRelationFilterBy: ['userFollowed'],
+    };
+
+    return await findWithPagination(
+      this.brandsRepository,
+      options,
+      ['userFollowed'],
+      (queryBuilder: any) => {
+        if (userId) {
+          queryBuilder.addSelect(
+            createFollowedBrandSubQuery(userId),
+            'entity_isFollowed',
+          );
+        }
+      },
+    );
   }
 
   async unfollowBrand(userId: string, brandId: string) {

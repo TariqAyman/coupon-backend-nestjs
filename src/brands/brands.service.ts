@@ -5,6 +5,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { findWithPagination } from 'src/common/utils/pagination.util';
 import { log } from 'console';
+import { createFollowedBrandSubQuery } from 'src/common/utils/sub-query';
 
 @Injectable()
 export class BrandsService {
@@ -31,24 +32,12 @@ export class BrandsService {
       (queryBuilder: any) => {
         if (userId) {
           queryBuilder.addSelect(
-            this.createFollowedSubQuery(userId),
+            createFollowedBrandSubQuery(userId),
             'entity_isFollowed',
           );
         }
       },
     );
-  }
-
-  private createFollowedSubQuery(userId: string) {
-    return (subQuery: SelectQueryBuilder<Brand>) => {
-      return subQuery
-        .select(
-          'EXISTS(SELECT 1 FROM user_followed_brands ufcc WHERE ufcc.brandId = entity.id AND ufcc.userId = :userId)',
-        )
-        .from('user_followed_brands', 'ufcc')
-        .limit(1)
-        .setParameter('userId', userId);
-    };
   }
 
   async findOne(id: string) {

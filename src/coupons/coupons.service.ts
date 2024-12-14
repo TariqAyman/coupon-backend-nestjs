@@ -8,13 +8,18 @@ import { log } from 'console';
 import { UsersService } from 'src/users/users.service';
 import { th } from '@faker-js/faker/.';
 import { User } from 'src/users/entities/user.entity';
+import {
+  createDislikedSubQuery,
+  createFavoriteSubQuery,
+  createFollowedSubQuery,
+  createLikedSubQuery,
+} from 'src/common/utils/sub-query';
 
 @Injectable()
 export class CouponsService {
   constructor(
     @InjectRepository(Coupon)
     private couponRepository: Repository<Coupon>,
-    private readonly usersService: UsersService,
   ) {}
 
   async findAll(
@@ -33,72 +38,21 @@ export class CouponsService {
       (queryBuilder: any) => {
         if (userId) {
           queryBuilder.addSelect(
-            this.createDislikedSubQuery(userId),
+            createDislikedSubQuery(userId),
             'entity_isDisliked',
           );
           queryBuilder.addSelect(
-            this.createFavoriteSubQuery(userId),
+            createFavoriteSubQuery(userId),
             'entity_isFavorite',
           );
           queryBuilder.addSelect(
-            this.createFollowedSubQuery(userId),
+            createFollowedSubQuery(userId),
             'entity_isFollowed',
           );
-          queryBuilder.addSelect(
-            this.createLikedSubQuery(userId),
-            'entity_isLiked',
-          );
+          queryBuilder.addSelect(createLikedSubQuery(userId), 'entity_isLiked');
         }
       },
     );
-  }
-
-  private createDislikedSubQuery(userId: string) {
-    return (subQuery: SelectQueryBuilder<Coupon>) => {
-      return subQuery
-        .select(
-          'EXISTS(SELECT 1 FROM user_disliked_coupons ulcc WHERE ulcc.couponId = entity.id AND ulcc.userId = :userId)',
-        )
-        .from('user_disliked_coupons', 'ufcc')
-        .limit(1)
-        .setParameter('userId', userId);
-    };
-  }
-
-  private createFavoriteSubQuery(userId: string) {
-    return (subQuery: SelectQueryBuilder<Coupon>) => {
-      return subQuery
-        .select(
-          'EXISTS(SELECT 1 FROM user_favorite_coupons ulcc WHERE ulcc.couponId = entity.id AND ulcc.userId = :userId)',
-        )
-        .from('user_favorite_coupons', 'ufcc')
-        .limit(1)
-        .setParameter('userId', userId);
-    };
-  }
-
-  private createLikedSubQuery(userId: string) {
-    return (subQuery: SelectQueryBuilder<Coupon>) => {
-      return subQuery
-        .select(
-          'EXISTS(SELECT 1 FROM user_liked_coupons ulcc WHERE ulcc.couponId = entity.id AND ulcc.userId = :userId)',
-        )
-        .from('user_liked_coupons', 'ufcc')
-        .limit(1)
-        .setParameter('userId', userId);
-    };
-  }
-
-  private createFollowedSubQuery(userId: string) {
-    return (subQuery: SelectQueryBuilder<Coupon>) => {
-      return subQuery
-        .select(
-          'EXISTS(SELECT 1 FROM user_followed_coupons ufcc WHERE ufcc.couponId = entity.id AND ufcc.userId = :userId)',
-        )
-        .from('user_followed_coupons', 'ufcc')
-        .limit(1)
-        .setParameter('userId', userId);
-    };
   }
 
   async findOne(id: string) {

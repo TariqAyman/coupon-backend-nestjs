@@ -6,6 +6,8 @@ import {
   Delete,
   Req,
   UseGuards,
+  Query,
+  Request,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
@@ -13,7 +15,8 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { UserRole } from 'src/common/enums/UserRole';
 import { User } from './entities/user.entity';
-import { success } from 'src/common/utils/api-response-wrapper';
+import { paginate, success } from 'src/common/utils/api-response-wrapper';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 
 @Controller('user')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -38,15 +41,14 @@ export class UsersController {
   }
 
   @Get('coupons/favorites')
-  async getUserFavoriteCoupons(@Req() req: Request) {
-    const userRequest = (req as any).user as User;
-    const coupons = await this.usersService.getUserFavoriteCoupons(
-      userRequest.id,
-    );
-
-    const user = await this.usersService.profile(userRequest.id);
-
-    return success({ coupons, user });
+  async getUserFavoriteCoupons(
+    @Request() req: any,
+    @Query() pagination: PaginationOptionsDto,
+  ) {
+    const user = (req as any).user as User;
+    const { data, total, pageNumber, limitNumber } =
+      await this.usersService.getUserFavoriteCoupons(pagination, user.id);
+    return paginate(data, total, pageNumber, limitNumber);
   }
 
   @Get('coupons/liked')
@@ -56,15 +58,14 @@ export class UsersController {
     return success(coupons);
   }
   @Get('brands/followed')
-  async getUserFollowedBrands(@Req() req: Request) {
-    const userRequest = (req as any).user as User;
-    const brands = await this.usersService.getUserFollowedBrands(
-      userRequest.id,
-    );
-
-    const user = await this.usersService.profile(userRequest.id);
-
-    return success({ brands, user });
+  async getUserFollowedBrands(
+    @Request() req: any,
+    @Query() pagination: PaginationOptionsDto,
+  ) {
+    const user = (req as any).user as User;
+    const { data, total, pageNumber, limitNumber } =
+      await this.usersService.getUserFollowedBrands(pagination, user.id);
+    return paginate(data, total, pageNumber, limitNumber);
   }
 
   /// Actions

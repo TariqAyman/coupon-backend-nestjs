@@ -51,4 +51,7 @@ export class PaginationOptionsDto {
   @IsBoolean()
   @Type(() => Boolean)
   simple?: boolean = false; // Simple response flag
+
+  @IsOptional()
+  hiddenRelationFilterBy?: string[]; // Field to filter in relation
 }
