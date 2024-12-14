@@ -26,8 +26,6 @@ export class ActionByUserSubscriber implements EntitySubscriberInterface {
       if (event?.entity?.createdById !== undefined) {
         event.entity.createdById = this.currentUserId;
       }
-    } else {
-      console.warn('currentUserId is undefined in beforeInsert');
     }
   }
 
@@ -39,8 +37,6 @@ export class ActionByUserSubscriber implements EntitySubscriberInterface {
       if (event?.entity?.updatedById !== undefined) {
         event.entity.updatedById = this.currentUserId;
       }
-    } else {
-      console.warn('currentUserId is undefined in beforeUpdate');
     }
   }
 }
