@@ -23,8 +23,6 @@ export class BrandsService {
     pageNumber: number;
     limitNumber: number;
   }> {
-
-    log(userId);
     return await findWithPagination(
       this.brandRepository,
       pagination,

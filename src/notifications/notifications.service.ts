@@ -26,7 +26,7 @@ export class NotificationsService {
 
     pagination.search = userId;
     pagination.searchField = 'userId';
-log(pagination);
+
     return findWithPagination(this.notificationRepository, pagination);
   }
 }

@@ -13,9 +13,6 @@ export class LocaleMiddleware implements NestMiddleware {
       req.headers['x-locale'] ??
       'en'; // Default to 'en'
 
-
-    console.log('LocaleMiddleware', req.user);
-
     next();
   }
 }

@@ -70,7 +70,7 @@ export class PushNotificationService {
         });
       }
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   }
 
@@ -109,7 +109,7 @@ export class PushNotificationService {
         );
       }
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   }
 
@@ -129,7 +129,7 @@ export class PushNotificationService {
         );
       }
     } catch (err) {
-      console.log(err);
+      throw err;
     }
   }
 
@@ -147,7 +147,7 @@ export class PushNotificationService {
           { deletedAt: new Date(), topics: [] },
         );
       } catch (err) {
-        console.log(err);
+        throw err;
       }
     }
   }
@@ -272,7 +272,7 @@ export class PushNotificationService {
       await admin.messaging().send(message, true);
       isValid = true;
     } catch (error) {
-      console.log(error);
+      throw error;
     }
     return isValid;
   }

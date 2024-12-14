@@ -35,7 +35,6 @@ export class MailService {
         html: options.html,
       });
     } catch (error) {
-      log(error);
       throw error;
     }
   }

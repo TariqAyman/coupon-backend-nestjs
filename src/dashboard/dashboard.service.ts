@@ -176,10 +176,6 @@ export class DashboardService {
     const counts: Record<string, number> = {};
     let current = from.clone();
 
-    console.log('filters', filters);
-    console.log('grouped', grouped);
-    console.log(current.isBefore(to));
-
     while (current.isBefore(to)) {
       const key = current.format('YYYY_M');
       counts[this.parseMonthsDate(key)] = grouped[key] || 0;

@@ -204,8 +204,6 @@ export class AuthenticationService {
   }
 
   async resetPassword(resetPasswordDto: ResetPasswordDto) {
-    console.log(resetPasswordDto);
-
     const encryptedToken = crypto
       .createHash('sha256')
       .update(resetPasswordDto.token)
@@ -243,7 +241,6 @@ export class AuthenticationService {
   }
 
   async changePassword(userId: string, changePasswordDto: ChangePasswordDto) {
-    log(userId);
     const user = await this.userService.findOne(userId);
 
     if (!user) {
@@ -285,7 +282,6 @@ export class AuthenticationService {
       await this.userService.verifyUserEmail(user.email as string);
       return 'Email verified successfully';
     } catch (error) {
-      log(error);
       throw new UnauthorizedException('Invalid or expired token');
     }
   }
@@ -340,8 +336,6 @@ export class AuthenticationService {
     }
 
     let userExists = await this.userService.findByEmail(user.email);
-
-    log('userExists', userExists);
 
     if (!userExists) {
       const userExists = await this.userService.registerGoogleUser(user);
