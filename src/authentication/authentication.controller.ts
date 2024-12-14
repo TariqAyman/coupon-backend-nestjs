@@ -7,6 +7,7 @@ import {
   Request,
   UseInterceptors,
   UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { LoginDto } from './dto/login.dto';
@@ -17,11 +18,11 @@ import { ChangePasswordDto } from './dto/changePassword.dto';
 import { VerifyEmailDto } from './dto/verifyEmail.dto';
 import { ResendVerificationEmailDto } from './dto/resendVerificationEmail.dto';
 import { ChangeEmailDto } from './dto/changeEmail.dto';
-import { DeleteAccountDto } from './dto/deleteAccount.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { LocalAuthGuard } from '../common/guards/local-auth.guard';
 import { success } from 'src/common/utils/api-response-wrapper';
 import { EntityFileInterceptor } from 'src/upload-media/entity-file.interceptor';
+import { UpdateProfileDto } from './dto/updateProfile.dto';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -66,6 +67,22 @@ export class AuthenticationController {
   @Get('profile')
   async profile(@Request() req: any) {
     const response = await this.authenticationService.profile(req.user.id);
+    return success(response);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @Post('profile')
+  @UseInterceptors(EntityFileInterceptor('user', 'avatar'))
+  async updateProfile(
+    @Req() req: any,
+    @Body() updateProfileDto: UpdateProfileDto,
+    @UploadedFile() avatar: Express.Multer.File,
+  ) {
+    const response = await this.authenticationService.updateProfile(
+      req.user.id,
+      updateProfileDto,
+      avatar,
+    );
     return success(response);
   }
 

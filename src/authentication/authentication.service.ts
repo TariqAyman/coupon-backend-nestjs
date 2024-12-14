@@ -26,6 +26,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MoreThan, Repository } from 'typeorm';
 import { MailService } from 'src/common/services/mail.service';
 import * as crypto from 'crypto';
+import { UpdateProfileDto } from './dto/updateProfile.dto';
 
 @Injectable()
 export class AuthenticationService {
@@ -168,6 +169,20 @@ export class AuthenticationService {
   async profile(userId: string) {
     const user = await this.userService.findOne(userId);
     if (!user) throw new NotFoundException('User not found');
+    return new ProfileDto(user);
+  }
+
+  async updateProfile(
+    userId: string,
+    updateProfile: UpdateProfileDto,
+    avatar: any,
+  ) {    
+    const user = await this.userService.updateProfile(
+      userId,
+      updateProfile,
+      avatar,
+    );
+
     return new ProfileDto(user);
   }
 

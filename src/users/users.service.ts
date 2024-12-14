@@ -28,6 +28,7 @@ import {
   createFollowedSubQuery,
   createLikedSubQuery,
 } from 'src/common/utils/sub-query';
+import { UpdateProfileDto } from 'src/authentication/dto/updateProfile.dto';
 
 @Injectable()
 export class UsersService {
@@ -535,5 +536,30 @@ export class UsersService {
     const user = await this.findOne(userId);
     if (!user) throw new NotFoundException('User not found');
     return new ProfileDto(user);
+  }
+
+  async updateProfile(
+    userId: string,
+    updateProfileDto: UpdateProfileDto,
+    file?: Express.Multer.File,
+  ) {
+    const user = await this.usersRepository.findOne({ where: { id: userId } });
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const uploadedAvatar = file
+      ? await this.uploadMediaService.saveOneFile(file, 'user', user.id)
+      : null;
+
+    await this.usersRepository.update(userId, {
+      ...updateProfileDto,
+      avatar: uploadedAvatar?.url || user.avatar,
+    });
+
+    const newUserInfo = await this.usersRepository.findOne({
+      where: { id: userId },
+    });
+
+    return new ProfileDto(newUserInfo);
   }
 }
