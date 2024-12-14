@@ -25,14 +25,18 @@ export class AuthenticationGoogleController {
   @Get('callback')
   @UseGuards(GoogleOauthGuard)
   async googleAuthCallback(@Req() req: any, @Res() res: Response) {
-    const token = await this.authenticationService.signInByGoogle(req.user);
+    const user = await this.authenticationService.signInByGoogle(req.user);
 
-    res.cookie('token', token, {
+    console.log(process.env.FRONTEND_DOMAIN_COOKIE);
+
+    await res.cookie('token', user.token, {
       maxAge: 2592000000,
-      domain: process.env.FRONTEND_DOMAIN_COOKIE,
+      // domain: process.env.FRONTEND_DOMAIN_COOKIE,
       secure: true,
       sameSite: false,
     });
+
+    setTimeout(() => {}, 2000);
 
     return res.redirect(process.env.FRONTEND_BASE_URL as string);
   }
