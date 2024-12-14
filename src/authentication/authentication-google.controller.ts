@@ -27,13 +27,14 @@ export class AuthenticationGoogleController {
   async googleAuthCallback(@Req() req: any, @Res() res: Response) {
     const token = await this.authenticationService.signInByGoogle(req.user);
 
-    res.cookie('accessToken', token, {
+    res.cookie('token', token, {
       maxAge: 2592000000,
-      sameSite: true,
-      secure: false,
+      domain: process.env.FRONTEND_DOMAIN,
+      secure: true,
+      sameSite: false,
     });
 
-    return res.send().status(HttpStatus.OK);
+    return res.redirect(process.env.FRONTEND_BASE_URL as string);
   }
 
   @Get('redirect')

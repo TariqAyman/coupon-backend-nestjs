@@ -27,6 +27,7 @@ import { MoreThan, Repository } from 'typeorm';
 import { MailService } from 'src/common/services/mail.service';
 import * as crypto from 'crypto';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
+import { console } from 'inspector';
 
 @Injectable()
 export class AuthenticationService {
@@ -176,7 +177,7 @@ export class AuthenticationService {
     userId: string,
     updateProfile: UpdateProfileDto,
     avatar: any,
-  ) {    
+  ) {
     const user = await this.userService.updateProfile(
       userId,
       updateProfile,
@@ -359,7 +360,7 @@ export class AuthenticationService {
         throw new InternalServerErrorException('Failed to register user');
       }
     }
-
+    
     return await this.generateAccessToken(userExists);
   }
 
