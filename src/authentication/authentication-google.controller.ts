@@ -12,6 +12,7 @@ import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { log } from 'console';
 import { success } from 'src/common/utils/api-response-wrapper';
+import { fa } from '@faker-js/faker/.';
 
 @Controller('auth/google')
 export class AuthenticationGoogleController {
@@ -29,11 +30,30 @@ export class AuthenticationGoogleController {
 
     console.log(process.env.FRONTEND_DOMAIN_COOKIE);
 
-    await res.cookie('token', user.token, {
+    res.cookie('token1', user.token, {
       maxAge: 2592000000,
       // domain: process.env.FRONTEND_DOMAIN_COOKIE,
+      sameSite: true,
+      secure: false,
+    });
+
+    res.cookie('token2', user.token, {
+      maxAge: 2592000000,
+      domain: process.env.FRONTEND_DOMAIN_COOKIE,
+      sameSite: true,
+      secure: false,
+    });
+
+    res.cookie('token3', user.token, {
+      maxAge: 2592000000,
+      sameSite: true,
       secure: true,
+    });
+
+    res.cookie('token4', user.token, {
+      maxAge: 2592000000,
       sameSite: false,
+      secure: true,
     });
 
     setTimeout(() => {}, 2000);
