@@ -97,7 +97,7 @@ export class UsersService {
     return new ProfileDto(newUser);
   }
 
-  async registerGoogleUser(googleUser: any) {
+  async registerGoogleUser(googleUser: any): Promise<User | null> {
     try {
       const existingUser = await this.usersRepository.findOne({
         where: { email: googleUser.email },
@@ -128,7 +128,7 @@ export class UsersService {
       user.userLocale = 'en';
       const newUser = await this.usersRepository.save(user);
 
-      return new ProfileDto(newUser);
+      return newUser;
     } catch {
       return null;
     }

@@ -354,13 +354,13 @@ export class AuthenticationService {
     let userExists = await this.userService.findByEmail(user.email);
 
     if (!userExists) {
-      const userExists = await this.userService.registerGoogleUser(user);
+      userExists = await this.userService.registerGoogleUser(user);
 
       if (!userExists) {
         throw new InternalServerErrorException('Failed to register user');
       }
     }
-    
+
     return await this.generateAccessToken(userExists);
   }
 
