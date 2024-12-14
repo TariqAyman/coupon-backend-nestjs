@@ -39,9 +39,14 @@ export class UsersController {
 
   @Get('coupons/favorites')
   async getUserFavoriteCoupons(@Req() req: Request) {
-    const user = (req as any).user as User;
-    const coupons = await this.usersService.getUserFavoriteCoupons(user.id);
-    return success(coupons);
+    const userRequest = (req as any).user as User;
+    const coupons = await this.usersService.getUserFavoriteCoupons(
+      userRequest.id,
+    );
+
+    const user = await this.usersService.profile(userRequest.id);
+
+    return success({ coupons, user });
   }
 
   @Get('coupons/liked')
@@ -52,9 +57,14 @@ export class UsersController {
   }
   @Get('brands/followed')
   async getUserFollowedBrands(@Req() req: Request) {
-    const user = (req as any).user as User;
-    const brands = await this.usersService.getUserFollowedBrands(user.id);
-    return success(brands);
+    const userRequest = (req as any).user as User;
+    const brands = await this.usersService.getUserFollowedBrands(
+      userRequest.id,
+    );
+
+    const user = await this.usersService.profile(userRequest.id);
+
+    return success({ brands, user });
   }
 
   /// Actions

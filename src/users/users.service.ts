@@ -467,4 +467,10 @@ export class UsersService {
     user.confirmAccount = true;
     return await this.usersRepository.save(user);
   }
+
+  async profile(userId: string) {
+    const user = await this.findOne(userId);
+    if (!user) throw new NotFoundException('User not found');
+    return new ProfileDto(user);
+  }
 }
