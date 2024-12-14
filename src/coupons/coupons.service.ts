@@ -55,10 +55,30 @@ export class CouponsService {
     );
   }
 
-  async findOne(id: string) {
-    return this.couponRepository.findOne({
-      where: { id },
-      relations: ['categories', 'countries', 'brands'],
-    });
+  async findOne(id: string, userId?: string) {
+    const queryBuilder = this.couponRepository
+      .createQueryBuilder('entity')
+      .leftJoinAndSelect('entity.categories', 'categories')
+      .leftJoinAndSelect('entity.countries', 'countries')
+      .leftJoinAndSelect('entity.brands', 'brands')
+      .where('entity.id = :id', { id });
+
+    if (userId) {
+      queryBuilder.addSelect(
+        createDislikedSubQuery(userId),
+        'entity_isDisliked',
+      );
+      queryBuilder.addSelect(
+        createFavoriteSubQuery(userId),
+        'entity_isFavorite',
+      );
+      queryBuilder.addSelect(
+        createFollowedSubQuery(userId),
+        'entity_isFollowed',
+      );
+      queryBuilder.addSelect(createLikedSubQuery(userId), 'entity_isLiked');
+    }
+
+    return queryBuilder.getOne();
   }
 }

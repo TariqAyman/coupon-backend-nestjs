@@ -7,7 +7,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { CouponsService } from './coupons.service';
-import { paginate } from 'src/common/utils/api-response-wrapper';
+import { paginate, showOne } from 'src/common/utils/api-response-wrapper';
 import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { JwtAuthOrGuestGuard } from 'src/common/guards/jwt-auth-or-guest.guard';
 
@@ -27,7 +27,9 @@ export class CouponsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.couponsService.findOne(id);
+  async findOne(@Request() req: any, @Param('id') id: string) {
+    const coupon = await this.couponsService.findOne(id, req.user?.id);
+
+    return showOne(coupon);
   }
 }

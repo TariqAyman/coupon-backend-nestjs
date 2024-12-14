@@ -38,10 +38,20 @@ export class BrandsService {
     );
   }
 
-  async findOne(id: string) {
-    return this.brandRepository.findOne({
-      where: { id },
-      relations: ['categories', 'countries'],
-    });
+  async findOne(id: string, userId?: string) {
+    const queryBuilder = this.brandRepository
+      .createQueryBuilder('entity')
+      .leftJoinAndSelect('entity.categories', 'categories')
+      .leftJoinAndSelect('entity.countries', 'countries')
+      .where('entity.id = :id', { id });
+
+    if (userId) {
+      queryBuilder.addSelect(
+        createFollowedBrandSubQuery(userId),
+        'entity_isFollowed',
+      );
+    }
+
+    return queryBuilder.getOne();
   }
 }
