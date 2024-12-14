@@ -203,6 +203,10 @@ export class PushNotificationService {
       };
 
       await admin.messaging().send(message);
+      console.log(
+        'Notification sent to topic:',
+        await admin.messaging().send(message),
+      );
     } catch (err) {
       console.error('Error sending notification to topic:', err);
     }
