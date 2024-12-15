@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   DeleteDateColumn,
 } from 'typeorm';
-import { IsUrl, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+import { IsUrl, IsNotEmpty } from 'class-validator';
 import { Category } from '../../categories/entities/category.entity';
 import { User } from '../../users/entities/user.entity';
 import { Country } from '../../countries/entities/country.entity';
@@ -110,10 +110,10 @@ export class Brand {
   }
 
   @Column({
-    nullable: true,
     select: false,
+    insert: false,
     update: false,
-    default: 0,
+    nullable: true,
   })
   isFollowed: number;
 }

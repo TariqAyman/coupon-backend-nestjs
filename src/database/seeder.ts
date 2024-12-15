@@ -12,460 +12,370 @@ import { UserRole } from '../common/enums/UserRole';
 import { UserStatus } from '../common/enums/UserStatus';
 import { CouponStatusAr, CouponStatusEn } from '../common/enums/CouponStatus';
 
-const dataSource = connectionSource;
+async function initializeSeeder() {
+  const dataSource = connectionSource;
+  const NUM_ITEMS = 100;
+  const PASSWORD_HASH = await bcrypt.hash('password', 10);
 
-async function seedUsers() {
-  const userRepository = dataSource.getRepository(User);
-  const users = [];
-  users.push({
-    id: uuidv4(),
-    fullName: 'Admin',
-    email: 'admin@admin.com',
-    password: await bcrypt.hash('password', 10),
-    phoneNumber: '01003003200',
-    phoneNumberCountryCode: 'EG',
-    userLocale: 'en',
-    role: UserRole.Admin,
-    confirmAccount: true,
-    status: UserStatus.Online,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    likedCoupons: [] as Coupon[],
-    followedCoupons: [] as Coupon[],
-    favoriteCoupons: [] as Coupon[],
-    dislikedCoupons: [] as Coupon[],
-    followedBrands: [] as Brand[],
-  });
+  async function createEntity(entityType: any, data: any) {
+    const repository = dataSource.getRepository(entityType);
+    await repository.save(data);
+    return data;
+  }
 
-  users.push({
-    id: uuidv4(),
-    fullName: 'User',
-    password: await bcrypt.hash('password', 10),
-    phoneNumber: '01003003201',
-    phoneNumberCountryCode: 'EG',
-    userLocale: 'ar',
-    role: UserRole.User,
-    confirmAccount: true,
-    status: UserStatus.Online,
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    likedCoupons: [] as Coupon[],
-    followedCoupons: [] as Coupon[],
-    favoriteCoupons: [] as Coupon[],
-    dislikedCoupons: [] as Coupon[],
-    followedBrands: [] as Brand[],
-  });
-  await userRepository.save(users);
+  function generateCommonFields() {
+    return {
+      id: uuidv4(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+  }
 
-  if (process.env.NODE_ENV === 'development') {
-    for (let i = 0; i < 100; i++) {
-      users.push({
-        id: uuidv4(),
-        fullName: faker.person.fullName(),
-        email: faker.internet.email(),
-        password: await bcrypt.hash('password', 10),
-        phoneNumber: faker.phone.number(),
-        phoneNumberCountryCode: faker.location.countryCode(),
+  function createSEOData() {
+    return {
+      ogDescription: {
+        en: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
+      },
+      twitterDescription: {
+        en: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
+      },
+      seoDescription: {
+        en: faker.lorem.sentence(),
+        ar: fakerAR.lorem.sentence(),
+      },
+      seoKeywords: {
+        en: faker.lorem.words({ min: 10, max: 20 }),
+        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
+      },
+      ogTitle: { en: faker.lorem.words(5), ar: fakerAR.lorem.words(5) },
+
+      ogImage: faker.image.url(),
+      ogUrl: faker.internet.url(),
+      twitterCard: 'summary_large_image',
+      twitterTitle: { en: faker.lorem.words(5), ar: fakerAR.lorem.words(5) },
+      twitterImage: faker.image.url(),
+    };
+  }
+
+  async function seedUsers() {
+    const users = [
+      {
+        ...generateCommonFields(),
+        fullName: 'Admin',
+        email: 'admin@admin.com',
+        password: PASSWORD_HASH,
+        phoneNumber: '01003003200',
+        phoneNumberCountryCode: 'EG',
         userLocale: 'en',
-        role: i % 2 === 0 ? UserRole.Admin : UserRole.User,
+        role: UserRole.Admin,
         confirmAccount: true,
         status: UserStatus.Online,
-        createdAt: new Date(),
-        updatedAt: new Date(),
         likedCoupons: [] as Coupon[],
         followedCoupons: [] as Coupon[],
         favoriteCoupons: [] as Coupon[],
         dislikedCoupons: [] as Coupon[],
         followedBrands: [] as Brand[],
+      },
+      {
+        ...generateCommonFields(),
+        fullName: 'User',
+        email: 'user@user.com',
+        password: PASSWORD_HASH,
+        phoneNumber: '01003003201',
+        phoneNumberCountryCode: 'EG',
+        userLocale: 'ar',
+        role: UserRole.User,
+        confirmAccount: true,
+        status: UserStatus.Online,
+        likedCoupons: [] as Coupon[],
+        followedCoupons: [] as Coupon[],
+        favoriteCoupons: [] as Coupon[],
+        dislikedCoupons: [] as Coupon[],
+        followedBrands: [] as Brand[],
+      },
+    ];
+
+    if (process.env.NODE_ENV === 'development') {
+      for (let i = 0; i < NUM_ITEMS; i++) {
+        users.push({
+          ...generateCommonFields(),
+          fullName: faker.person.fullName(),
+          email: faker.internet.email(),
+          password: PASSWORD_HASH,
+          phoneNumber: faker.phone.number(),
+          phoneNumberCountryCode: faker.location.countryCode(),
+          userLocale: 'en',
+          role: i % 2 === 0 ? UserRole.Admin : UserRole.User,
+          confirmAccount: true,
+          status: UserStatus.Online,
+          likedCoupons: [] as Coupon[],
+          followedCoupons: [] as Coupon[],
+          favoriteCoupons: [] as Coupon[],
+          dislikedCoupons: [] as Coupon[],
+          followedBrands: [] as Brand[],
+        });
+
+        logProgress(User.name, i, NUM_ITEMS + 2);
+      }
+    }
+
+    // check if users already exist with email or phoneNumber
+    const existingUsers = await dataSource.getRepository(User).find({
+      where: users.map((user) => ({
+        email: user.email, // Check the email
+      })),
+      select: ['email', 'phoneNumber'], // Select email and phone number
+    });
+
+    // remove existing users from the array
+    const filteredUsers = users.filter(
+      (user) =>
+        !existingUsers.some(
+          (existingUser) =>
+            existingUser.email == user.email ||
+            existingUser.phoneNumber == user.phoneNumber,
+        ),
+    );
+
+    return createEntity(User, filteredUsers);
+  }
+
+  async function seedCategories() {
+    const categories = Array.from({ length: NUM_ITEMS }, (_, i) => {
+      // Log progress for each item
+      logProgress(Category.name, i, NUM_ITEMS);
+
+      return {
+        ...generateCommonFields(),
+        ...createSEOData(),
+        name: { en: faker.company.name(), ar: fakerAR.company.name() },
+        description: {
+          en: faker.lorem.sentence(),
+          ar: fakerAR.lorem.sentence(),
+        },
+        slug: { en: faker.lorem.slug(), ar: fakerAR.lorem.slug() },
+        image: faker.image.url(),
+        color: faker.color.rgb(),
+        twitterCard: 'summary_large_image',
+        ogImage: faker.image.url(),
+        ogUrl: faker.internet.url(),
+        twitterImage: faker.image.url(),
+      };
+    });
+
+    return createEntity(Category, categories);
+  }
+
+  async function seedBrands() {
+    const brands = Array.from({ length: NUM_ITEMS }, (_, i) => {
+      // Log progress for each item
+      logProgress(Brand.name, i, NUM_ITEMS);
+
+      return {
+        ...generateCommonFields(),
+        ...createSEOData(),
+        name: { en: faker.company.name(), ar: fakerAR.company.name() },
+        description: {
+          en: faker.lorem.sentence(),
+          ar: fakerAR.lorem.sentence(),
+        },
+        slug: { en: faker.company.name(), ar: fakerAR.company.name() },
+        link: faker.internet.url(),
+        image: faker.image.url(),
+        twitterCard: 'summary_large_image',
+        ogImage: faker.image.url(),
+        ogUrl: faker.internet.url(),
+        twitterImage: faker.image.url(),
+      };
+    });
+
+    return createEntity(Brand, brands);
+  }
+
+  async function seedCountries() {
+    const countries = Array.from({ length: NUM_ITEMS }, (_, i) => {
+      // Log progress for each item
+      logProgress(Country.name, i, NUM_ITEMS);
+
+      return {
+        ...generateCommonFields(),
+        ...createSEOData(),
+        name: faker.location.country(),
+        countryCode: faker.location.countryCode(),
+        latitude: faker.location.latitude().toString(),
+        longitude: faker.location.longitude().toString(),
+        image: faker.image.url(),
+        description: {
+          en: faker.lorem.sentence(),
+          ar: fakerAR.lorem.sentence(),
+        },
+        twitterCard: 'summary_large_image',
+        ogImage: faker.image.url(),
+        ogUrl: faker.internet.url(),
+        twitterImage: faker.image.url(),
+      };
+    });
+
+    return createEntity(Country, countries);
+  }
+
+  async function seedCoupons(
+    users: User[],
+    categories: any[],
+    brands: any[],
+    countries: any[],
+  ) {
+    const coupons = Array.from({ length: NUM_ITEMS }, (_, i) => {
+      // Log progress for each item
+      logProgress(Coupon.name, i, NUM_ITEMS);
+
+      return {
+        ...generateCommonFields(),
+        ...createSEOData(),
+        name: { en: faker.company.name(), ar: fakerAR.company.name() },
+        description: {
+          en: faker.lorem.sentence(),
+          ar: fakerAR.lorem.sentence(),
+        },
+        code: faker.string.alphanumeric(10),
+        amount: faker.number.int({ min: 5, max: 50 }),
+        status: { en: CouponStatusEn.DISCOUNT, ar: CouponStatusAr.DISCOUNT },
+        expire: faker.date.future(),
+        qrCode: faker.string.alphanumeric(10),
+        link: faker.internet.url(),
+        twitterCard: 'summary_large_image',
+        ogImage: faker.image.url(),
+        ogUrl: faker.internet.url(),
+        twitterImage: faker.image.url(),
+        createdById: users[Math.floor(Math.random() * users.length)],
+        categories: [categories[Math.floor(Math.random() * categories.length)]],
+        countries: [countries[Math.floor(Math.random() * countries.length)]],
+        brand: brands[Math.floor(Math.random() * brands.length)],
+      };
+    });
+
+    return createEntity(Coupon, coupons);
+  }
+
+  async function seedAds() {
+    const ads = Array.from({ length: NUM_ITEMS }, (_, i) => {
+      // Log progress for each item
+      logProgress(Ads.name, i, NUM_ITEMS);
+
+      return {
+        ...generateCommonFields(),
+        ...createSEOData(),
+        name: { en: faker.company.name(), ar: fakerAR.company.name() },
+        description: {
+          en: faker.lorem.sentence(),
+          ar: fakerAR.lorem.sentence(),
+        },
+        link: faker.internet.url(),
+        image: faker.image.url(),
+        twitterCard: 'summary_large_image',
+        ogImage: faker.image.url(),
+        ogUrl: faker.internet.url(),
+        twitterImage: faker.image.url(),
+      };
+    });
+
+    return createEntity(Ads, ads);
+  }
+
+  async function runSeeders() {
+    console.time('Seeding Duration');
+
+    await dataSource
+      .initialize()
+      .then(() => {
+        console.log('Data Source has been initialized!');
+      })
+      .catch((err) => {
+        console.error('Error during Data Source initialization', err);
       });
+
+    // Run independent seeds in parallel
+    const [users, categories, brands, countries, ads] = await Promise.all([
+      seedUsers(),
+      seedCategories(),
+      seedBrands(),
+      seedCountries(),
+      seedAds(),
+    ]);
+
+    const coupons = await seedCoupons(
+      users as any,
+      categories,
+      brands,
+      countries,
+    );
+
+    // Establish relationships
+    await seedRelationships(User, users, coupons, 'likedCoupons');
+    await seedRelationships(User, users, coupons, 'followedCoupons');
+    await seedRelationships(User, users, coupons, 'favoriteCoupons');
+    await seedRelationships(User, users, coupons, 'dislikedCoupons');
+    await seedRelationships(User, users, brands, 'followedBrands');
+
+    // Seed additional relationships
+    await seedRelationships(Brand, brands, categories, 'categories');
+    await seedRelationships(Brand, brands, countries, 'countries');
+    await seedRelationships(Ads, ads, countries, 'countries');
+    await seedRelationships(Category, categories, countries, 'countries');
+    await seedRelationships(Coupon, coupons, brands, 'brands');
+  }
+
+  async function seedRelationships(
+    entityType: any,
+    entities: any,
+    relatedEntities: any,
+    relationKey: any,
+    min = 1,
+    max = 3,
+  ) {
+    const repository = dataSource.getRepository(entityType);
+
+    for (const [index, entity] of entities.entries()) {
+      entity[relationKey] = faker.helpers.arrayElements(relatedEntities, {
+        min,
+        max,
+      });
+
+      logRelationshipsProgress(
+        `${entityType.name} with ${relationKey}`,
+        index + 1,
+        entities.length,
+      );
+      await repository.save(entity);
     }
   }
 
-  await userRepository.save(users);
-  return users;
-}
+  const logRelationshipsProgress = (
+    entity: any,
+    current: number,
+    total: number,
+  ) => {
+    console.warn(
+      `Seeding ${entity}: ${current}/${total} (${Math.round((current / total) * 100)}%)`,
+    );
+  };
 
-async function seedCategories() {
-  const categoryRepository = dataSource.getRepository(Category);
-  const categories = [];
-  for (let i = 0; i < 100; i++) {
-    categories.push({
-      id: uuidv4(),
-      name: {
-        en: faker.commerce.department(),
-        ar: fakerAR.commerce.department(),
-      },
-      slug: { en: faker.lorem.slug(), ar: fakerAR.lorem.slug() },
-      description: { en: faker.lorem.sentence(), ar: fakerAR.lorem.sentence() },
-      image: faker.image.url(),
-      color: faker.color.rgb(),
-      seoDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      seoKeywords: {
-        en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
-      },
-      ogTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      ogDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      ogImage: faker.image.url(),
-      ogUrl: faker.internet.url(),
-      twitterCard: 'summary_large_image',
-      twitterTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      twitterDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      twitterImage: faker.image.url(),
-      createdById: null as any,
-      createdAt: new Date(),
-      updatedAt: new Date(),
+  const logProgress = (entity: any, current: number, total: number) => {
+    console.warn(
+      `Seeding Relationships ${entity}: ${current}/${total} (${Math.round((current / total) * 100)}%)`,
+    );
+  };
+
+  runSeeders()
+    .catch((error) => console.error('Error seeding data:', error))
+    .finally(() => {
+      dataSource.destroy();
+      console.timeEnd('Seeding Duration');
     });
-  }
-  await categoryRepository.save(categories);
-  return categories;
 }
 
-async function seedBrands() {
-  const brandRepository = dataSource.getRepository(Brand);
-  const brands = [];
-  for (let i = 0; i < 100; i++) {
-    brands.push({
-      id: uuidv4(),
-      name: { en: faker.company.name(), ar: fakerAR.company.name() },
-      slug: { en: faker.company.name(), ar: fakerAR.company.name() },
-      description: { en: faker.lorem.sentence(), ar: fakerAR.lorem.sentence() },
-      link: faker.internet.url(),
-      image: faker.image.url(),
-      seoDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      seoKeywords: {
-        en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
-      },
-      ogTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      ogDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      ogImage: faker.image.url(),
-      ogUrl: faker.internet.url(),
-      twitterCard: 'summary_large_image',
-      twitterTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      twitterDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      twitterImage: faker.image.url(),
-      createdById: null as any,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-  }
-  await brandRepository.save(brands);
-  return brands;
-}
-
-async function seedCountries() {
-  const countryRepository = dataSource.getRepository(Country);
-  const countries = [];
-  for (let i = 0; i < 100; i++) {
-    countries.push({
-      id: uuidv4(),
-      name: faker.location.country(),
-      countryCode: faker.location.countryCode(),
-      latitude: faker.location.latitude().toString(),
-      longitude: faker.location.longitude().toString(),
-      image: faker.image.url(),
-      seoDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      seoKeywords: {
-        en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
-      },
-      ogTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      ogDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      ogImage: faker.image.url(),
-      ogUrl: faker.internet.url(),
-      twitterCard: 'summary_large_image',
-      twitterTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      twitterDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      twitterImage: faker.image.url(),
-      createdById: null as any,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-  }
-  await countryRepository.save(countries);
-  return countries;
-}
-
-async function seedCoupons(
-  users: User[],
-  categories: any[],
-  brands: any[],
-  countries: any[],
-) {
-  const couponRepository = dataSource.getRepository(Coupon);
-  const coupons = [];
-  for (let i = 0; i < 100; i++) {
-    coupons.push({
-      id: uuidv4(),
-      name: { en: faker.company.name(), ar: fakerAR.company.name() },
-      code: faker.string.alphanumeric(10),
-      amount: faker.number.int({ min: 5, max: 50 }),
-      status: {
-        en: CouponStatusEn.DISCOUNT,
-        ar: CouponStatusAr.DISCOUNT,
-      },
-      description: { en: faker.lorem.sentence(), ar: fakerAR.lorem.sentence() },
-      expire: faker.date.future(),
-      qrCode: faker.string.alphanumeric(10),
-      link: faker.internet.url(),
-      seoDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      seoKeywords: {
-        en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
-      },
-      ogTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      ogDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      ogImage: faker.image.url(),
-      ogUrl: faker.internet.url(),
-      twitterCard: 'summary_large_image',
-      twitterTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      twitterDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      twitterImage: faker.image.url(),
-      createdById: users[Math.floor(Math.random() * users.length)],
-      categories: [categories[Math.floor(Math.random() * categories.length)]],
-      countries: [countries[Math.floor(Math.random() * countries.length)]],
-      brand: brands[Math.floor(Math.random() * brands.length)],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-  }
-  await couponRepository.save(coupons);
-  return coupons;
-}
-
-async function seedAds() {
-  const adsRepository = dataSource.getRepository(Ads);
-  const ads = [];
-  for (let i = 0; i < 100; i++) {
-    ads.push({
-      id: uuidv4(),
-      name: { en: faker.company.name(), ar: fakerAR.company.name() },
-      link: faker.internet.url(),
-      image: faker.image.url(),
-      seoDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      seoKeywords: {
-        en: faker.lorem.words({ min: 10, max: 20 }),
-        ar: fakerAR.lorem.words({ min: 10, max: 20 }),
-      },
-      ogTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      ogDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      ogImage: faker.image.url(),
-      ogUrl: faker.internet.url(),
-      twitterCard: 'summary_large_image',
-      twitterTitle: {
-        en: faker.lorem.words(5),
-        ar: fakerAR.lorem.words(5),
-      },
-      twitterDescription: {
-        en: faker.lorem.sentence(),
-        ar: fakerAR.lorem.sentence(),
-      },
-      twitterImage: faker.image.url(),
-      // createdById: users[Math.floor(Math.random() * users.length)],
-      // countries: [countries[Math.floor(Math.random() * countries.length)]],
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
-  }
-  await adsRepository.save(ads);
-  return ads;
-}
-
-async function seedBrandCategories(brands: Brand[], categories: Category[]) {
-  const brandRepository = dataSource.getRepository(Brand);
-
-  for (const brand of brands) {
-    // Randomly select 1-3 categories for each brand
-    const brandCategories = faker.helpers.arrayElements(categories, {
-      min: 1,
-      max: 3,
-    });
-    brand.categories = brandCategories;
-    await brandRepository.save(brand);
-  }
-}
-
-async function seedBrandCountries(brands: Brand[], countries: Country[]) {
-  const brandRepository = dataSource.getRepository(Brand);
-
-  for (const brand of brands) {
-    // Randomly select 1-3 countries for each brand
-    const brandCountries = faker.helpers.arrayElements(countries, {
-      min: 1,
-      max: 3,
-    });
-    brand.countries = brandCountries;
-    await brandRepository.save(brand);
-  }
-}
-
-async function seedAdsCountries(ads: Ads[], countries: Country[]) {
-  const adsRepository = dataSource.getRepository(Ads);
-
-  for (const ad of ads) {
-    // Randomly select 1-3 countries for each brand
-    const adsCountries = faker.helpers.arrayElements(countries, {
-      min: 1,
-      max: 3,
-    });
-    ad.countries = adsCountries;
-    await adsRepository.save(ad);
-  }
-}
-
-async function seedCategoryCountries(
-  categories: Category[],
-  countries: Country[],
-) {
-  const categoryRepository = dataSource.getRepository(Category);
-
-  for (const category of categories) {
-    // Randomly select 1-3 countries for each category
-    const categoryCountries = faker.helpers.arrayElements(countries, {
-      min: 1,
-      max: 3,
-    });
-    category.countries = categoryCountries;
-    await categoryRepository.save(category);
-  }
-}
-
-async function seedCouponBrands(coupons: Coupon[], brands: Brand[]) {
-  const couponRepository = dataSource.getRepository(Coupon);
-
-  for (const coupon of coupons) {
-    // Randomly select 1-3 brands for each coupon
-    const couponBrands = faker.helpers.arrayElements(brands, {
-      min: 1,
-      max: 3,
-    });
-    coupon.brands = couponBrands;
-    await couponRepository.save(coupon);
-  }
-}
-
-async function runSeeders() {
-  await dataSource
-    .initialize()
-    .then(() => {
-      console.log('Data Source has been initialized!');
-    })
-    .catch((err) => {
-      console.error('Error during Data Source initialization', err);
-    });
-
-  const users = await seedUsers();
-  const categories = await seedCategories();
-  const brands = await seedBrands();
-  const countries = await seedCountries();
-  const coupons = await seedCoupons(
-    users as any,
-    categories,
-    brands,
-    countries,
-  );
-  const ads = await seedAds();
-
-  // Establish relationships
-  const userRepository = dataSource.getRepository(User);
-  users.forEach((user) => {
-    user.likedCoupons = [
-      coupons[Math.floor(Math.random() * coupons.length)] as any,
-    ];
-    user.followedCoupons = [
-      coupons[Math.floor(Math.random() * coupons.length)] as any,
-    ];
-    user.favoriteCoupons = [
-      coupons[Math.floor(Math.random() * coupons.length)] as any,
-    ];
-    user.dislikedCoupons = [
-      coupons[Math.floor(Math.random() * coupons.length)] as any,
-    ];
-    user.followedBrands = [
-      brands[Math.floor(Math.random() * brands.length)] as any,
-    ];
-  });
-
-  await userRepository.save(users);
-
-  // Seed additional relationships
-  await seedBrandCategories(brands as any, categories as any);
-  await seedBrandCountries(brands as any, countries as any);
-  await seedAdsCountries(ads as any, countries as any);
-  await seedCategoryCountries(categories as any, countries as any);
-  await seedCouponBrands(coupons as any, brands as any);
-
-  await dataSource.destroy();
-}
-
-runSeeders().catch((error) => console.error('Error seeding data:', error));
+initializeSeeder().catch((error) =>
+  console.error('Error initializing seeder:', error),
+);

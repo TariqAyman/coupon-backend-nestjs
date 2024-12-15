@@ -20,8 +20,8 @@ export class BrandsController {
   }
 
   @Get(':id')
-  async findOne(@Param('id') id: string) {
-    const response = await this.brandsService.findOne(id);
+  async findOne(@Request() req: any, @Param('id') id: string) {
+    const response = await this.brandsService.findOne(id, req.user?.id);
     return showOne(response);
   }
 }

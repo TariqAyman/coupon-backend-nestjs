@@ -135,34 +135,34 @@ export class Coupon {
   }
 
   @Column({
-    nullable: true,
     select: false,
+    insert: false,
     update: false,
-    default: 0,
+    nullable: true,
   })
   isDisliked: number;
 
   @Column({
-    nullable: true,
     select: false,
+    insert: false,
     update: false,
-    default: 0,
+    nullable: true,
   })
   isLiked: number;
 
   @Column({
-    nullable: true,
     select: false,
+    insert: false,
     update: false,
-    default: 0,
+    nullable: true,
   })
   isFavorite: number;
 
   @Column({
-    nullable: true,
     select: false,
+    insert: false,
     update: false,
-    default: 0,
+    nullable: true,
   })
   isFollowed: number;
 }

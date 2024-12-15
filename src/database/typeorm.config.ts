@@ -18,8 +18,10 @@ const databaseConfig = {
   subscribers: [ActionByUserSubscriber, LocaleSubscriber],
   autoLoadEntities: true,
   synchronize: false,
-  logging: `${process.env.NODE_ENV}` === 'development',
-  logger: 'advanced-console',
+  logging:
+    process.env.DATABASE_LOGGING === 'true' ||
+    `${process.env.NODE_ENV}` === 'development',
+  logger: process.env.DATABASE_LOGGER_TYPE || 'advanced-console',
   cli: {
     entitiesDir: 'dist/**/entities',
     migrationsDir: 'dist/migrations',
