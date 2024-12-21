@@ -18,5 +18,10 @@ export class DataSendNotificationDto {
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
+  topics?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
   groupOfDevices?: string[];
 }

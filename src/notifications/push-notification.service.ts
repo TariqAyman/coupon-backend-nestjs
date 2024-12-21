@@ -85,6 +85,11 @@ export class PushNotificationService {
         data.data.topic as string,
         data.data.notificationData,
       );
+    else if (data.action === NotificationAction.topics)
+      return await this.sendToGroupOfTopics(
+        data.data.topics as string[],
+        data.data.notificationData,
+      );
     else if (data.action === NotificationAction.groupOfDevices)
       return await this.sendToGroupOfDevices(
         data.data.groupOfDevices as string[],
@@ -207,6 +212,36 @@ export class PushNotificationService {
         'Notification sent to topic:',
         await admin.messaging().send(message),
       );
+    } catch (err) {
+      console.error('Error sending notification to topic:', err);
+    }
+  }
+
+  async sendToGroupOfTopics(topics: string[], data: NotificationDataDto) {
+    try {
+      for (const topic of topics) {
+        const message: admin.messaging.Message = {
+          topic: topic,
+          notification: {
+            title: data.title.ar,
+            body: data.body.ar,
+          },
+          android: {
+            notification: {
+              sound: 'default',
+            },
+          },
+          apns: {
+            payload: {
+              aps: {
+                sound: 'default',
+              },
+            },
+          },
+        };
+
+        await admin.messaging().send(message);
+      }
     } catch (err) {
       console.error('Error sending notification to topic:', err);
     }

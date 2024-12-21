@@ -31,7 +31,7 @@ export class AuthenticationGoogleController {
     res.cookie('token', user.token.access_token, {
       maxAge: 2592000000,
       domain: process.env.FRONTEND_DOMAIN_COOKIE,
-      sameSite: true,
+      sameSite: 'lax',
       secure: false,
     });
 
