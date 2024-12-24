@@ -134,6 +134,9 @@ export class UsersAdminService {
         email: true,
         fullName: true,
       },
+      relations: {
+        userTokens: true,
+      },
       where: {
         userTokens: {
           token: Not(IsNull()),

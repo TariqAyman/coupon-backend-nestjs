@@ -17,6 +17,7 @@ export class SendNotificationDto {
     NotificationAction.topic,
     NotificationAction.topics,
     NotificationAction.groupOfDevices,
+    NotificationAction.groupOfUsers,
   ])
   action: string;
 

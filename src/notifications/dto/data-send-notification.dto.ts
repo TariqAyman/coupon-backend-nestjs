@@ -24,4 +24,9 @@ export class DataSendNotificationDto {
   @IsArray()
   @IsString({ each: true })
   groupOfDevices?: string[];
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  groupOfUsers?: string[];
 }

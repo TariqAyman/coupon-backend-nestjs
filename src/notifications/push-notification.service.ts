@@ -6,7 +6,7 @@ import { SubscribeTopicInterface } from './interfaces/subscribe-topic.interface'
 import { FCMToken } from './interfaces/token.interface';
 import { Cron } from '@nestjs/schedule';
 import { checkFCMTopicPattern } from './helpers';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserToken } from './entities/user-tokens.entity';
 import { SendNotificationDto } from './dto/send-notification.dto';
@@ -95,6 +95,11 @@ export class PushNotificationService {
         data.data.groupOfDevices as string[],
         data.data.notificationData,
       );
+    else if (data.action === NotificationAction.groupOfUsers)
+      return await this.sendToGroupOfUsers(
+        data.data.groupOfUsers as string[],
+        data.data.notificationData,
+      );
   }
 
   async subscribeToTopic(userId: string, data: SubscribeTopicInterface) {
@@ -159,6 +164,8 @@ export class PushNotificationService {
 
   async sendToSingleDevice(token: string, data: NotificationDataDto) {
     try {
+      const user = await this.userTokensRepository.findOneBy({ token });
+
       const message: admin.messaging.Message = {
         token: token,
         notification: {
@@ -249,6 +256,59 @@ export class PushNotificationService {
 
   async sendToGroupOfDevices(tokens: string[], data: NotificationDataDto) {
     try {
+      const message: admin.messaging.MulticastMessage = {
+        tokens: tokens,
+        notification: {
+          title: data.title.ar,
+          body: data.body.ar,
+        },
+        android: {
+          notification: {
+            sound: 'default',
+            priority: 'high',
+          },
+        },
+        apns: {
+          headers: {
+            'apns-priority': '10',
+          },
+          payload: {
+            aps: {
+              sound: 'default',
+            },
+          },
+        },
+      };
+
+      const result = await admin.messaging().sendEachForMulticast(message);
+
+      result.responses.forEach((resp, idx) => {
+        if (!resp.success) {
+          console.error(`Failed to send to ${tokens[idx]}:`, resp.error);
+          this.checkFCMToken({ token: tokens[idx] });
+        }
+      });
+    } catch (err) {
+      console.error('Error sending notification to group of devices:', err);
+    }
+  }
+
+  async sendToGroupOfUsers(usersIds: string[], data: NotificationDataDto) {
+    try {
+      // get all tokens for users ids
+      const usersTokens = await this.userTokensRepository.find({
+        where: {
+          user: {
+            id: In(usersIds),
+          },
+        },
+        select: {
+          token: true,
+        },
+      });
+
+      const tokens = usersTokens.map((item) => item.token);
+
       const message: admin.messaging.MulticastMessage = {
         tokens: tokens,
         notification: {

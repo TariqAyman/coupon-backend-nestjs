@@ -3,6 +3,7 @@ export enum NotificationAction {
   topic = 'topic',
   topics = 'topics',
   groupOfDevices = 'groupOfDevices',
+  groupOfUsers = 'groupOfUsers',
 }
 
 // export interface NotificationDataInterface {
