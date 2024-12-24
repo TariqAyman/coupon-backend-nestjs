@@ -1,10 +1,4 @@
-import {
-  Controller,
-  Get,
-  Query,
-  Request,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Query, Request, UseGuards } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';

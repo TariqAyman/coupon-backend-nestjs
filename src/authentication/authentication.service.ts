@@ -14,7 +14,6 @@ import { ResetPasswordDto } from './dto/resetPassword.dto';
 import { ChangePasswordDto } from './dto/changePassword.dto';
 import { VerifyEmailDto } from './dto/verifyEmail.dto';
 import { ResendVerificationEmailDto } from './dto/resendVerificationEmail.dto';
-import { DeleteAccountDto } from './dto/deleteAccount.dto';
 import { ChangeEmailDto } from './dto/changeEmail.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -27,13 +26,15 @@ import { MoreThan, Repository } from 'typeorm';
 import { MailService } from 'src/common/services/mail.service';
 import * as crypto from 'crypto';
 import { UpdateProfileDto } from './dto/updateProfile.dto';
-import { console } from 'inspector';
+import { AccessToken } from './entities/access-token.entity';
 
 @Injectable()
 export class AuthenticationService {
   constructor(
     @InjectRepository(ResetPasswordToken)
     private readonly resetPasswordTokenRepository: Repository<ResetPasswordToken>,
+    @InjectRepository(AccessToken)
+    private readonly accessTokenRepository: Repository<AccessToken>,
     private readonly userService: UsersService,
     private readonly mailService: MailService,
     private jwtService: JwtService,
@@ -52,15 +53,6 @@ export class AuthenticationService {
   }
 
   async generateAccessToken(user: any) {
-    const payload = {
-      id: user.id,
-      email: user.email,
-      fullName: user.fullName,
-      phoneNumber: user.phoneNumber,
-      phoneNumberCountryCode: user.phoneNumberCountryCode,
-      role: user.role,
-    };
-
     // Calculate the expiration time
     const expirationDate = new Date(
       Date.now() + this.parseExpirationTime(jwtConstants.expiresIn) * 1000,
@@ -72,15 +64,35 @@ export class AuthenticationService {
         this.parseExpirationTime(jwtConstants.refreshExpiresIn) * 1000,
     );
 
+    const payload = {
+      id: user.id,
+      email: user.email,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      phoneNumberCountryCode: user.phoneNumberCountryCode,
+      role: user.role,
+      expirationDate,
+      refreshExpirationDate,
+    };
+
     const accessToken = this.jwtService.sign(payload);
     const refreshToken = this.jwtService.sign(payload, {
       expiresIn: jwtConstants.refreshExpiresIn,
     });
 
-    user.lastLogin = new Date();
+    // save access token to db
+    this.saveAccessTokenToDb(
+      user,
+      accessToken,
+      refreshToken,
+      expirationDate,
+      refreshExpirationDate,
+    );
+
+    this.userService.updateLastLogin(user.id);
 
     return {
-      user: payload,
+      user: user,
       token: {
         type: 'Bearer',
         access_token: accessToken,
@@ -89,6 +101,25 @@ export class AuthenticationService {
         refresh_token_expire: refreshExpirationDate.toISOString(),
       },
     };
+  }
+
+  async saveAccessTokenToDb(
+    user: any,
+    accessToken: string,
+    refreshToken: string,
+    expirationDate: Date,
+    refreshExpirationDate: Date,
+  ) {
+    const accessTokenEntity = this.accessTokenRepository.create({
+      refreshToken,
+      accessToken,
+      identifier: user.email,
+      userId: user.id,
+      expiration: expirationDate,
+      refreshExpiration: refreshExpirationDate,
+    });
+
+    await this.accessTokenRepository.save(accessTokenEntity);
   }
 
   async login(loginDto: LoginDto) {
@@ -121,14 +152,16 @@ export class AuthenticationService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    return this.generateAccessToken(user);
+    const token = (await this.generateAccessToken(user)).token;
+
+    return { user: new ProfileDto(user), token };
   }
 
   async refresh(refreshToken: string) {
     try {
       const payload = this.jwtService.verify(refreshToken);
 
-      return this.generateAccessToken(payload);
+      return await this.generateAccessToken(payload);
     } catch (e) {
       throw new UnauthorizedException('Invalid refresh token');
     }
@@ -159,6 +192,7 @@ export class AuthenticationService {
       registerDto,
       avatar,
     );
+
     return new ProfileDto(user);
   }
 

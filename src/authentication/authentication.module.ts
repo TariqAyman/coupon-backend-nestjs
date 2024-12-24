@@ -10,9 +10,9 @@ import { jwtConstants } from './constants';
 import { GoogleStrategy } from './strategy/google.strategy';
 import { AuthenticationGoogleController } from './authentication-google.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { RefreshToken } from './entities/refresh-token.entity';
 import { ResetPasswordToken } from './entities/reset-password-token.entity';
 import { MailService } from 'src/common/services/mail.service';
+import { AccessToken } from './entities/access-token.entity';
 
 @Module({
   imports: [
@@ -22,7 +22,7 @@ import { MailService } from 'src/common/services/mail.service';
       secret: jwtConstants.secret,
       signOptions: { expiresIn: jwtConstants.expiresIn },
     }),
-    TypeOrmModule.forFeature([RefreshToken, ResetPasswordToken]),
+    TypeOrmModule.forFeature([ResetPasswordToken, AccessToken]),
   ],
   controllers: [AuthenticationController, AuthenticationGoogleController],
   providers: [

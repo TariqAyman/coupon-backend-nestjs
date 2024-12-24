@@ -5,8 +5,12 @@ import { jwtConstants } from '../constants';
 import { UsersService } from 'src/users/users.service';
 
 export type JwtPayload = {
-  sub: string;
+  id: string;
   email: string;
+  fullName: string;
+  phoneNumber: string;
+  phoneNumberCountryCode: string;
+  role: string;
 };
 
 @Injectable()

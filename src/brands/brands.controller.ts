@@ -1,4 +1,11 @@
-import { Controller, Get, Param, Query, Request, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Param,
+  Query,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
 import { BrandsService } from './brands.service';
 import { paginate, showOne } from 'src/common/utils/api-response-wrapper';
 import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';

@@ -197,7 +197,14 @@ export class UsersService {
     return await this.usersRepository.findOne({ where: { id } });
   }
 
-  // add last login time func
+  async updateLastLogin(id: string): Promise<User | null> {
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    user.lastLogin = new Date();
+    return await this.usersRepository.save(user);
+  }
 
   async addDislikedCoupon(userId: string, couponId: string) {
     await this.dataSource.transaction(async (manager) => {
