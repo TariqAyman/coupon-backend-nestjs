@@ -1,9 +1,18 @@
-import { IsString, IsOptional, IsArray, ValidateNested } from 'class-validator';
+import {
+  IsString,
+  IsOptional,
+  IsArray,
+  ValidateNested,
+  ValidateIf,
+  IsNotEmpty,
+} from 'class-validator';
 import { Type } from 'class-transformer';
 import { NotificationDataDto } from './notification-data.dto';
+import { NotificationAction } from '../interfaces/push-notification.interface';
 
 export class DataSendNotificationDto {
   @ValidateNested()
+  @IsNotEmpty()
   @Type(() => NotificationDataDto)
   notificationData: NotificationDataDto;
 
@@ -13,12 +22,12 @@ export class DataSendNotificationDto {
 
   @IsOptional()
   @IsString()
-  topic?: string;
+  topic: string;
 
   @IsOptional()
   @IsArray()
   @IsString({ each: true })
-  topics?: string[];
+  topics: string[];
 
   @IsOptional()
   @IsArray()

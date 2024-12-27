@@ -41,7 +41,7 @@ export class UsersService {
     private readonly brandsRepository: Repository<Brand>,
     private readonly uploadMediaService: UploadMediaService,
     private jwtService: JwtService,
-    private readonly dataSource: DataSource, // Inject DataSource for transactions
+    private readonly dataSource: DataSource,
   ) {}
 
   async register(

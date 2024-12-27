@@ -1,4 +1,5 @@
 export enum NotificationAction {
+  all = 'all',
   singleDevice = 'singleDevice',
   topic = 'topic',
   topics = 'topics',

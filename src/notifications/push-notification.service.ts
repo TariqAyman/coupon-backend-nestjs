@@ -1,4 +1,4 @@
-import { Injectable, OnModuleInit } from '@nestjs/common';
+import { ConsoleLogger, Injectable, OnModuleInit } from '@nestjs/common';
 import { NotificationAction } from './interfaces/push-notification.interface';
 import { NewSubscriberInterface } from './interfaces/subscriber.interface';
 import * as admin from 'firebase-admin';
@@ -11,12 +11,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserToken } from './entities/user-tokens.entity';
 import { SendNotificationDto } from './dto/send-notification.dto';
 import { NotificationDataDto } from './dto/notification-data.dto';
+import { pluck } from 'rxjs';
+import { Notification } from './entities/notification.entity';
+import { th } from '@faker-js/faker/.';
 
 @Injectable()
 export class PushNotificationService {
   constructor(
     @InjectRepository(UserToken)
     private readonly userTokensRepository: Repository<UserToken>,
+    @InjectRepository(Notification)
+    private readonly notificationRepository: Repository<Notification>,
   ) {}
 
   async addNewSubscribe(userId: string, data: NewSubscriberInterface) {
@@ -75,7 +80,9 @@ export class PushNotificationService {
   }
 
   async sendPushNotification(data: SendNotificationDto) {
-    if (data.action === NotificationAction.singleDevice)
+    if (data.action === NotificationAction.all)
+      return await this.sendToAllDevices(data.data.notificationData);
+    else if (data.action === NotificationAction.singleDevice)
       return await this.sendToSingleDevice(
         data.data.token as string,
         data.data.notificationData,
@@ -100,6 +107,16 @@ export class PushNotificationService {
         data.data.groupOfUsers as string[],
         data.data.notificationData,
       );
+  }
+
+  async sendToAllDevices(notificationData: NotificationDataDto) {
+    const usersTokens = await this.userTokensRepository.find({
+      select: ['token'],
+    });
+
+    const tokens = usersTokens.map((userToken) => userToken.token);
+
+    await this.sendToGroupOfDevices(tokens, notificationData);
   }
 
   async subscribeToTopic(userId: string, data: SubscribeTopicInterface) {
@@ -164,7 +181,14 @@ export class PushNotificationService {
 
   async sendToSingleDevice(token: string, data: NotificationDataDto) {
     try {
-      const user = await this.userTokensRepository.findOneBy({ token });
+      const userToken = await this.userTokensRepository.findOneBy({ token });
+
+      this.saveUserNotification(userToken?.userId as string, data);
+
+      if (token == null) {
+        console.log('token is null');
+        return;
+      }
 
       const message: admin.messaging.Message = {
         token: token,
@@ -194,6 +218,12 @@ export class PushNotificationService {
 
   async sendToSpecificTopic(topic: string, data: NotificationDataDto) {
     try {
+      this.saveTopicsNotification(topic, data);
+
+      if (topic == null) {
+        return;
+      }
+
       const message: admin.messaging.Message = {
         topic: topic,
         notification: {
@@ -226,6 +256,8 @@ export class PushNotificationService {
 
   async sendToGroupOfTopics(topics: string[], data: NotificationDataDto) {
     try {
+      this.saveTopicsNotification(topics, data);
+
       for (const topic of topics) {
         const message: admin.messaging.Message = {
           topic: topic,
@@ -256,6 +288,19 @@ export class PushNotificationService {
 
   async sendToGroupOfDevices(tokens: string[], data: NotificationDataDto) {
     try {
+      const usersTokens = await this.userTokensRepository.find({
+        where: {
+          token: In(tokens),
+        },
+        select: {
+          userId: true,
+        },
+      });
+
+      const userIds = usersTokens.map((userToken) => userToken.userId);
+
+      this.saveUsersNotification(userIds, data);
+
       const message: admin.messaging.MulticastMessage = {
         tokens: tokens,
         notification: {
@@ -295,6 +340,8 @@ export class PushNotificationService {
 
   async sendToGroupOfUsers(usersIds: string[], data: NotificationDataDto) {
     try {
+      this.saveUsersNotification(usersIds, data);
+
       // get all tokens for users ids
       const usersTokens = await this.userTokensRepository.find({
         where: {
@@ -308,6 +355,11 @@ export class PushNotificationService {
       });
 
       const tokens = usersTokens.map((item) => item.token);
+
+      if (!tokens.length) {
+        console.log('No tokens found for the given users');
+        return;
+      }
 
       const message: admin.messaging.MulticastMessage = {
         tokens: tokens,
@@ -437,5 +489,56 @@ export class PushNotificationService {
         },
       },
     };
+  }
+
+  async saveUserNotification(userId: string, data: NotificationDataDto) {
+    const notification = new Notification();
+    notification.user = userId;
+    notification.title = data.title;
+    notification.body = data.body;
+    await this.notificationRepository.save(notification);
+  }
+
+  async saveUsersNotification(userIds: string[], data: NotificationDataDto) {
+    const notifications = userIds.map((userId) => {
+      const notification = new Notification();
+      notification.user = userId;
+      notification.title = data.title;
+      notification.body = data.body;
+      return notification;
+    });
+
+    await this.notificationRepository.save(notifications);
+  }
+
+  async saveTopicsNotification(
+    topics: string[] | string,
+    data: NotificationDataDto,
+  ) {
+    if (typeof topics === 'string') {
+      topics = [topics];
+    }
+
+    const users = await this.userTokensRepository
+      .createQueryBuilder('user')
+      .where('JSON_CONTAINS(user.topics, :topic)', {
+        topic: JSON.stringify(topics),
+      })
+      .select(['user.token as token', 'user.userId as userId'])
+      .getRawMany();
+
+    if (!users.length) {
+      return;
+    }
+
+    const notifications = users.map((user) => {
+      const notification = new Notification();
+      notification.user = user.userId;
+      notification.title = data.title;
+      notification.body = data.body;
+      return notification;
+    });
+
+    await this.notificationRepository.save(notifications);
   }
 }

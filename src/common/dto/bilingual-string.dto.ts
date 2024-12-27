@@ -1,10 +1,12 @@
-import { IsString } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class BilingualString {
   @IsString()
+  @IsNotEmpty()
   en: string;
 
   @IsString()
+  @IsNotEmpty()
   ar: string;
 }
 

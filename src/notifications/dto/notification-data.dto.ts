@@ -4,12 +4,12 @@ import { BilingualString } from 'src/common/dto/bilingual-string.dto';
 
 export class NotificationDataDto {
   @IsNotEmpty()
-  @ValidateNested()
+  @ValidateNested({ each: true })
   @Type(() => BilingualString)
   title: BilingualString;
 
   @IsNotEmpty()
-  @ValidateNested()
+  @ValidateNested({ each: true })
   @Type(() => BilingualString)
   body: BilingualString;
 }

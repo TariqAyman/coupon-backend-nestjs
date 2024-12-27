@@ -21,17 +21,10 @@ export class NotificationsAdminController {
   ) {}
 
   @Post('push-notification')
-  sendPushNotification(
-    @Body() data: SendNotificationDto | SendNotificationDto[],
-  ) {
-    if (Array.isArray(data)) {
-      for (const item of data)
-        this.pushNotificationService.sendPushNotification(item);
-    } else {
-      return this.pushNotificationService.sendPushNotification(
-        data as SendNotificationDto,
-      );
-    }
+  async sendPushNotification(@Body() data: SendNotificationDto) {
+    this.pushNotificationService.sendPushNotification(data);
+
+    return success('Push notification sent successfully');
   }
 
   @Post()

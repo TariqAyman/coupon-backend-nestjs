@@ -13,6 +13,7 @@ export class SendNotificationDto {
   @IsNotEmpty()
   @IsString()
   @IsIn([
+    NotificationAction.all,
     NotificationAction.singleDevice,
     NotificationAction.topic,
     NotificationAction.topics,
@@ -25,7 +26,7 @@ export class SendNotificationDto {
   @IsString()
   dateTime: string;
 
-  @ValidateNested()
+  @ValidateNested({ each: true })
   @Type(() => DataSendNotificationDto) // Transform the nested DTO
   data: DataSendNotificationDto;
 }
