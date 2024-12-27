@@ -76,7 +76,7 @@ export class UsersService {
 
     const uploadedAvatar = await this.uploadMediaService.saveOneFile(
       avatar,
-      'brand',
+      'users',
       user.id,
     );
     user.avatar = uploadedAvatar?.url;
@@ -555,7 +555,7 @@ export class UsersService {
     if (!user) throw new NotFoundException('User not found');
 
     const uploadedAvatar = file
-      ? await this.uploadMediaService.saveOneFile(file, 'user', user.id)
+      ? await this.uploadMediaService.saveOneFile(file, 'users', user.id)
       : null;
 
     await this.usersRepository.update(userId, {

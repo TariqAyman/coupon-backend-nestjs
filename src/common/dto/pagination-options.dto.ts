@@ -6,6 +6,7 @@ import {
   IsEnum,
   IsBoolean,
   Max,
+  IsArray,
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
@@ -54,4 +55,9 @@ export class PaginationOptionsDto {
 
   @IsOptional()
   hiddenRelationFilterBy?: string[]; // Field to filter in relation
+
+  @IsOptional()
+  @IsString({ each: true })
+  @IsArray()
+  simpleSelectFields?: string[]; // Fields to select in simple response
 }

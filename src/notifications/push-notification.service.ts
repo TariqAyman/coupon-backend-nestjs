@@ -299,7 +299,7 @@ export class PushNotificationService {
 
       const userIds = usersTokens.map((userToken) => userToken.userId);
 
-      this.saveUsersNotification(userIds, data);
+      await this.saveUsersNotification(userIds, data);
 
       const message: admin.messaging.MulticastMessage = {
         tokens: tokens,
@@ -330,6 +330,7 @@ export class PushNotificationService {
       result.responses.forEach((resp, idx) => {
         if (!resp.success) {
           console.error(`Failed to send to ${tokens[idx]}:`, resp.error);
+          this.revokeUserToken(tokens[idx]);
           this.checkFCMToken({ token: tokens[idx] });
         }
       });
@@ -390,6 +391,7 @@ export class PushNotificationService {
       result.responses.forEach((resp, idx) => {
         if (!resp.success) {
           console.error(`Failed to send to ${tokens[idx]}:`, resp.error);
+          this.revokeUserToken(tokens[idx]);
           this.checkFCMToken({ token: tokens[idx] });
         }
       });

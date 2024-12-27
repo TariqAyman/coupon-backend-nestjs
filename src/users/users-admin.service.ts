@@ -7,7 +7,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { IsNull, Not, Repository } from 'typeorm';
+import { IsNull, Not, Repository, SelectQueryBuilder } from 'typeorm';
 import { User } from './entities/user.entity';
 import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 import { findWithPagination } from 'src/common/utils/pagination.util';
@@ -58,7 +58,7 @@ export class UsersAdminService {
 
     const uploadedAvatar = await this.uploadMediaService.saveOneFile(
       avatar,
-      'brand',
+      'users',
       user.id,
     );
     user.avatar = uploadedAvatar?.url;
@@ -107,7 +107,7 @@ export class UsersAdminService {
 
     const uploadedAvatar = await this.uploadMediaService.saveOneFile(
       avatar,
-      'brand',
+      'users',
       user.id,
     );
 
@@ -127,23 +127,28 @@ export class UsersAdminService {
     return this.usersRepository.softDelete(id);
   }
 
-  async getUsersHasTokens() {
-    const users = await this.usersRepository.find({
-      select: {
-        id: true,
-        email: true,
-        fullName: true,
-      },
-      relations: {
-        userTokens: true,
-      },
-      where: {
-        userTokens: {
-          token: Not(IsNull()),
-        },
-      },
-    });
+  async getUsersHasTokens(pagination: PaginationOptionsDto): Promise<{
+    data: User[];
+    total: number;
+    pageNumber: number;
+    limitNumber: number;
+  }> {
+    const options: PaginationOptionsDto = {
+      ...pagination,
+      relationFilterBy: 'userTokens.token',
+      hiddenRelationFilterBy: ['userTokens'],
+      simple: true,
+      simpleSelectFields: [
+        'entity.id',
+        'entity.fullName',
+        'entity.email',
+        'entity.phoneNumber',
+        'entity.phoneNumberCountryCode',
+      ],
+    };
 
-    return users;
+    return await findWithPagination(this.usersRepository, options, [
+      'userTokens',
+    ]);
   }
 }

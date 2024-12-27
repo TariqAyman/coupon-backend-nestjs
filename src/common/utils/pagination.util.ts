@@ -30,6 +30,7 @@ export async function findWithPagination<Entity extends ObjectLiteral>(
     relationFilterBy,
     relationFilterValue,
     simple,
+    simpleSelectFields,
     hiddenRelationFilterBy,
   } = options;
 
@@ -60,10 +61,14 @@ export async function findWithPagination<Entity extends ObjectLiteral>(
   }
 
   // Add filters for relation fields if provided
-  if (relationFilterBy && relationFilterValue) {
-    queryBuilder.andWhere(`${relationFilterBy} = :relationFilterValue`, {
-      relationFilterValue,
-    });
+  if (relationFilterBy) {
+    if (relationFilterValue) {
+      queryBuilder.andWhere(`${relationFilterBy} = :relationFilterValue`, {
+        relationFilterValue,
+      });
+    } else {
+      queryBuilder.where(`${relationFilterBy} IS NOT NULL`);
+    }
   }
 
   // Add search functionality
@@ -83,7 +88,11 @@ export async function findWithPagination<Entity extends ObjectLiteral>(
 
   // If `simple=true`, select only the 'id', 'name', and 'image' fields
   if (simple) {
-    const selectFields = ['entity.id', 'entity.name', 'entity.image'];
+    const selectFields = simpleSelectFields ?? [
+      'entity.id',
+      'entity.name',
+      'entity.image',
+    ];
 
     if (sortBy && !selectFields.includes(`entity.${sortBy}`)) {
       selectFields.push(`entity.${sortBy}`);

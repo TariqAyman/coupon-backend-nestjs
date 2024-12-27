@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Query } from '@nestjs/common';
 import { CreateNotificationDto } from './dto/create-notification.dto';
 import { NotificationsAdminService } from './notifications-admin.service';
 import { RolesGuard } from 'src/common/guards/roles.guard';
@@ -7,8 +7,9 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { PushNotificationService } from './push-notification.service';
 import { SendNotificationDto } from './dto/send-notification.dto';
-import { success } from 'src/common/utils/api-response-wrapper';
+import { paginate, success } from 'src/common/utils/api-response-wrapper';
 import { UsersAdminService } from 'src/users/users-admin.service';
+import { PaginationOptionsDto } from 'src/common/dto/pagination-options.dto';
 
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.Admin)
@@ -45,9 +46,9 @@ export class NotificationsAdminController {
   }
 
   @Get('users')
-  async getUsersHasTokens() {
-    const users = await this.usersAdminService.getUsersHasTokens();
-
-    return success(users);
+  async getUsersHasTokens(@Query() pagination: PaginationOptionsDto) {
+    const { data, total, pageNumber, limitNumber } =
+      await this.usersAdminService.getUsersHasTokens(pagination);
+    return paginate(data, total, pageNumber, limitNumber);
   }
 }
