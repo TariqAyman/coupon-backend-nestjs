@@ -11,9 +11,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserToken } from './entities/user-tokens.entity';
 import { SendNotificationDto } from './dto/send-notification.dto';
 import { NotificationDataDto } from './dto/notification-data.dto';
-import { pluck } from 'rxjs';
 import { Notification } from './entities/notification.entity';
-import { th } from '@faker-js/faker/.';
 
 @Injectable()
 export class PushNotificationService {
@@ -35,7 +33,7 @@ export class PushNotificationService {
 
     const topics: string[] = [];
 
-    const promises = subscribeTopics.map((item) => {
+    const promises = await subscribeTopics.map((item) => {
       if (item && checkFCMTopicPattern(item)) {
         topics.push(item);
         return admin.messaging().subscribeToTopic(data.token, item);
@@ -401,10 +399,11 @@ export class PushNotificationService {
   }
 
   @Cron('0 18 * * *')
-  async checkFCMToken(data?: FCMToken): Promise<void> {
-    if (data !== undefined) {
-      if (!(await this.isValidFCMToken(data.token))) {
-        this.revokeUserToken(data.token);
+  async checkFCMToken(token: any): Promise<void> {
+    if (token instanceof UserToken) {
+    } else if (token instanceof UserToken) {
+      if (!(await this.isValidFCMToken(token.token))) {
+        this.revokeUserToken(token.token);
       }
     } else {
       this.handleIsValidFCMTokenCronJob();
@@ -416,7 +415,7 @@ export class PushNotificationService {
     const message = {
       data: {
         score: '1',
-        time: '12:00',
+        // time: '12:00',
       },
       token,
     };
@@ -502,7 +501,10 @@ export class PushNotificationService {
   }
 
   async saveUsersNotification(userIds: string[], data: NotificationDataDto) {
-    const notifications = userIds.map((userId) => {
+    // filter duplicate userIds
+    const uniqueUserIds = [...new Set(userIds)];
+
+    const notifications = uniqueUserIds.map((userId) => {
       const notification = new Notification();
       notification.user = userId;
       notification.title = data.title;
@@ -526,14 +528,17 @@ export class PushNotificationService {
       .where('JSON_CONTAINS(user.topics, :topic)', {
         topic: JSON.stringify(topics),
       })
-      .select(['user.token as token', 'user.userId as userId'])
+      .select(['user.userId as userId'])
       .getRawMany();
 
     if (!users.length) {
       return;
     }
 
-    const notifications = users.map((user) => {
+    // filter duplicate userIds
+    const uniqueUserIds = [...new Set(users.map((user) => user.userId))];
+
+    const notifications = uniqueUserIds.map((user) => {
       const notification = new Notification();
       notification.user = user.userId;
       notification.title = data.title;
