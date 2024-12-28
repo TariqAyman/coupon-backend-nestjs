@@ -538,9 +538,9 @@ export class PushNotificationService {
     // filter duplicate userIds
     const uniqueUserIds = [...new Set(users.map((user) => user.userId))];
 
-    const notifications = uniqueUserIds.map((user) => {
+    const notifications = uniqueUserIds.map((userId) => {
       const notification = new Notification();
-      notification.user = user.userId;
+      notification.user = userId;
       notification.title = data.title;
       notification.body = data.body;
       return notification;
