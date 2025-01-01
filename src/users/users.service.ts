@@ -234,6 +234,8 @@ export class UsersService {
         }
       }
     });
+
+    this.unlikeCoupon(userId, couponId);
   }
 
   async addFavoriteCoupon(userId: string, couponId: string) {
@@ -324,6 +326,8 @@ export class UsersService {
 
           // Update coupon likeCount
           await manager.update(Coupon, couponId, { likeCount });
+
+          this.removeDislikedCoupon(userId, couponId);
         }
         return user;
       }

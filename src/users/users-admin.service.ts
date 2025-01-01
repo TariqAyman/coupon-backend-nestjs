@@ -135,8 +135,7 @@ export class UsersAdminService {
   }> {
     const options: PaginationOptionsDto = {
       ...pagination,
-      relationFilterBy: 'userTokens.token',
-      hiddenRelationFilterBy: ['userTokens'],
+      whereHas: ['userTokens'],
       simple: true,
       simpleSelectFields: [
         'entity.id',
@@ -147,8 +146,9 @@ export class UsersAdminService {
       ],
     };
 
-    return await findWithPagination(this.usersRepository, options, [
-      'userTokens',
-    ]);
+    return await findWithPagination(
+      this.usersRepository,
+      options,
+    );
   }
 }

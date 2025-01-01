@@ -60,4 +60,9 @@ export class PaginationOptionsDto {
   @IsString({ each: true })
   @IsArray()
   simpleSelectFields?: string[]; // Fields to select in simple response
+
+  @IsOptional()
+  @IsString({ each: true })
+  @IsArray()
+  whereHas?: string[];
 }
