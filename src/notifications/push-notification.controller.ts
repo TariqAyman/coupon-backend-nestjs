@@ -31,7 +31,7 @@ export class PushNotificationController {
   @Post('subscribe-topic')
   async subscribeToTopic(@Req() req: Request, @Body() data: SubscribeTopicDto) {
     const user = (req as any).user as User;
-    const response = this.pushNotificationService.subscribeToTopic(
+    const response = await this.pushNotificationService.subscribeToTopic(
       user.id,
       data,
     );
@@ -53,7 +53,6 @@ export class PushNotificationController {
 
   @Post('revoke-token')
   async revokeUserToken(
-    @Req() req: Request,
     @Body() data: UnSubscribeTopicDto,
   ) {
     const response = await this.pushNotificationService.revokeUserToken(
@@ -63,10 +62,8 @@ export class PushNotificationController {
   }
 
   @Post('check-fcm-token')
-  async isValidFCMToken(
-    @Req() req: Request,
-    @Body() data: FCMTokenDto,
-  ): Promise<void> {
-    await this.pushNotificationService.checkFCMToken(data);
+  async isValidFCMToken(@Body() data: FCMTokenDto) {
+    const response = await this.pushNotificationService.checkFCMToken(data);
+    return success(response);
   }
 }

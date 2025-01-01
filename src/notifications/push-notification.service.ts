@@ -1,10 +1,15 @@
-import { ConsoleLogger, Injectable, OnModuleInit } from '@nestjs/common';
+import {
+  ConsoleLogger,
+  Injectable,
+  Logger,
+  OnModuleInit,
+} from '@nestjs/common';
 import { NotificationAction } from './interfaces/push-notification.interface';
 import { NewSubscriberInterface } from './interfaces/subscriber.interface';
 import * as admin from 'firebase-admin';
 import { SubscribeTopicInterface } from './interfaces/subscribe-topic.interface';
 import { FCMToken } from './interfaces/token.interface';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression, Interval } from '@nestjs/schedule';
 import { checkFCMTopicPattern } from './helpers';
 import { In, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -15,6 +20,8 @@ import { Notification } from './entities/notification.entity';
 
 @Injectable()
 export class PushNotificationService {
+  private readonly logger = new Logger(PushNotificationService.name);
+
   constructor(
     @InjectRepository(UserToken)
     private readonly userTokensRepository: Repository<UserToken>,
@@ -398,16 +405,30 @@ export class PushNotificationService {
     }
   }
 
-  @Cron('0 18 * * *')
-  async checkFCMToken(token: any): Promise<void> {
-    if (token instanceof UserToken) {
+  // Runs at midnight
+  @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT)
+  async handleDailyCron() {
+    this.logger.debug('Cron job is running every 5 seconds');
+
+    await this.handleIsValidFCMTokenCronJob();
+  }
+
+  async checkFCMToken(token: any): Promise<boolean> {
+    let isValid = false;
+
+    if (token instanceof String) {
+      isValid = await this.isValidFCMToken(token as string);
     } else if (token instanceof UserToken) {
       if (!(await this.isValidFCMToken(token.token))) {
         this.revokeUserToken(token.token);
+        isValid = false;
       }
+      isValid = true;
     } else {
       this.handleIsValidFCMTokenCronJob();
+      isValid = true;
     }
+    return isValid;
   }
 
   async isValidFCMToken(token: string): Promise<boolean> {
@@ -455,11 +476,14 @@ export class PushNotificationService {
   }
 
   async findTopics() {
-    const topics = await this.userTokensRepository.query(`
-    SELECT DISTINCT topic 
-    FROM user_tokens, 
-         JSON_TABLE(user_tokens.topics, '$[*]' COLUMNS (topic VARCHAR(255) PATH '$')) AS topics_table
-  `);
+    const topics = await this.userTokensRepository.query(
+      `SELECT
+        DISTINCT topic
+      FROM
+        user_tokens,
+        JSON_TABLE(user_tokens.topics, '$[*]' COLUMNS (topic VARCHAR(255) PATH '$'))
+      AS topics_table
+   `);
 
     // Extract the 'topic' values and return as a single array
     const uniqueTopics = topics.map((row: any) => row.topic);

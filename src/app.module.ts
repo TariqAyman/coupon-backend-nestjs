@@ -27,9 +27,11 @@ import { YcI18nService } from './common/yc-i18n/yc-i18n.service';
 import { LoggerMiddleware } from './common/middleware/log.middleware';
 import { AppLoggerMiddleware } from './common/middleware/app-log.middleware';
 import { DashboardModule } from './dashboard/dashboard.module';
+import { ScheduleModule } from '@nestjs/schedule';
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     SentryModule.forRoot(),
     I18nModule.forRoot({
       fallbackLanguage: '',
